@@ -17,3 +17,13 @@ func NewData() Data {
 		},
 	}
 }
+
+func (d *Data) IndexOf(id int) int {
+	for i, name := range d.TransactionTypes {
+		if name.Id == id {
+			return i
+		}
+	}
+
+	return -1
+}

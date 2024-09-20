@@ -26,8 +26,8 @@ form {
 }
 
 form select,
-a,
-input {
+form a,
+form input {
     margin-bottom: 10px;
 }
 
@@ -148,4 +148,9 @@ tr:hover {
     height: 32px;
     background-color: #ecf0f1;
     border-radius: 50%;
+}
+
+.transaction-type-list.htmx-swapping {
+    opacity: 0;
+    transition: opacity 500ms ease-in;
 }
