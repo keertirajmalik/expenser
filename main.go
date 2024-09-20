@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Transaction struct {
@@ -40,10 +41,10 @@ func main() {
 
 	mux := http.NewServeMux()
 
-    data := newData()
+	data := newData()
 
 	mux.HandleFunc("GET /", handleGetHome(template, data))
-
+	mux.HandleFunc("POST /transaction", handleTransactionCreate(template, data))
 	server := &http.Server{
 		Addr:    ":" + port,
 		Handler: mux,
@@ -56,5 +57,19 @@ func main() {
 func handleGetHome(template *Templates, data Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		template.Render(w, "home", data)
+	}
+}
+
+func handleTransactionCreate(template *Templates, data Data) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		name := r.FormValue("name")
+		amount, _ := strconv.Atoi(r.FormValue("amount"))
+		transactionType := r.FormValue("type")
+		note := r.FormValue("note")
+
+		transaction := newTransaction(name, transactionType, note, amount)
+		data.Transactions = append(data.Transactions, transaction)
+
+		template.Render(w, "transaction-list-oob", transaction)
 	}
 }
