@@ -24,7 +24,7 @@
 {{ block "transaction-type-form" .}}
 <form hx-post="/type" hx-target="#transaction-types-table tbody" hx-swap="beforeend">
     <input type="text" name="name" placeholder="Name" required>
-    <input type="text" name="description" placeholder="Description" required>
+    <input type="text" name="description" placeholder="Description">
     <input type="submit" value="Add Transaction Type">
 </form>
 {{ end }}

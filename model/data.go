@@ -1,7 +1,8 @@
 package model
 
 type TransactionData struct {
-	Transactions []Transaction
+	Transactions     []Transaction
+	TransactionTypes []TransactionType
 }
 
 func NewTransactionData() TransactionData {
@@ -10,15 +11,19 @@ func NewTransactionData() TransactionData {
 			NewTransaction("Tea", "food", "", 10),
 			NewTransaction("Bike", "Travel", "", 100),
 		},
+		TransactionTypes: []TransactionType{
+			NewTransactionType("Food", "Transaction related to food"),
+			NewTransactionType("Travel", "Transaction related to travel"),
+		},
 	}
 }
 
-type TypeData struct {
+type TransactionTypeData struct {
 	TransactionTypes []TransactionType
 }
 
-func NewTransactionTypesData() TypeData {
-	return TypeData{
+func NewTransactionTypesData() TransactionTypeData {
+	return TransactionTypeData{
 		TransactionTypes: []TransactionType{
 			NewTransactionType("Food", "Transaction related to food"),
 			NewTransactionType("Travel", "Transaction related to travel"),

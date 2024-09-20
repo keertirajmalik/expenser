@@ -25,10 +25,25 @@
 <form hx-post="/transaction" hx-target="#transaction-table tbody" hx-swap="beforeend">
     <input type="text" name="name" placeholder="Name" required>
     <input type="text" name="amount" placeholder="Amount" required>
-    <input type="text" name="type" placeholder="Type" required>
-    <input type="text" name="note" placeholder="Note" required>
+    <select name="type" hx-target="this" required>
+        {{ template "transaction-type-options" .TransactionTypes }}
+    </select>
+    <input type="text" name="note" placeholder="Note">
     <input type="submit" value="Add Transaction">
 </form>
+{{ end }}
+
+{{ block "transaction-type-options" . }}
+<option disabled selected value="">Select Transaction Type</option>
+
+{{ range . }}
+
+{{ if .Name }}
+<option value="{{ .Name }}">{{ .Name }}</option>
+{{ end }}
+
+{{ end }}
+
 {{ end }}
 
 {{ block "transaction-display" . }}

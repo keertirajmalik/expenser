@@ -21,6 +21,7 @@ form {
     margin-bottom: 20px;
 }
 
+select,
 input[type="text"],
 input[type="submit"] {
     width: 100%;
