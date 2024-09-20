@@ -27,7 +27,7 @@
     <td>{{ .Note }}</td>
     <td>
         <div hx-target="#transaction-list-div-{{ .Id }}" hx-swap="outerHTML swap:1000ms"
-            hx-delete="/transaction/{{ .Id }}" style="width: 1rem; cursor: pointer;">
+            hx-delete="/transaction/{{ .Id }}" style="width: 1rem; cursor: pointer;" confirm-with-sweet-alert='delete'>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path fill="none" d="M0 0h24v24H0z" />
                 <path

@@ -24,27 +24,60 @@
             });
         });
     </script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    </script>
 </head>
 
 <body>
-    {{ template "app-bar" . }}
-    {{ template "transaction-type-form" . }}
-    {{ template "transaction-type-display" . }}
+    <script> document.body.addEventListener('htmx:confirm', function (evt) {
+            if (evt.target.matches("[confirm-with-sweet-alert='delete']")) {
+                evt.preventDefault();
+                swal({
+                    title: "Are you sure?",
+                    text: "Are you sure you wish to delete your transaction type?",
+                    icon: "warning",
+                    buttons:["Cancel", "Confirm"],
+                    dangerMode: true,
+                }).then((confirmed) => {
+                    if (confirmed) {
+                        evt.detail.issueRequest();
+                    }
+                });
+            }
+            else if (evt.target.matches("[confirm-with-sweet-alert='create']")) {
+                evt.preventDefault();
+                swal({
+                    title: "Are you sure?",
+                    text: "Are you sure you wish to create your transaction type?",
+                    icon: "info",
+                    buttons:["Cancel", "Confirm"],
+                    dangerMode: false,
+                }).then((confirmed) => {
+                    if (confirmed) {
+                        evt.detail.issueRequest();
+                    }
+                });
+            }
+        });
+    </script>
+    {{ template "app-bar". }}
+    {{ template "transaction-type-form". }}
+    {{ template "transaction-type-display". }}
 </body>
 
 </html>
-{{ end }}
+{{end}}
 
-{{ block "transaction-type-form" .}}
-<form hx-post="/type" hx-target="#transaction-types-table tbody" hx-swap="beforeend">
+{{ block "transaction-type-form".}}
+<form hx-post="/type" hx-target="#transaction-types-table tbody" hx-swap="beforeend" confirm-with-sweet-alert="create">
     <h2>Create Transaction Types</h2>
     <input type="text" name="name" placeholder="Name" required>
     <input type="text" name="description" placeholder="Description">
     <input type="submit" value="Add Transaction Type">
 </form>
-{{ end }}
+{{end}}
 
-{{ block "transaction-type-display" . }}
+{{block "transaction-type-display" . }}
 <table id="transaction-types-table">
     <thead>
         <tr>
@@ -54,20 +87,20 @@
         </tr>
     </thead>
     <tbody>
-        {{ range .TransactionTypes}}
-        {{ template "transaction-type-list" . }}
-        {{ end }}
+        {{range .TransactionTypes}}
+        {{template "transaction-type-list" . }}
+        {{end}}
     </tbody>
 </table>
-{{ end }}
+{{end}}
 
-{{ block "transaction-type-list" . }}
+{{block "transaction-type-list" . }}
 <tr class="transaction-type-list" id="transaction-type-list-div-{{ .Id }}">
-    <td>{{ .Name }}</td>
+    <td>{{ .Name}}</td>
     <td>{{ .Description}}</td>
     <td>
         <div hx-target="#transaction-type-list-div-{{ .Id }}" hx-swap="innerHTML swap:1000ms"
-            hx-delete="/type/{{ .Id }}" style="width: 1rem; cursor: pointer;">
+            hx-delete="/type/{{ .Id }}" style="width: 1rem; cursor: pointer;" confirm-with-sweet-alert="delete">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path fill="none" d="M0 0h24v24H0z" />
                 <path
@@ -76,12 +109,12 @@
         </div>
     </td>
 </tr>
-{{ end }}
+{{end}}
 
-{{ block "transaction-type-list-oob" . }}
+{{block "transaction-type-list-oob" . }}
 <tbody hx-swap-oob="beforeend:#transaction-types-table tbody">
     <tr class="transaction-type-list" id="transaction-type-list-div-{{ .Id }}">
-        <td>{{ .Name }}</td>
+        <td>{{ .Name}}</td>
         <td>{{ .Description}}</td>
         <td>
             <div hx-target="#transaction-type-list-div-{{ .Id }}" hx-swap="innerHTML swap:1000ms"
@@ -95,4 +128,4 @@
         </td>
     </tr>
 </tbody>
-{{ end }}
+{{end}}

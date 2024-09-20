@@ -23,9 +23,41 @@
             });
         });
     </script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 </head>
 
 <body>
+    <script> document.body.addEventListener('htmx:confirm', function (evt) {
+            if (evt.target.matches("[confirm-with-sweet-alert='delete']")) {
+                evt.preventDefault();
+                swal({
+                    title: "Are you sure?",
+                    text: "Are you sure you wish to delete your transaction?",
+                    icon: "warning",
+                    buttons:["Cancel", "Confirm"],
+                    dangerMode: true,
+                }).then((confirmed) => {
+                    if (confirmed) {
+                        evt.detail.issueRequest();
+                    }
+                });
+            }
+            else if (evt.target.matches("[confirm-with-sweet-alert='create']")) {
+                evt.preventDefault();
+                swal({
+                    title: "Are you sure?",
+                    text: "Are you sure you wish to create your transaction?",
+                    icon: "info",
+                    buttons:["Cancel", "Confirm"],
+                    dangerMode: false,
+                }).then((confirmed) => {
+                    if (confirmed) {
+                        evt.detail.issueRequest();
+                    }
+                });
+            }
+        });
+    </script>
     {{ template "app-bar" . }}
     {{ template "transaction-form" . }}
     {{ template "transaction-display" . }}
@@ -35,7 +67,7 @@
 {{ end }}
 
 {{ block "transaction-form" .}}
-<form hx-post="/transaction" hx-target="#transaction-table tbody" hx-swap="beforeend">
+<form hx-post="/transaction" hx-target="#transaction-table tbody" hx-swap="beforeend" confirm-with-sweet-alert="create">
     <h2>Create Transaction</h2>
     <input type="text" name="name" placeholder="Name" required>
     <input type="text" name="amount" placeholder="Amount" required>
