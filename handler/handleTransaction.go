@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/keertirajmalik/expenser/model"
 )
@@ -20,7 +21,10 @@ func HandleTransactionCreate(template *model.Templates, data *model.Data) http.H
 		transactionType := r.FormValue("type")
 		note := r.FormValue("note")
 
-		transaction := model.NewTransaction(name, transactionType, note, amount)
+		// 02/01/2006 used to show the date format. that is how it works in go
+		parsedDate, _ := time.Parse("02/01/2006", r.FormValue("date"))
+
+		transaction := model.NewTransaction(name, transactionType, note, amount, parsedDate)
 		data.Transactions = append(data.Transactions, transaction)
 
 		template.Render(w, "transaction-list-oob", transaction)

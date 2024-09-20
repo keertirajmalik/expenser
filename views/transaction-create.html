@@ -46,6 +46,8 @@
         <a href="/type" class="navigate-link">Create
             Transaction Type</a>
     </div>
+    <input type="text" name="date" onfocus="(this.type='date')"
+        onblur="this.type='text'; this.value = this.value.split('-').reverse().join('/')" placeholder="Date" required>
     <input type="text" name="note" placeholder="Note">
     <input type="submit" value="Add Transaction">
 </form>

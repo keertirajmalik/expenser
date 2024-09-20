@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type Data struct {
 	Transactions     []Transaction
 	TransactionTypes []TransactionType
@@ -8,8 +10,8 @@ type Data struct {
 func NewData() Data {
 	return Data{
 		Transactions: []Transaction{
-			NewTransaction("Tea", "food", "", 10),
-			NewTransaction("Bike", "Travel", "", 100),
+			NewTransaction("Tea", "food", "", 10, time.Now()),
+			NewTransaction("Bike", "Travel", "", 100, time.Now()),
 		},
 		TransactionTypes: []TransactionType{
 			NewTransactionType("Food", "Transaction related to food"),

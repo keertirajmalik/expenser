@@ -5,6 +5,7 @@
             <th>Transaction</th>
             <th>Amount</th>
             <th>Type</th>
+            <th>Date</th>
             <th>Note</th>
             <th>Action</th>
         </tr>
@@ -22,6 +23,7 @@
     <td>{{ .Name }}</td>
     <td>{{ .Amount }}</td>
     <td>{{ .TransactionType }}</td>
+    <td>{{ .Date }}</td>
     <td>{{ .Note }}</td>
     <td>
         <div hx-target="#transaction-list-div-{{ .Id }}" hx-swap="outerHTML swap:1000ms"
@@ -42,6 +44,7 @@
         <td>{{ .Name }}</td>
         <td>{{ .Amount }}</td>
         <td>{{ .TransactionType }}</td>
+        <td>{{ .Date }}</td>
         <td>{{ .Note }}</td>
         <td>
             <div hx-target="#transaction-div-{{ .Id }}" hx-swap="outerHTML swap:1000ms"

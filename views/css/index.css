@@ -31,8 +31,13 @@ form input {
     margin-bottom: 10px;
 }
 
+form input[type="date"]:focus {
+    text-transform: uppercase;
+}
+
 select,
 a,
+input[type="date"],
 input[type="text"],
 input[type="submit"] {
     width: 100%;
