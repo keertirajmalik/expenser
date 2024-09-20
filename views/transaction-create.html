@@ -25,11 +25,11 @@
     <h2>Create Transaction</h2>
     <input type="text" name="name" placeholder="Name" required>
     <input type="text" name="amount" placeholder="Amount" required>
-    <div class="type-group" style="display: flex;">
-        <select name="type" hx-target="this" style="margin-right: 1rem;" required>
+    <div class="type-group">
+        <select name="type" hx-target="this" required>
             {{ template "transaction-type-options" .TransactionTypes }}
         </select>
-        <a href="/type" class="navigate-link" style="text-decoration: none;width: fit-content;text-wrap: nowrap;">Create
+        <a href="/type" class="navigate-link">Create
             Transaction Type</a>
     </div>
     <input type="text" name="note" placeholder="Note">

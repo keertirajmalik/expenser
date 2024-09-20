@@ -25,13 +25,18 @@ form {
     margin-bottom: 10px;
 }
 
+form select,
+a,
+input {
+    margin-bottom: 10px;
+}
+
 select,
 a,
 input[type="text"],
 input[type="submit"] {
     width: 100%;
     padding: 10px;
-    margin-bottom: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
@@ -79,13 +84,26 @@ tr:hover {
     width: 100%;
     margin-bottom: 10px;
     box-sizing: border-box;
+    display: flex;
+}
+
+.type-group select {
+    margin-bottom: 0px;
+    margin-right: 1rem;
+}
+
+.type-group a {
+    margin-bottom: 0px;
+    text-decoration: none;
+    width: fit-content;
+    text-wrap: nowrap;
 }
 
 .app-bar {
     margin-bottom: 10px;
     background-color: #3498db;
     color: white;
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
