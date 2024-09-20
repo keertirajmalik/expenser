@@ -12,8 +12,7 @@
 </head>
 
 <body>
-    <h2> Welcome to the expenser application</h2>
-
+    <h2>Welcome to the expenser application</h2>
     {{ template "transaction-form" . }}
     <hr />
     {{ template "transaction-display" . }}
@@ -22,21 +21,16 @@
 </html>
 {{ end }}
 
-{{ block "transaction-form" . }}
+{{ block "transaction-form" .}}
 <form hx-post="/transaction" hx-target="#transaction-table tbody" hx-swap="beforeend">
-
     <label for="name">Name</label>
     <input name="name" placeholder="Name">
-
     <label for="amount">Amount</label>
     <input name="amount" placeholder="Amount">
-
     <label for="type">Type</label>
     <input name="type" placeholder="Type">
-
     <label for="note">Note</label>
     <input name="note" placeholder="Note">
-
     <button type="submit">Submit</button>
 </form>
 {{ end }}
@@ -59,23 +53,22 @@
 </table>
 {{ end }}
 
-
 {{ block "transaction-list" . }}
-
 <tr>
-    <td>{{ .Name}} </td>
-    <td> {{ .Amount }} </td>
-    <td> {{ .TransactionType }} </td>
-    <td> {{ .Note }} </td>
-</tr>
-
-{{ end }}
-
-{{ block "transaction-list-oob" . }}
-<tr hx-swap-oob="beforeend:#transaction-table tbody">
     <td>{{ .Name }}</td>
     <td>{{ .Amount }}</td>
     <td>{{ .TransactionType }}</td>
     <td>{{ .Note }}</td>
 </tr>
+{{ end }}
+
+{{ block "transaction-list-oob" . }}
+<tbody hx-swap-oob="beforeend:#transaction-table tbody">
+    <tr>
+        <td>{{ .Name }}</td>
+        <td>{{ .Amount }}</td>
+        <td>{{ .TransactionType }}</td>
+        <td>{{ .Note }}</td>
+    </tr>
+</tbody>
 {{ end }}
