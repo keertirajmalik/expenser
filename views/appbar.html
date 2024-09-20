@@ -1,0 +1,20 @@
+{{ block "app-bar" . }}
+<div class="app-bar">
+    <div class="app-name">
+        <a href="/">Expenser</a>
+    </div>
+    <div class="app-actions">
+        <a href="/transaction" class="add-transaction-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                style="margin-right: 0.5rem;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Add Transaction
+        </a>
+        <div class="profile-icon"></div>
+    </div>
+</div>
+{{ end }}

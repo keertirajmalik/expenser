@@ -9,7 +9,7 @@ import (
 
 func HandleTransactionGet(template *model.Templates, data *model.Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		template.Render(w, "home", data)
+		template.Render(w, "transaction-create", data)
 	}
 }
 
