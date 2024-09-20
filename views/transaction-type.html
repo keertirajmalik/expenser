@@ -1,68 +1,7 @@
 {{ block "transaction-type" .}}
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
-    <script src="https://unpkg.com/htmx.org@2.0.2"
-        integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ"
-        crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="./css/index.css">
-    <script>
-        document.addEventListener("DOMContentLoaded", (event) => {
-            document.body.addEventListener('htmx:beforeSwap', function (evt) {
-                if (evt.detail.xhr.status === 204) {
-                    // allow 204 responses to swap as we are using this as a signal that
-                    // contact delete was successful
-
-                    // set isError to false to avoid error logging in console
-                    evt.detail.shouldSwap = true;
-                    evt.detail.isError = false;
-                }
-            });
-        });
-    </script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    </script>
-</head>
-
-<body>
-    <script> document.body.addEventListener('htmx:confirm', function (evt) {
-            if (evt.target.matches("[confirm-with-sweet-alert='delete']")) {
-                evt.preventDefault();
-                swal({
-                    title: "Are you sure?",
-                    text: "Are you sure you wish to delete your transaction type?",
-                    icon: "warning",
-                    buttons:["Cancel", "Confirm"],
-                    dangerMode: true,
-                }).then((confirmed) => {
-                    if (confirmed) {
-                        evt.detail.issueRequest();
-                    }
-                });
-            }
-            else if (evt.target.matches("[confirm-with-sweet-alert='create']")) {
-                evt.preventDefault();
-                swal({
-                    title: "Are you sure?",
-                    text: "Are you sure you wish to create your transaction type?",
-                    icon: "info",
-                    buttons:["Cancel", "Confirm"],
-                    dangerMode: false,
-                }).then((confirmed) => {
-                    if (confirmed) {
-                        evt.detail.issueRequest();
-                    }
-                });
-            }
-        });
-    </script>
-    {{ template "app-bar". }}
-    {{ template "transaction-type-form". }}
-    {{ template "transaction-type-display". }}
+{{ template "app-bar". }}
+{{ template "transaction-type-form". }}
+{{ template "transaction-type-display". }}
 </body>
 
 </html>
@@ -101,11 +40,7 @@
     <td>
         <div hx-target="#transaction-type-list-div-{{ .Id }}" hx-swap="innerHTML swap:1000ms"
             hx-delete="/type/{{ .Id }}" style="width: 1rem; cursor: pointer;" confirm-with-sweet-alert="delete">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path fill="none" d="M0 0h24v24H0z" />
-                <path
-                    d="M4 2h16a1 1 0 011 1v1a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1zM3 6h18v16a1 1 0 01-1 1H4a1 1 0 01-1-1V6zm3 3v9a1 1 0 002 0v-9a1 1 0 00-2 0zm5 0v9a1 1 0 002 0v-9a1 1 0 00-2 0zm5 0v9a1 1 0 002 0v-9a1 1 0 00-2 0z" />
-            </svg>
+            {{ template "delete-icon" . }}
         </div>
     </td>
 </tr>
@@ -119,11 +54,7 @@
         <td>
             <div hx-target="#transaction-type-list-div-{{ .Id }}" hx-swap="innerHTML swap:1000ms"
                 hx-delete="/type/{{ .Id }}" style="width: 1rem; cursor: pointer;">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path fill="none" d="M0 0h24v24H0z" />
-                    <path
-                        d="M4 2h16a1 1 0 011 1v1a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1zM3 6h18v16a1 1 0 01-1 1H4a1 1 0 01-1-1V6zm3 3v9a1 1 0 002 0v-9a1 1 0 00-2 0zm5 0v9a1 1 0 002 0v-9a1 1 0 00-2 0zm5 0v9a1 1 0 002 0v-9a1 1 0 00-2 0z" />
-                </svg>
+                {{ template "delete-icon" . }}
             </div>
         </td>
     </tr>

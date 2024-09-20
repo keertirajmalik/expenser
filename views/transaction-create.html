@@ -1,66 +1,7 @@
 {{ block "transaction-create" .}}
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
-    <script src="https://unpkg.com/htmx.org@2.0.2"
-        integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ"
-        crossorigin="anonymous"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", (event) => {
-            document.body.addEventListener('htmx:beforeSwap', function (evt) {
-                if (evt.detail.xhr.status === 204) {
-                    // allow 204 responses to swap as we are using this as a signal that
-                    // contact delete was successful
-
-                    // set isError to false to avoid error logging in console
-                    evt.detail.shouldSwap = true;
-                    evt.detail.isError = false;
-                }
-            });
-        });
-    </script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-</head>
-
-<body>
-    <script> document.body.addEventListener('htmx:confirm', function (evt) {
-            if (evt.target.matches("[confirm-with-sweet-alert='delete']")) {
-                evt.preventDefault();
-                swal({
-                    title: "Are you sure?",
-                    text: "Are you sure you wish to delete your transaction?",
-                    icon: "warning",
-                    buttons:["Cancel", "Confirm"],
-                    dangerMode: true,
-                }).then((confirmed) => {
-                    if (confirmed) {
-                        evt.detail.issueRequest();
-                    }
-                });
-            }
-            else if (evt.target.matches("[confirm-with-sweet-alert='create']")) {
-                evt.preventDefault();
-                swal({
-                    title: "Are you sure?",
-                    text: "Are you sure you wish to create your transaction?",
-                    icon: "info",
-                    buttons:["Cancel", "Confirm"],
-                    dangerMode: false,
-                }).then((confirmed) => {
-                    if (confirmed) {
-                        evt.detail.issueRequest();
-                    }
-                });
-            }
-        });
-    </script>
-    {{ template "app-bar" . }}
-    {{ template "transaction-form" . }}
-    {{ template "transaction-display" . }}
+{{ template "app-bar" . }}
+{{ template "transaction-form" . }}
+{{ template "transaction-display" . }}
 </body>
 
 </html>
