@@ -6,12 +6,12 @@ type TransactionType struct {
 	Description string
 }
 
-var id = 0
+var transactionTypeId = 0
 
 func NewTransactionType(name, description string) TransactionType {
-	id++
+	transactionTypeId++
 	return TransactionType{
-		Id:          id,
+		Id:          transactionTypeId,
 		Name:        name,
 		Description: description,
 	}

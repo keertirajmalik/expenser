@@ -24,6 +24,7 @@ func main() {
 
 	mux.HandleFunc("GET /transaction", handler.HandleTransactionGet(template, &transactionData))
 	mux.HandleFunc("POST /transaction", handler.HandleTransactionCreate(template, &transactionData))
+	mux.HandleFunc("DELETE /transaction/{id}", handler.HandleTransactionDelete(template, &transactionData))
 
 	mux.HandleFunc("GET /type", handler.HandleTransactionTypeGet(template, &transactionData))
 	mux.HandleFunc("POST /type", handler.HandleTransactionTypeCreate(template, &transactionData))

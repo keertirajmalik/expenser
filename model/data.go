@@ -18,9 +18,19 @@ func NewData() Data {
 	}
 }
 
-func (d *Data) IndexOf(id int) int {
-	for i, name := range d.TransactionTypes {
-		if name.Id == id {
+func (d *Data) TransactionTypeIndexOf(id int) int {
+	for i, transactionType := range d.TransactionTypes {
+		if transactionType.Id == id {
+			return i
+		}
+	}
+
+	return -1
+}
+
+func (d *Data) TransactionIndexOf(id int) int {
+	for i, transaction := range d.Transactions {
+		if transaction.Id == id {
 			return i
 		}
 	}

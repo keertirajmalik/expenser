@@ -150,7 +150,8 @@ tr:hover {
     border-radius: 50%;
 }
 
-.transaction-type-list.htmx-swapping {
+.transaction-type-list.htmx-swapping,
+.transaction-list.htmx-swapping {
     opacity: 0;
     transition: opacity 500ms ease-in;
 }

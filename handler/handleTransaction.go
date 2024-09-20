@@ -26,3 +26,27 @@ func HandleTransactionCreate(template *model.Templates, data *model.Data) http.H
 		template.Render(w, "transaction-list-oob", transaction)
 	}
 }
+
+func HandleTransactionDelete(_ *model.Templates, data *model.Data) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Invalid id"))
+			return
+		}
+
+		index := data.TransactionIndexOf(id)
+		if index == -1 {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("Transaction not found"))
+			return
+		}
+
+		data.Transactions = append(data.Transactions[:index], data.Transactions[index+1:]...)
+
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
