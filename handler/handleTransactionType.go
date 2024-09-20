@@ -18,6 +18,8 @@ func HandleTransactionTypeCreate(template *model.Templates, data *model.TypeData
 		description := r.FormValue("description")
 
 		transactionType := model.NewTransactionType(name, description)
+		data.TransactionTypes = append(data.TransactionTypes, transactionType)
+
 		template.Render(w, "transaction-type-list-oob", transactionType)
 	}
 }

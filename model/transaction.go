@@ -15,4 +15,3 @@ func NewTransaction(transaction, transactionType, note string, amount int) Trans
 		Note:            note,
 	}
 }
-
