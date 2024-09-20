@@ -13,7 +13,6 @@
 
 <body>
     {{ template "app-bar" . }}
-    <h2>Create Transaction</h2>
     {{ template "transaction-form" . }}
     {{ template "transaction-display" . }}
 </body>
@@ -23,6 +22,7 @@
 
 {{ block "transaction-form" .}}
 <form hx-post="/transaction" hx-target="#transaction-table tbody" hx-swap="beforeend">
+    <h2>Create Transaction</h2>
     <input type="text" name="name" placeholder="Name" required>
     <input type="text" name="amount" placeholder="Amount" required>
     <div class="type-group" style="display: flex;">
@@ -30,7 +30,7 @@
             {{ template "transaction-type-options" .TransactionTypes }}
         </select>
         <a href="/type" class="navigate-link" style="text-decoration: none;width: fit-content;text-wrap: nowrap;">Create
-            New Transaction Type</a>
+            Transaction Type</a>
     </div>
     <input type="text" name="note" placeholder="Note">
     <input type="submit" value="Add Transaction">

@@ -8,6 +8,10 @@ body {
     background-color: #f4f4f4;
 }
 
+h2 {
+    margin: inherit;
+}
+
 h1 {
     color: #2c3e50;
     text-align: center;
@@ -48,11 +52,11 @@ input[type="submit"]:hover {
 }
 
 table {
-    margin-top: 10px;
     width: 100%;
     border-collapse: collapse;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
 }
 
 th,
@@ -78,6 +82,7 @@ tr:hover {
 }
 
 .app-bar {
+    margin-bottom: 10px;
     background-color: #3498db;
     color: white;
     padding: 1rem;
