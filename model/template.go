@@ -1,4 +1,4 @@
-package main
+package model
 
 import (
 	"html/template"
@@ -13,7 +13,7 @@ func (t *Templates) Render(w io.Writer, name string, data interface{}) error {
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
-func newTemplates() *Templates {
+func NewTemplates() *Templates {
 	return &Templates{
 		templates: template.Must(template.ParseGlob("views/*.html")),
 	}
