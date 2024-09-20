@@ -22,6 +22,7 @@ form {
 }
 
 select,
+a,
 input[type="text"],
 input[type="submit"] {
     width: 100%;
@@ -32,6 +33,7 @@ input[type="submit"] {
     box-sizing: border-box;
 }
 
+a,
 input[type="submit"] {
     background-color: #3498db;
     color: white;
@@ -40,6 +42,7 @@ input[type="submit"] {
     transition: background-color 0.3s;
 }
 
+a:hover,
 input[type="submit"]:hover {
     background-color: #2980b9;
 }
@@ -65,4 +68,10 @@ th {
 
 tr:hover {
     background-color: #f5f5f5;
+}
+
+.type-group{
+    width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
 }
