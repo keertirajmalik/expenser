@@ -1,0 +1,41 @@
+{{ block "home" .}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="https://unpkg.com/htmx.org@2.0.2"
+        integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <h2> Welcome to the expenser application</h2>
+
+    {{ template "transaction" . }}
+</body>
+
+</html>
+
+{{ end }}
+
+{{ block "transaction" . }}
+<table>
+    <tr>
+        <th>Transaction</th>
+        <th>Amount</th>
+        <th>Type</th>
+        <th>Note</th>
+    </tr>
+    {{ range .Transactions }}
+    <tr>
+        <td>{{ .Name}} </td>
+        <td> {{ .Amount }} </td>
+        <td> {{ .TransactionType }} </td>
+        <td> {{ .Note }} </td>
+    </tr>
+    {{ end }}
+</table>
+{{ end }}
