@@ -15,8 +15,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	transactionData := model.NewTransactionData()
-    transactionTypeData := model.NewTransactionTypesData()
+	transactionData := model.NewData()
 
     fs := http.FileServer(http.Dir("views/css"))
     mux.Handle("GET /css/", http.StripPrefix("/css/", fs))
@@ -24,8 +23,8 @@ func main() {
 	mux.HandleFunc("GET /", handler.HandleTransactionGet(template, &transactionData))
 	mux.HandleFunc("POST /transaction", handler.HandleTransactionCreate(template, &transactionData))
 
-	mux.HandleFunc("GET /type", handler.HandleTransactionTypeGet(template, &transactionTypeData))
-	mux.HandleFunc("POST /type", handler.HandleTransactionTypeCreate(template, &transactionTypeData))
+	mux.HandleFunc("GET /type", handler.HandleTransactionTypeGet(template, &transactionData))
+	mux.HandleFunc("POST /type", handler.HandleTransactionTypeCreate(template, &transactionData))
 	server := &http.Server{
 		Addr:    ":" + port,
 		Handler: mux,

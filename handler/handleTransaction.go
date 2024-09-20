@@ -7,13 +7,13 @@ import (
 	"github.com/keertirajmalik/expenser/model"
 )
 
-func HandleTransactionGet(template *model.Templates, data *model.TransactionData) http.HandlerFunc {
+func HandleTransactionGet(template *model.Templates, data *model.Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		template.Render(w, "home", data)
 	}
 }
 
-func HandleTransactionCreate(template *model.Templates, data *model.TransactionData) http.HandlerFunc {
+func HandleTransactionCreate(template *model.Templates, data *model.Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		name := r.FormValue("name")
 		amount, _ := strconv.Atoi(r.FormValue("amount"))
