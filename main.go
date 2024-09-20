@@ -15,10 +15,17 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	data := model.NewData()
+	transactionData := model.NewTransactionData()
+    transactionTypeData := model.NewTransactionTypesData()
 
-	mux.HandleFunc("GET /", handler.HandleTransactionGet(template, &data))
-	mux.HandleFunc("POST /transaction", handler.HandleTransactionCreate(template, &data))
+    fs := http.FileServer(http.Dir("views/css"))
+    mux.Handle("GET /css/", http.StripPrefix("/css/", fs))
+
+	mux.HandleFunc("GET /", handler.HandleTransactionGet(template, &transactionData))
+	mux.HandleFunc("POST /transaction", handler.HandleTransactionCreate(template, &transactionData))
+
+	mux.HandleFunc("GET /type", handler.HandleTransactionTypeGet(template, &transactionTypeData))
+	mux.HandleFunc("POST /type", handler.HandleTransactionTypeCreate(template, &transactionTypeData))
 	server := &http.Server{
 		Addr:    ":" + port,
 		Handler: mux,
@@ -27,4 +34,3 @@ func main() {
 	log.Printf("Start of our new project on port:%s \n", port)
 	log.Fatal(server.ListenAndServe())
 }
-

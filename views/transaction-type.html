@@ -1,0 +1,62 @@
+{{ block "transaction-type" .}}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="https://unpkg.com/htmx.org@2.0.2"
+        integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./css/index.css">
+</head>
+
+<body>
+    <h2>Create transaction Types</h2>
+    {{ template "transaction-type-form" . }}
+    {{ template "transaction-type-display" . }}
+</body>
+
+</html>
+{{ end }}
+
+{{ block "transaction-type-form" .}}
+<form hx-post="/type" hx-target="#transaction-types-table tbody" hx-swap="beforeend">
+    <input type="text" name="name" placeholder="Name" required>
+    <input type="text" name="description" placeholder="Description" required>
+    <input type="submit" value="Add Transaction Type">
+</form>
+{{ end }}
+
+{{ block "transaction-type-display" . }}
+<table id="transaction-types-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .TransactionTypes}}
+        {{ template "transaction-type-list" . }}
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}
+
+{{ block "transaction-type-list" . }}
+<tr>
+    <td>{{ .Name }}</td>
+    <td>{{ .Description}}</td>
+</tr>
+{{ end }}
+
+{{ block "transaction-type-list-oob" . }}
+<tbody hx-swap-oob="beforeend:#transaction-types-table tbody">
+    <tr>
+        <td>{{ .Name }}</td>
+        <td>{{ .Description}}</td>
+    </tr>
+</tbody>
+{{ end }}
