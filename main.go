@@ -3,13 +3,30 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/keertirajmalik/expenser/handler"
 	"github.com/keertirajmalik/expenser/model"
+	"github.com/keertirajmalik/expenser/sql"
+	_ "github.com/lib/pq"
 )
 
 func main() {
-	const port = "8080"
+
+	godotenv.Load()
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		log.Fatal("PORT is not found in the enviornment")
+	}
+
+	dbURL := os.Getenv("DB_URL")
+	if dbURL == "" {
+		log.Fatal("DB_URL is not found in the enviornment")
+	}
+
+	dbConfig := sql.CreateDbConnection(dbURL)
 
 	template := model.NewTemplates()
 
@@ -23,7 +40,7 @@ func main() {
 	mux.HandleFunc("GET /", HandleHome(template, &transactionData))
 
 	mux.HandleFunc("GET /transaction", handler.HandleTransactionGet(template, &transactionData))
-	mux.HandleFunc("POST /transaction", handler.HandleTransactionCreate(template, &transactionData))
+	mux.HandleFunc("POST /transaction", handler.HandleTransactionCreate(template, &transactionData, &dbConfig))
 	mux.HandleFunc("DELETE /transaction/{id}", handler.HandleTransactionDelete(template, &transactionData))
 
 	mux.HandleFunc("GET /type", handler.HandleTransactionTypeGet(template, &transactionData))

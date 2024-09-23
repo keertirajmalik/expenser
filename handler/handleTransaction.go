@@ -1,11 +1,15 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/keertirajmalik/expenser/internal/database"
 	"github.com/keertirajmalik/expenser/model"
+	"github.com/keertirajmalik/expenser/sql"
 )
 
 func HandleTransactionGet(template *model.Templates, data *model.Data) http.HandlerFunc {
@@ -14,7 +18,7 @@ func HandleTransactionGet(template *model.Templates, data *model.Data) http.Hand
 	}
 }
 
-func HandleTransactionCreate(template *model.Templates, data *model.Data) http.HandlerFunc {
+func HandleTransactionCreate(template *model.Templates, data *model.Data, db *sql.DbConfig) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		name := r.FormValue("name")
 		amount, _ := strconv.Atoi(r.FormValue("amount"))
@@ -25,8 +29,19 @@ func HandleTransactionCreate(template *model.Templates, data *model.Data) http.H
 		parsedDate, _ := time.Parse("02/01/2006", r.FormValue("date"))
 
 		transaction := model.NewTransaction(name, transactionType, note, amount, parsedDate)
-		data.Transactions = append(data.Transactions, transaction)
 
+		_, err := db.DB.CreateTransaction(r.Context(), database.CreateTransactionParams{
+			ID:     uuid.New(),
+			Name:   transaction.Name,
+			Type:   transaction.TransactionType,
+			Amount: int32(transaction.Amount),
+			Date:   transaction.Date,
+			//TODO: add the missing note field as well
+		})
+
+		if err != nil {
+			log.Println("Couldn't create transaction in DB", err)
+		}
 		template.Render(w, "transaction-list-oob", transaction)
 	}
 }

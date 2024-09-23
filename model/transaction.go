@@ -7,7 +7,7 @@ type Transaction struct {
 	Name            string
 	Amount          int
 	TransactionType string
-	Date            string
+	Date            time.Time
 	Note            string
 }
 
@@ -21,7 +21,7 @@ func NewTransaction(transaction, transactionType, note string, amount int, date 
 		Name:            transaction,
 		Amount:          amount,
 		TransactionType: transactionType,
-		Date:            date.Format("02/01/2006"),
+		Date:            date,
 		Note:            note,
 	}
 }
