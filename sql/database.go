@@ -7,18 +7,18 @@ import (
 	"github.com/keertirajmalik/expenser/internal/database"
 )
 
-type DbConfig struct {
+type DBConfig struct {
 	DB *database.Queries
 }
 
-func CreateDbConnection(dbURL string) DbConfig {
+func CreateDbConnection(dbURL string) DBConfig {
 
 	conn, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatal("Can't connect to database", err)
 	}
 
-	dbConfig := DbConfig{
+	dbConfig := DBConfig{
 		DB: database.New(conn),
 	}
 	return dbConfig

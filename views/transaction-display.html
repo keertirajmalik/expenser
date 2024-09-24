@@ -19,15 +19,15 @@
 {{ end }}
 
 {{ block "transaction-list" . }}
-<tr class="transaction-list" id="transaction-list-div-{{ .Id }}">
+<tr class="transaction-list" id="transaction-list-div-{{ .ID}}">
     <td>{{ .Name }}</td>
     <td>{{ .Amount }}</td>
-    <td>{{ .TransactionType }}</td>
+    <td>{{ .TransactionType}}</td>
     <td>{{ .Date }}</td>
     <td>{{ .Note }}</td>
     <td>
-        <div hx-target="#transaction-list-div-{{ .Id }}" hx-swap="outerHTML swap:1000ms"
-            hx-delete="/transaction/{{ .Id }}" style="width: 1rem; cursor: pointer;" confirm-with-sweet-alert='delete'>
+        <div hx-target="#transaction-list-div-{{ .ID }}" hx-swap="outerHTML swap:1000ms"
+            hx-delete="/transaction/{{ .ID }}" style="width: 1rem; cursor: pointer;" confirm-with-sweet-alert='delete'>
             {{ template "delete-icon" . }}
         </div>
     </td>
@@ -36,15 +36,15 @@
 
 {{ block "transaction-list-oob" . }}
 <tbody hx-swap-oob="beforeend:#transaction-table tbody">
-    <tr class="transaction-list" id="transaction-list-div-{{ .Id }}">
+    <tr class="transaction-list" id="transaction-list-div-{{ .ID }}">
         <td>{{ .Name }}</td>
         <td>{{ .Amount }}</td>
         <td>{{ .TransactionType }}</td>
         <td>{{ .Date }}</td>
         <td>{{ .Note }}</td>
         <td>
-            <div hx-target="#transaction-div-{{ .Id }}" hx-swap="outerHTML swap:1000ms"
-                hx-delete="/transaction/{{ .Id }}" style="width: 1rem; cursor: pointer;">
+            <div hx-target="#transaction-div-{{ .ID }}" hx-swap="outerHTML swap:1000ms"
+                hx-delete="/transaction/{{ .ID }}" style="width: 1rem; cursor: pointer;">
                 {{ template "delete-icon" . }}
             </div>
         </td>

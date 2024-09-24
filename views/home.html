@@ -1,45 +1,8 @@
 {{ block "home" .}}
-    {{ template "app-bar" . }}
-    {{ template "transaction-display" . }}
+{{ template "app-bar" . }}
+{{ template "transaction-display" . }}
 </body>
 
 </html>
 {{ end }}
 
-{{ block "transaction-display" . }}
-<table id="transaction-table" ;">
-    <thead>
-        <tr>
-            <th>Transaction</th>
-            <th>Amount</th>
-            <th>Type</th>
-            <th>Note</th>
-        </tr>
-    </thead>
-    <tbody>
-        {{ range .Transactions }}
-        {{ template "transaction-list" . }}
-        {{ end }}
-    </tbody>
-</table>
-{{ end }}
-
-{{ block "transaction-list" . }}
-<tr>
-    <td>{{ .Name }}</td>
-    <td>{{ .Amount }}</td>
-    <td>{{ .TransactionType }}</td>
-    <td>{{ .Note }}</td>
-</tr>
-{{ end }}
-
-{{ block "transaction-list-oob" . }}
-<tbody hx-swap-oob="beforeend:#transaction-table tbody">
-    <tr>
-        <td>{{ .Name }}</td>
-        <td>{{ .Amount }}</td>
-        <td>{{ .TransactionType }}</td>
-        <td>{{ .Note }}</td>
-    </tr>
-</tbody>
-{{ end }}

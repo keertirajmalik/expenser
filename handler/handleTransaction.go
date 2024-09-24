@@ -1,24 +1,21 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/keertirajmalik/expenser/internal/database"
 	"github.com/keertirajmalik/expenser/model"
-	"github.com/keertirajmalik/expenser/sql"
 )
 
 func HandleTransactionGet(template *model.Templates, data *model.Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		template.Render(w, "transaction-create", data)
+		template.Render(w, "transaction-create", data.GetData())
 	}
 }
 
-func HandleTransactionCreate(template *model.Templates, data *model.Data, db *sql.DbConfig) http.HandlerFunc {
+func HandleTransactionCreate(template *model.Templates, data *model.Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		name := r.FormValue("name")
 		amount, _ := strconv.Atoi(r.FormValue("amount"))
@@ -29,19 +26,8 @@ func HandleTransactionCreate(template *model.Templates, data *model.Data, db *sq
 		parsedDate, _ := time.Parse("02/01/2006", r.FormValue("date"))
 
 		transaction := model.NewTransaction(name, transactionType, note, amount, parsedDate)
+		data.AddData(transaction)
 
-		_, err := db.DB.CreateTransaction(r.Context(), database.CreateTransactionParams{
-			ID:     uuid.New(),
-			Name:   transaction.Name,
-			Type:   transaction.TransactionType,
-			Amount: int32(transaction.Amount),
-			Date:   transaction.Date,
-			Note:   note,
-		})
-
-		if err != nil {
-			log.Println("Couldn't create transaction in DB", err)
-		}
 		template.Render(w, "transaction-list-oob", transaction)
 	}
 }
@@ -50,7 +36,7 @@ func HandleTransactionDelete(_ *model.Templates, data *model.Data) http.HandlerF
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 
-		id, err := strconv.Atoi(idStr)
+		id, err := uuid.Parse(idStr)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("Invalid id"))

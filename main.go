@@ -32,7 +32,7 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	transactionData := model.NewData()
+	transactionData := model.Data{DBConfig: &dbConfig}
 
 	fs := http.FileServer(http.Dir("views/css"))
 	mux.Handle("GET /css/", http.StripPrefix("/css/", fs))
@@ -40,7 +40,7 @@ func main() {
 	mux.HandleFunc("GET /", HandleHome(template, &transactionData))
 
 	mux.HandleFunc("GET /transaction", handler.HandleTransactionGet(template, &transactionData))
-	mux.HandleFunc("POST /transaction", handler.HandleTransactionCreate(template, &transactionData, &dbConfig))
+	mux.HandleFunc("POST /transaction", handler.HandleTransactionCreate(template, &transactionData))
 	mux.HandleFunc("DELETE /transaction/{id}", handler.HandleTransactionDelete(template, &transactionData))
 
 	mux.HandleFunc("GET /type", handler.HandleTransactionTypeGet(template, &transactionData))
@@ -58,6 +58,6 @@ func main() {
 
 func HandleHome(template *model.Templates, data *model.Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		template.Render(w, "home", data)
+		template.Render(w, "home", data.GetData())
 	}
 }

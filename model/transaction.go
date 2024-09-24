@@ -1,27 +1,27 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Transaction struct {
-	Id              int
+	ID              uuid.UUID
 	Name            string
 	Amount          int
 	TransactionType string
-	Date            time.Time
+	Date            string
 	Note            string
 }
 
-var transactionId = 0
-
 func NewTransaction(transaction, transactionType, note string, amount int, date time.Time) Transaction {
-	transactionId++
-
 	return Transaction{
-		Id:              transactionId,
+		ID:              uuid.New(),
 		Name:            transaction,
 		Amount:          amount,
 		TransactionType: transactionType,
-		Date:            date,
+		Date:            date.Format("02/01/2006"),
 		Note:            note,
 	}
 }
