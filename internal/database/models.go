@@ -5,7 +5,6 @@
 package database
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,5 +16,5 @@ type Transaction struct {
 	Amount int32
 	Type   string
 	Date   time.Time
-	Note   sql.NullString
+	Note   string
 }

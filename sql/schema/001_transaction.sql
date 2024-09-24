@@ -6,7 +6,7 @@ CREATE TABLE transactions(
     amount INTEGER NOT NULL,
     type TEXT NOT NULL,
     date DATE NOT NULL,
-    note TEXT
+    note TEXT NOT NULL
 );
 
 -- +goose Down

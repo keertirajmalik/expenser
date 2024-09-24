@@ -36,7 +36,7 @@ func HandleTransactionCreate(template *model.Templates, data *model.Data, db *sq
 			Type:   transaction.TransactionType,
 			Amount: int32(transaction.Amount),
 			Date:   transaction.Date,
-			//TODO: add the missing note field as well
+			Note:   note,
 		})
 
 		if err != nil {
