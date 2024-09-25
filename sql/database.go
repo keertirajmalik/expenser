@@ -24,7 +24,7 @@ func CreateDbConnection(dbURL string) DBConfig {
 	return dbConfig
 }
 
-func ConvertStrignToSqlNullString(str string, valid bool) sql.NullString {
+func ConvertStringToSqlNullString(str string, valid bool) sql.NullString {
 	return sql.NullString{String: str, Valid: valid}
 }
 

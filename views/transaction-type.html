@@ -39,7 +39,7 @@
     <td>{{ .Description}}</td>
     <td>
         <div hx-target="#transaction-type-list-div-{{ .ID }}" hx-swap="innerHTML swap:1000ms"
-            hx-delete="/type/{{ .Id }}" style="width: 1rem; cursor: pointer;" confirm-with-sweet-alert="delete">
+            hx-delete="/type/{{ .ID }}" style="width: 1rem; cursor: pointer;" confirm-with-sweet-alert="delete">
             {{ template "delete-icon" . }}
         </div>
     </td>

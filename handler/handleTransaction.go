@@ -26,7 +26,7 @@ func HandleTransactionCreate(template *model.Templates, data *model.Data) http.H
 		parsedDate, _ := time.Parse("02/01/2006", r.FormValue("date"))
 
 		transaction := model.NewTransaction(name, transactionType, note, amount, parsedDate)
-		data.AddData(transaction)
+		data.AddTransactionData(transaction)
 
 		template.Render(w, "transaction-list-oob", transaction)
 	}

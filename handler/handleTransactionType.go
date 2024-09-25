@@ -9,7 +9,7 @@ import (
 
 func HandleTransactionTypeGet(template *model.Templates, data *model.Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		template.Render(w, "transaction-type", data)
+		template.Render(w, "transaction-type", data.GetData())
 	}
 }
 
@@ -19,7 +19,7 @@ func HandleTransactionTypeCreate(template *model.Templates, data *model.Data) ht
 		description := r.FormValue("description")
 
 		transactionType := model.NewTransactionType(name, description)
-		data.TransactionTypes = append(data.TransactionTypes, transactionType)
+		data.AddTransactionTypeData(transactionType)
 
 		template.Render(w, "transaction-type-list-oob", transactionType)
 	}

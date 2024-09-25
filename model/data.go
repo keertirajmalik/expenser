@@ -57,7 +57,7 @@ func convertDBTransactionToTransaction(dbTransactions []database.Transaction) []
 func getTransactionTypesFromDB(context context.Context, d *Data) []TransactionType {
 	dbTransactionTypes, err := d.DBConfig.DB.GetTransactionType(context)
 	if err != nil {
-		log.Println("Couldn't get transaction from in DB", err)
+		log.Println("Couldn't get transaction type from in DB", err)
 	}
 
 	return convertDBTransactionTypesToTransactionTypes(dbTransactionTypes)
@@ -96,7 +96,7 @@ func (d *Data) TransactionIndexOf(id uuid.UUID) int {
 	return -1
 }
 
-func (d *Data) AddData(transaction Transaction) Data {
+func (d *Data) AddTransactionData(transaction Transaction) Data {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -107,7 +107,7 @@ func (d *Data) AddData(transaction Transaction) Data {
 		Type:   transaction.TransactionType,
 		Amount: int32(transaction.Amount),
 		Date:   parsedDate,
-		Note:   sql.ConvertStrignToSqlNullString(transaction.Note, transaction.Note != ""),
+		Note:   sql.ConvertStringToSqlNullString(transaction.Note, transaction.Note != ""),
 	})
 
 	if err != nil {
@@ -118,5 +118,26 @@ func (d *Data) AddData(transaction Transaction) Data {
 
 	return Data{
 		Transactions: append(d.Transactions, transactions...),
+	}
+}
+
+func (d *Data) AddTransactionTypeData(transactionType TransactionType) Data {
+	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+	defer cancel()
+
+	dbTransactionType, err := d.DBConfig.DB.CreateTransactionType(context, database.CreateTransactionTypeParams{
+		ID:          uuid.New(),
+		Name:        transactionType.Name,
+		Description: sql.ConvertStringToSqlNullString(transactionType.Description, transactionType.Description != ""),
+	})
+
+	if err != nil {
+		log.Println("Couldn't create transaction type in DB", err)
+	}
+
+	transactionTypes := convertDBTransactionTypesToTransactionTypes([]database.TransactionType{dbTransactionType})
+
+	return Data{
+		TransactionTypes: append(d.TransactionTypes, transactionTypes...),
 	}
 }
