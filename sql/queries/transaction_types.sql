@@ -5,3 +5,6 @@ RETURNING *;
 
 -- name: GetTransactionType :many
 SELECT * from transaction_types;
+
+-- name: DeleteTransactionType :exec
+DELETE FROM transaction_types where id=$1;

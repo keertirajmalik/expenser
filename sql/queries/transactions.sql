@@ -5,3 +5,6 @@ RETURNING *;
 
 -- name: GetTransaction :many
 SELECT * from transactions;
+
+-- name: DeleteTransaction :exec
+DELETE FROM transactions where id = $1;

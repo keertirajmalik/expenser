@@ -36,14 +36,7 @@ func HandleTransactionTypeDelete(_ *model.Templates, data *model.Data) http.Hand
 			return
 		}
 
-		index := data.TransactionTypeIndexOf(id)
-		if index == -1 {
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte("Transaction type not found"))
-			return
-		}
-
-		data.TransactionTypes = append(data.TransactionTypes[:index], data.TransactionTypes[index+1:]...)
+		data.DeleteTransactionTypeData(id)
 
 		w.WriteHeader(http.StatusNoContent)
 	}

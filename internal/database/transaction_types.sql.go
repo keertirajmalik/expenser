@@ -31,6 +31,15 @@ func (q *Queries) CreateTransactionType(ctx context.Context, arg CreateTransacti
 	return i, err
 }
 
+const deleteTransactionType = `-- name: DeleteTransactionType :exec
+DELETE FROM transaction_types where id=$1
+`
+
+func (q *Queries) DeleteTransactionType(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteTransactionType, id)
+	return err
+}
+
 const getTransactionType = `-- name: GetTransactionType :many
 SELECT id, name, description from transaction_types
 `

@@ -10,7 +10,33 @@ import (
 	"github.com/keertirajmalik/expenser/sql"
 )
 
-func (d *Data) AddTransactionData(transaction Transaction) Data {
+func (d *Data) GetTransactionsFromDB(context context.Context) []Transaction {
+	dbTransactions, err := d.DBConfig.DB.GetTransaction(context)
+	if err != nil {
+		log.Println("Couldn't get transaction from in DB", err)
+	}
+
+	return convertDBTransactionToTransaction(dbTransactions)
+}
+
+func convertDBTransactionToTransaction(dbTransactions []database.Transaction) []Transaction {
+	transactions := []Transaction{}
+
+	for _, transaction := range dbTransactions {
+		transactions = append(transactions, Transaction{
+			ID:              transaction.ID,
+			Name:            transaction.Name,
+			Amount:          int(transaction.Amount),
+			TransactionType: transaction.Type,
+			Date:            transaction.Date.Format("02/01/2006"),
+			Note:            sql.ConvertSqlNullStringToString(transaction.Note),
+		})
+	}
+
+	return transactions
+}
+
+func (d *Data) AddTransactionData(transaction Transaction) {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -30,19 +56,30 @@ func (d *Data) AddTransactionData(transaction Transaction) Data {
 
 	transactions := convertDBTransactionToTransaction([]database.Transaction{dbTransaction})
 
-	return Data{
-		Transactions: append(d.Transactions, transactions...),
-	}
+	d.Transactions = append(d.Transactions, transactions...)
 }
 
-func (d *Data) TransactionIndexOf(id uuid.UUID) int {
-	for i, transaction := range d.Transactions {
+func (d *Data) DeleteTransactionData(id uuid.UUID) {
+	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+	defer cancel()
+
+	if transactionExist(d, id) {
+		err := d.DBConfig.DB.DeleteTransaction(context, id)
+		if err != nil {
+			log.Println("Couldn't delete transaction from DB", err)
+		}
+
+		return
+	}
+
+	log.Println("Invalid transaction id", id)
+}
+
+func transactionExist(d *Data, id uuid.UUID) bool {
+	for _, transaction := range d.Transactions {
 		if transaction.ID == id {
-			return i
+			return true
 		}
 	}
-
-	return -1
+	return false
 }
-
-

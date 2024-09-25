@@ -43,14 +43,7 @@ func HandleTransactionDelete(_ *model.Templates, data *model.Data) http.HandlerF
 			return
 		}
 
-		index := data.TransactionIndexOf(id)
-		if index == -1 {
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte("Transaction not found"))
-			return
-		}
-
-		data.Transactions = append(data.Transactions[:index], data.Transactions[index+1:]...)
+		data.DeleteTransactionData(id)
 
 		w.WriteHeader(http.StatusNoContent)
 	}
