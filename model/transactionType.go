@@ -1,17 +1,16 @@
 package model
 
+import "github.com/google/uuid"
+
 type TransactionType struct {
-	Id          int
+	ID          uuid.UUID
 	Name        string
 	Description string
 }
 
-var transactionTypeId = 0
-
 func NewTransactionType(name, description string) TransactionType {
-	transactionTypeId++
 	return TransactionType{
-		Id:          transactionTypeId,
+		ID:          uuid.New(),
 		Name:        name,
 		Description: description,
 	}

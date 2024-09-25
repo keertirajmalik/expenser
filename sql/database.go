@@ -23,3 +23,15 @@ func CreateDbConnection(dbURL string) DBConfig {
 	}
 	return dbConfig
 }
+
+func ConvertStrignToSqlNullString(str string, valid bool) sql.NullString {
+	return sql.NullString{String: str, Valid: valid}
+}
+
+func ConvertSqlNullStringToString(str sql.NullString) string {
+	if str.Valid {
+		return str.String
+	}
+
+	return ""
+}

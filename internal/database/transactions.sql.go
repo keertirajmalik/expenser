@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,7 +25,7 @@ type CreateTransactionParams struct {
 	Amount int32
 	Type   string
 	Date   time.Time
-	Note   string
+	Note   sql.NullString
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {

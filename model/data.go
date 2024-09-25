@@ -20,20 +20,21 @@ func (d *Data) GetData() Data {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
+	transactions := getTransactionsFromDB(context, d)
+	transactionTypes := getTransactionTypesFromDB(context, d)
+	return Data{
+		Transactions:     transactions,
+		TransactionTypes: transactionTypes,
+	}
+}
+
+func getTransactionsFromDB(context context.Context, d *Data) []Transaction {
 	dbTransactions, err := d.DBConfig.DB.GetTransaction(context)
 	if err != nil {
 		log.Println("Couldn't get transaction from in DB", err)
 	}
 
-	transactions := convertDBTransactionToTransaction(dbTransactions)
-
-	return Data{
-		Transactions: transactions,
-		TransactionTypes: []TransactionType{
-			NewTransactionType("Food", "Transaction related to food"),
-			NewTransactionType("Travel", "Transaction related to travel"),
-		},
-	}
+	return convertDBTransactionToTransaction(dbTransactions)
 }
 
 func convertDBTransactionToTransaction(dbTransactions []database.Transaction) []Transaction {
@@ -46,16 +47,38 @@ func convertDBTransactionToTransaction(dbTransactions []database.Transaction) []
 			Amount:          int(transaction.Amount),
 			TransactionType: transaction.Type,
 			Date:            transaction.Date.Format("02/01/2006"),
-			Note:            transaction.Note,
+			Note:            sql.ConvertSqlNullStringToString(transaction.Note),
 		})
 	}
 
 	return transactions
 }
 
-func (d *Data) TransactionTypeIndexOf(id int) int {
+func getTransactionTypesFromDB(context context.Context, d *Data) []TransactionType {
+	dbTransactionTypes, err := d.DBConfig.DB.GetTransactionType(context)
+	if err != nil {
+		log.Println("Couldn't get transaction from in DB", err)
+	}
+
+	return convertDBTransactionTypesToTransactionTypes(dbTransactionTypes)
+}
+
+func convertDBTransactionTypesToTransactionTypes(dbTransactions []database.TransactionType) []TransactionType {
+	transactionTypes := []TransactionType{}
+
+	for _, transactionType := range dbTransactions {
+		transactionTypes = append(transactionTypes, TransactionType{
+			ID:          transactionType.ID,
+			Name:        transactionType.Name,
+			Description: sql.ConvertSqlNullStringToString(transactionType.Description),
+		})
+	}
+
+	return transactionTypes
+}
+func (d *Data) TransactionTypeIndexOf(id uuid.UUID) int {
 	for i, transactionType := range d.TransactionTypes {
-		if transactionType.Id == id {
+		if transactionType.ID == id {
 			return i
 		}
 	}
@@ -84,7 +107,7 @@ func (d *Data) AddData(transaction Transaction) Data {
 		Type:   transaction.TransactionType,
 		Amount: int32(transaction.Amount),
 		Date:   parsedDate,
-		Note:   transaction.Note,
+		Note:   sql.ConvertStrignToSqlNullString(transaction.Note, transaction.Note != ""),
 	})
 
 	if err != nil {

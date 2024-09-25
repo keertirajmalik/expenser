@@ -2,8 +2,8 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/keertirajmalik/expenser/model"
 )
 
@@ -29,7 +29,7 @@ func HandleTransactionTypeDelete(_ *model.Templates, data *model.Data) http.Hand
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 
-		id, err := strconv.Atoi(idStr)
+		id, err := uuid.Parse(idStr)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("Invalid id"))
