@@ -37,7 +37,11 @@ func main() {
 	fs := http.FileServer(http.Dir("views/css"))
 	mux.Handle("GET /css/", http.StripPrefix("/css/", fs))
 
-	mux.HandleFunc("GET /", HandleHome(template, &transactionData))
+	mux.HandleFunc("GET /", HandleLogin(template))
+
+	mux.HandleFunc("POST /login", handler.HandleUserLogin(template, &transactionData))
+
+	mux.HandleFunc("GET /home", HandleHome(template, &transactionData))
 
 	mux.HandleFunc("GET /transaction", handler.HandleTransactionGet(template, &transactionData))
 	mux.HandleFunc("POST /transaction", handler.HandleTransactionCreate(template, &transactionData))
@@ -59,5 +63,11 @@ func main() {
 func HandleHome(template *model.Templates, data *model.Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		template.Render(w, "home", data.GetData())
+	}
+}
+
+func HandleLogin(template *model.Templates) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		template.Render(w, "login", nil)
 	}
 }
