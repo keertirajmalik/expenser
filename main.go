@@ -7,6 +7,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/keertirajmalik/expenser/handler"
+	"github.com/keertirajmalik/expenser/middleware"
 	"github.com/keertirajmalik/expenser/model"
 	"github.com/keertirajmalik/expenser/sql"
 	_ "github.com/lib/pq"
@@ -53,7 +54,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    ":" + port,
-		Handler: mux,
+		Handler: middleware.Logging(mux),
 	}
 
 	log.Printf("Start of our new project on port:%s \n", port)

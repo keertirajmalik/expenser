@@ -36,7 +36,11 @@ func HandleTransactionTypeDelete(_ *model.Templates, data *model.Data) http.Hand
 			return
 		}
 
-		data.DeleteTransactionTypeData(id)
+		err = data.DeleteTransactionTypeData(id)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+            return
+		}
 
 		w.WriteHeader(http.StatusNoContent)
 	}

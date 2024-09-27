@@ -52,15 +52,16 @@ func (d *Data) AddTransactionTypeData(transactionType TransactionType) {
 	d.TransactionTypes = append(d.TransactionTypes, transactionTypes...)
 }
 
-func (d Data) DeleteTransactionTypeData(id uuid.UUID) {
+func (d Data) DeleteTransactionTypeData(id uuid.UUID) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
 	err := d.DBConfig.DB.DeleteTransactionType(context, id)
 	if err != nil {
 		log.Println("Couldn't delete transaction type from DB", err)
+		return err
 	}
-
+	return nil
 }
 
 func (d Data) TransactionTypeIndexOf(id uuid.UUID) bool {
