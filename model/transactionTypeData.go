@@ -10,7 +10,7 @@ import (
 	"github.com/keertirajmalik/expenser/sql"
 )
 
-func (d *Data) GetTransactionTypesFromDB(context context.Context) []TransactionType {
+func (d Data) GetTransactionTypesFromDB(context context.Context) []TransactionType {
 	dbTransactionTypes, err := d.DBConfig.DB.GetTransactionType(context)
 	if err != nil {
 		log.Println("Couldn't get transaction type from in DB", err)
@@ -33,7 +33,7 @@ func convertDBTransactionTypesToTransactionTypes(dbTransactions []database.Trans
 	return transactionTypes
 }
 
-func (d *Data) AddTransactionTypeData(transactionType TransactionType) Data {
+func (d *Data) AddTransactionTypeData(transactionType TransactionType) {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -49,12 +49,10 @@ func (d *Data) AddTransactionTypeData(transactionType TransactionType) Data {
 
 	transactionTypes := convertDBTransactionTypesToTransactionTypes([]database.TransactionType{dbTransactionType})
 
-	return Data{
-		TransactionTypes: append(d.TransactionTypes, transactionTypes...),
-	}
+	d.TransactionTypes = append(d.TransactionTypes, transactionTypes...)
 }
 
-func (d *Data) DeleteTransactionTypeData(id uuid.UUID) {
+func (d Data) DeleteTransactionTypeData(id uuid.UUID) {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -65,7 +63,7 @@ func (d *Data) DeleteTransactionTypeData(id uuid.UUID) {
 
 }
 
-func (d *Data) TransactionTypeIndexOf(id uuid.UUID) bool {
+func (d Data) TransactionTypeIndexOf(id uuid.UUID) bool {
 	for _, transactionType := range d.TransactionTypes {
 		if transactionType.ID == id {
 			return true

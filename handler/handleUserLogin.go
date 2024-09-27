@@ -6,7 +6,7 @@ import (
 	"github.com/keertirajmalik/expenser/model"
 )
 
-func HandleUserLogin(template *model.Templates, data *model.Data) http.HandlerFunc {
+func HandleUserLogin(template *model.Templates, data model.Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		username := r.FormValue("username")
 		password := r.FormValue("password")

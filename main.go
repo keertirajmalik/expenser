@@ -39,7 +39,7 @@ func main() {
 
 	mux.HandleFunc("GET /", HandleLogin(template))
 
-	mux.HandleFunc("POST /login", handler.HandleUserLogin(template, &transactionData))
+	mux.HandleFunc("POST /login", handler.HandleUserLogin(template, transactionData))
 
 	mux.HandleFunc("GET /home", HandleHome(template, &transactionData))
 

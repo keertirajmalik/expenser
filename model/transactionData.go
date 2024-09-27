@@ -10,7 +10,7 @@ import (
 	"github.com/keertirajmalik/expenser/sql"
 )
 
-func (d *Data) GetTransactionsFromDB(context context.Context) []Transaction {
+func (d Data) GetTransactionsFromDB(context context.Context) []Transaction {
 	dbTransactions, err := d.DBConfig.DB.GetTransaction(context)
 	if err != nil {
 		log.Println("Couldn't get transaction from in DB", err)
@@ -59,7 +59,7 @@ func (d *Data) AddTransactionData(transaction Transaction) {
 	d.Transactions = append(d.Transactions, transactions...)
 }
 
-func (d *Data) DeleteTransactionData(id uuid.UUID) {
+func (d Data) DeleteTransactionData(id uuid.UUID) {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -75,7 +75,7 @@ func (d *Data) DeleteTransactionData(id uuid.UUID) {
 	log.Println("Invalid transaction id", id)
 }
 
-func transactionExist(d *Data, id uuid.UUID) bool {
+func transactionExist(d Data, id uuid.UUID) bool {
 	for _, transaction := range d.Transactions {
 		if transaction.ID == id {
 			return true
