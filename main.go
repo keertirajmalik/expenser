@@ -27,7 +27,7 @@ func main() {
 		log.Fatal("DB_URL is not found in the enviornment")
 	}
 
-    dbConfig := db.CreateDbConnection(dbURL)
+	dbConfig := db.CreateDbConnection(dbURL)
 
 	template := model.NewTemplates()
 
@@ -35,8 +35,11 @@ func main() {
 
 	transactionData := model.Data{DBConfig: &dbConfig}
 
-	fs := http.FileServer(http.Dir("views/css"))
-	mux.Handle("GET /css/", http.StripPrefix("/css/", fs))
+	cssFS := http.FileServer(http.Dir("views/css"))
+	mux.Handle("GET /css/", http.StripPrefix("/css/", cssFS))
+
+	imageFS := http.FileServer(http.Dir("views/images"))
+	mux.Handle("GET /images/", http.StripPrefix("/images/", imageFS))
 
 	mux.HandleFunc("GET /", HandleLogin(template))
 
