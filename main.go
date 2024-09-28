@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/keertirajmalik/expenser/db"
 	"github.com/keertirajmalik/expenser/handler"
 	"github.com/keertirajmalik/expenser/middleware"
 	"github.com/keertirajmalik/expenser/model"
-	"github.com/keertirajmalik/expenser/sql"
 	_ "github.com/lib/pq"
 )
 
@@ -27,7 +27,7 @@ func main() {
 		log.Fatal("DB_URL is not found in the enviornment")
 	}
 
-	dbConfig := sql.CreateDbConnection(dbURL)
+    dbConfig := db.CreateDbConnection(dbURL)
 
 	template := model.NewTemplates()
 

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/keertirajmalik/expenser/db"
 	"github.com/keertirajmalik/expenser/internal/database"
-	"github.com/keertirajmalik/expenser/sql"
 )
 
 func (d Data) GetTransactionTypesFromDB(context context.Context) []TransactionType {
@@ -26,7 +26,7 @@ func convertDBTransactionTypesToTransactionTypes(dbTransactions []database.Trans
 		transactionTypes = append(transactionTypes, TransactionType{
 			ID:          transactionType.ID,
 			Name:        transactionType.Name,
-			Description: sql.ConvertSqlNullStringToString(transactionType.Description),
+			Description: db.ConvertSqlNullStringToString(transactionType.Description),
 		})
 	}
 
@@ -40,7 +40,7 @@ func (d *Data) AddTransactionTypeData(transactionType TransactionType) {
 	dbTransactionType, err := d.DBConfig.DB.CreateTransactionType(context, database.CreateTransactionTypeParams{
 		ID:          uuid.New(),
 		Name:        transactionType.Name,
-		Description: sql.ConvertStringToSqlNullString(transactionType.Description, transactionType.Description != ""),
+		Description: db.ConvertStringToSqlNullString(transactionType.Description, transactionType.Description != ""),
 	})
 
 	if err != nil {

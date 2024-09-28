@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/keertirajmalik/expenser/db"
 	"github.com/keertirajmalik/expenser/internal/database"
-	"github.com/keertirajmalik/expenser/sql"
 )
 
 func (d Data) GetTransactionsFromDB(context context.Context) []Transaction {
@@ -29,7 +29,7 @@ func convertDBTransactionToTransaction(dbTransactions []database.Transaction) []
 			Amount:          int(transaction.Amount),
 			TransactionType: transaction.Type,
 			Date:            transaction.Date.Format("02/01/2006"),
-			Note:            sql.ConvertSqlNullStringToString(transaction.Note),
+			Note:            db.ConvertSqlNullStringToString(transaction.Note),
 		})
 	}
 
@@ -47,7 +47,7 @@ func (d *Data) AddTransactionData(transaction Transaction) {
 		Type:   transaction.TransactionType,
 		Amount: int32(transaction.Amount),
 		Date:   parsedDate,
-		Note:   sql.ConvertStringToSqlNullString(transaction.Note, transaction.Note != ""),
+		Note:   db.ConvertStringToSqlNullString(transaction.Note, transaction.Note != ""),
 	})
 
 	if err != nil {

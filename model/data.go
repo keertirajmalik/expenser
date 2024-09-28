@@ -4,13 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/keertirajmalik/expenser/sql"
+	"github.com/keertirajmalik/expenser/db"
 )
 
 type Data struct {
 	Transactions     []Transaction
 	TransactionTypes []TransactionType
-	DBConfig         *sql.DBConfig
+	DBConfig         *db.DBConfig
 }
 
 func (d *Data) GetData() Data {
