@@ -1,23 +1,46 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/keertirajmalik/expenser/model"
 )
 
-func HandleUserLogin(template *model.Templates, data model.Data) http.HandlerFunc {
+func HandleHome(data *model.Data) http.HandlerFunc {
+	type response struct {
+		Transaction      []model.Transaction     `json:"transaction"`
+		TransactionTypes []model.TransactionType `json:"types"`
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		username := r.FormValue("username")
-		password := r.FormValue("password")
+		respondWithJson(w, http.StatusOK, response{
+			Transaction:      data.GetData().Transactions,
+			TransactionTypes: data.GetData().TransactionTypes,
+		})
+	}
+}
+
+func HandleUserLogin(data model.Data) http.HandlerFunc {
+	type parameters struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		decoder := json.NewDecoder(r.Body)
+		params := parameters{}
+		err := decoder.Decode(&params)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
+			return
+		}
 
 		// In a real application, you would validate the credentials against a database
-		if username == "admin" && password == "password" {
-			w.Header().Set("HX-Redirect", "/home")
+		if params.Username == "admin" && params.Password == "password" {
 
-			template.Render(w, "home", data.GetData())
+			w.WriteHeader(http.StatusNoContent)
 		} else {
-			template.Render(w, "login", nil)
+			w.WriteHeader(http.StatusUnauthorized)
 		}
 	}
 }

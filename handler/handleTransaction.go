@@ -1,38 +1,59 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/keertirajmalik/expenser/model"
 )
 
-func HandleTransactionGet(template *model.Templates, data *model.Data) http.HandlerFunc {
+func HandleTransactionGet(data *model.Data) http.HandlerFunc {
+	type validResponse struct {
+		Transactions []model.Transaction `json:"transaction"`
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		template.Render(w, "transaction-create", data.GetData())
+		respondWithJson(w, http.StatusOK, validResponse{
+			Transactions: data.GetData().Transactions,
+		})
 	}
 }
 
-func HandleTransactionCreate(template *model.Templates, data *model.Data) http.HandlerFunc {
+func HandleTransactionCreate(data *model.Data) http.HandlerFunc {
+	type parameters struct {
+		Name   string `json:"name"`
+		Amount int    `json:"amount"`
+		Type   string `json:"type"`
+		Date   string `json:"date"`
+		Note   string `json:"note"`
+	}
+
+	type response struct {
+		Transaction model.Transaction `json:"transaction"`
+	}
+
 	return func(w http.ResponseWriter, r *http.Request) {
-		name := r.FormValue("name")
-		amount, _ := strconv.Atoi(r.FormValue("amount"))
-		transactionType := r.FormValue("type")
-		note := r.FormValue("note")
+		decoder := json.NewDecoder(r.Body)
+		params := parameters{}
+		err := decoder.Decode(&params)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
+			return
+		}
 
-		// 02/01/2006 used to show the date format. that is how it works in go
-		parsedDate, _ := time.Parse("02/01/2006", r.FormValue("date"))
-
-		transaction := model.NewTransaction(name, transactionType, note, amount, parsedDate)
+		parsedDate, _ := time.Parse("02/01/2006", params.Date)
+		transaction := model.NewTransaction(params.Name, params.Type, params.Note, params.Amount, parsedDate)
 		data.AddTransactionData(transaction)
 
-		template.Render(w, "transaction-list-oob", transaction)
+		respondWithJson(w, http.StatusOK, response{
+			Transaction: transaction,
+		})
 	}
 }
 
-func HandleTransactionDelete(_ *model.Templates, data *model.Data) http.HandlerFunc {
+func HandleTransactionDelete(data *model.Data) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 

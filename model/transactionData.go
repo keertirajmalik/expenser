@@ -41,6 +41,7 @@ func (d *Data) AddTransactionData(transaction Transaction) {
 	defer cancel()
 
 	parsedDate, _ := time.Parse("02/01/2006", transaction.Date)
+
 	dbTransaction, err := d.DBConfig.DB.CreateTransaction(context, database.CreateTransactionParams{
 		ID:     uuid.New(),
 		Name:   transaction.Name,
