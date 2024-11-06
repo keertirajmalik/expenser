@@ -42,9 +42,9 @@ func main() {
 	mux.HandleFunc("POST /transaction", handler.HandleTransactionCreate(&transactionData))
 	mux.HandleFunc("DELETE /transaction/{id}", handler.HandleTransactionDelete(&transactionData))
 
-	//	mux.HandleFunc("GET /type", handler.HandleTransactionTypeGet(template, &transactionData))
-	//	mux.HandleFunc("POST /type", handler.HandleTransactionTypeCreate(template, &transactionData))
-	//	mux.HandleFunc("DELETE /type/{id}", handler.HandleTransactionTypeDelete(template, &transactionData))
+	mux.HandleFunc("GET /type", handler.HandleTransactionTypeGet(&transactionData))
+	mux.HandleFunc("POST /type", handler.HandleTransactionTypeCreate(&transactionData))
+	mux.HandleFunc("DELETE /type/{id}", handler.HandleTransactionTypeDelete(&transactionData))
 
 	server := &http.Server{
 		Addr:    ":" + port,

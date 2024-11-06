@@ -2,11 +2,9 @@ package handler
 
 import (
 	"encoding/json"
-	"net/http"
-	"time"
-
 	"github.com/google/uuid"
 	"github.com/keertirajmalik/expenser/model"
+	"net/http"
 )
 
 func HandleTransactionGet(data *model.Data) http.HandlerFunc {
@@ -43,10 +41,12 @@ func HandleTransactionCreate(data *model.Data) http.HandlerFunc {
 			return
 		}
 
-		parsedDate, _ := time.Parse("02/01/2006", params.Date)
-		transaction := model.NewTransaction(params.Name, params.Type, params.Note, params.Amount, parsedDate)
-		data.AddTransactionData(transaction)
-
+		transaction := model.NewTransaction(params.Name, params.Type, params.Note, params.Amount, params.Date)
+		err = data.AddTransactionData(transaction)
+		if err != nil {
+			respondWithError(w, http.StatusBadRequest, err.Error())
+			return
+		}
 		respondWithJson(w, http.StatusOK, response{
 			Transaction: transaction,
 		})
