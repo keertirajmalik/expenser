@@ -59,8 +59,7 @@ func HandleTransactionDelete(data *model.Data) http.HandlerFunc {
 
 		id, err := uuid.Parse(idStr)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte("Invalid id"))
+			respondWithError(w, http.StatusBadRequest, "Invalid id")
 			return
 		}
 
