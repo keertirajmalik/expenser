@@ -54,9 +54,3 @@ func main() {
 	log.Printf("Start of our new project on port:%s \n", port)
 	log.Fatal(server.ListenAndServe())
 }
-
-func HandleLogin(template *model.Templates) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		template.Render(w, "login", nil)
-	}
-}
