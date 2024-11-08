@@ -288,7 +288,8 @@ const calculateHeight = (pageSize: number) => {
   const rowHeight = 52; // Default row height in DataGrid
   const headerHeight = 56; // Default header height in DataGrid
   const footerHeight = 56; // Default footer height in DataGrid
-  return headerHeight + footerHeight + rowHeight * pageSize;
+  const count = rows.length < pageSize ? rows.length : pageSize;
+  return headerHeight + footerHeight + rowHeight * count;
 };
 
 export default function Home() {
@@ -317,6 +318,15 @@ export default function Home() {
               color: "white",
               fontWeight: "bold",
             },
+            "& .MuiDataGrid-iconButtonContainer": {
+              color: "white", // Change the color of the sort and filter icons
+            },
+            "& .MuiDataGrid-sortIcon": {
+              color: "white", // Change the color of the sort icon
+            },
+            "& .MuiDataGrid-menuIconButton": {
+              color: "white", // Change the color of the menu icon
+            },
           }}
         >
           <DataGrid
@@ -327,7 +337,7 @@ export default function Home() {
             onPaginationModelChange={(newPaginationModel) =>
               setPageSize(newPaginationModel.pageSize)
             }
-            pageSizeOptions={[10, 20, 30]}
+            pageSizeOptions={[10, 20, 50]}
             sx={{ border: 0 }}
           />
         </Box>
