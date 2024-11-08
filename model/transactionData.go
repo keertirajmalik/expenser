@@ -36,11 +36,12 @@ func convertDBTransactionToTransaction(dbTransactions []database.Transaction) []
 	return transactions
 }
 
-func (d *Data) AddTransactionData(transaction Transaction) {
+func (d *Data) AddTransactionData(transaction Transaction) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
 	parsedDate, _ := time.Parse("02/01/2006", transaction.Date)
+
 	dbTransaction, err := d.DBConfig.DB.CreateTransaction(context, database.CreateTransactionParams{
 		ID:     uuid.New(),
 		Name:   transaction.Name,
@@ -52,11 +53,13 @@ func (d *Data) AddTransactionData(transaction Transaction) {
 
 	if err != nil {
 		log.Println("Couldn't create transaction in DB", err)
+		return err
 	}
 
 	transactions := convertDBTransactionToTransaction([]database.Transaction{dbTransaction})
 
 	d.Transactions = append(d.Transactions, transactions...)
+	return nil
 }
 
 func (d Data) DeleteTransactionData(id uuid.UUID) {
