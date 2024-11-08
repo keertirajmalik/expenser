@@ -1,10 +1,11 @@
-import { AppBar, Toolbar, Typography } from "@mui/material";
+import { AddIcon } from "@imtf/icons";
+import { AppBar, Avatar, Button, Toolbar, Typography } from "@mui/material";
 
 function App() {
   return (
     <>
       <AppBar
-        position="sticky"
+        position="static"
         sx={{
           backgroundColor: "#1c2543",
         }}
@@ -13,6 +14,10 @@ function App() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Expenser
           </Typography>
+          <Button variant="contained" endIcon={<AddIcon fontSize="inherit" />}>
+            Create Expense
+          </Button>
+          <Avatar sx={{ marginLeft: 2 }} />
         </Toolbar>
       </AppBar>
     </>

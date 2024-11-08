@@ -32,8 +32,6 @@ func main() {
 
 	transactionData := model.Data{DBConfig: &dbConfig}
 
-	//	mux.HandleFunc("GET /", HandleLogin(template))
-
 	mux.HandleFunc("POST /login", handler.HandleUserLogin(transactionData))
 
 	mux.HandleFunc("GET /home", handler.HandleHome(&transactionData))
