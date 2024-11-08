@@ -11,6 +11,7 @@ import (
 	"github.com/keertirajmalik/expenser/middleware"
 	"github.com/keertirajmalik/expenser/model"
 	_ "github.com/lib/pq"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -36,7 +37,7 @@ func main() {
 
 	mux.HandleFunc("GET /home", handler.HandleHome(&transactionData))
 
-	mux.HandleFunc("GET /transaction", handler.HandleTransactionGet(&transactionData))
+	mux.HandleFunc("GET /cxf/transaction", handler.HandleTransactionGet(&transactionData))
 	mux.HandleFunc("POST /transaction", handler.HandleTransactionCreate(&transactionData))
 	mux.HandleFunc("DELETE /transaction/{id}", handler.HandleTransactionDelete(&transactionData))
 
@@ -44,9 +45,10 @@ func main() {
 	mux.HandleFunc("POST /type", handler.HandleTransactionTypeCreate(&transactionData))
 	mux.HandleFunc("DELETE /type/{id}", handler.HandleTransactionTypeDelete(&transactionData))
 
+	handler := cors.Default().Handler(mux)
 	server := &http.Server{
 		Addr:    ":" + port,
-		Handler: middleware.Logging(mux),
+		Handler: middleware.Logging(handler),
 	}
 
 	log.Printf("Start of our new project on port:%s \n", port)

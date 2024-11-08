@@ -30,6 +30,7 @@
     "@imtf/eslint-config-react": "^3.2.0",
     "@imtf/prettier-config": "^3.0.1",
     "@types/chance": "^1.1.6",
+    "@types/node": "^22.9.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
