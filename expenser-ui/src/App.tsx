@@ -14,10 +14,14 @@ function App() {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Expenser
           </Typography>
-          <Button variant="contained" endIcon={<AddIcon fontSize="inherit" />}>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon fontSize="inherit" />}
+            sx={{ marginRight: 2 }}
+          >
             Create Expense
           </Button>
-          <Avatar sx={{ marginLeft: 2 }} />
+          <Avatar />
         </Toolbar>
       </AppBar>
     </>

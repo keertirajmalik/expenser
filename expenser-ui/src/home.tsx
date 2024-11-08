@@ -288,8 +288,7 @@ const calculateHeight = (pageSize: number) => {
   const rowHeight = 52; // Default row height in DataGrid
   const headerHeight = 56; // Default header height in DataGrid
   const footerHeight = 56; // Default footer height in DataGrid
-  const count = rows.length < pageSize ? rows.length : pageSize;
-  return headerHeight + footerHeight + rowHeight * count;
+  return headerHeight + footerHeight + rowHeight * pageSize;
 };
 
 export default function Home() {
@@ -333,10 +332,15 @@ export default function Home() {
             rows={rows}
             columns={columns}
             initialState={{ pagination: { paginationModel } }}
-            paginationModel={{ page: paginationModel.page, pageSize }}
-            onPaginationModelChange={(newPaginationModel) =>
-              setPageSize(newPaginationModel.pageSize)
-            }
+            onPaginationModelChange={(newPaginationModel) => {
+              setPageSize(
+                Math.min(
+                  newPaginationModel.pageSize,
+                  rows.length -
+                    newPaginationModel.page * newPaginationModel.pageSize,
+                ),
+              );
+            }}
             pageSizeOptions={[10, 20, 50]}
             sx={{ border: 0 }}
           />
