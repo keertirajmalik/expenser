@@ -7,12 +7,12 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 import App from "./App.tsx";
-import Home from "./home.tsx";
+import TransactionTable from "./home.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <CssBaseline />
     <App />
-    <Home />
+    <TransactionTable />
   </StrictMode>,
 );

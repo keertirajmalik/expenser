@@ -51,7 +51,7 @@ const calculateHeight = (pageSize: number) => {
   return headerHeight + footerHeight + rowHeight * pageSize;
 };
 
-export default function Home() {
+export default function TransactionTable() {
   const [pageSize, setPageSize] = useState(paginationModel.pageSize);
   const [rows, setRows] = useState<Transaction[]>([]);
 
@@ -127,7 +127,10 @@ export default function Home() {
           <DataGrid
             rows={rows}
             columns={columns}
-            initialState={{ pagination: { paginationModel } }}
+            initialState={{
+              pagination: { paginationModel },
+              sorting: { sortModel: [{ field: "date", sort: "desc" }] },
+            }}
             onPaginationModelChange={handlePaginationModelChange}
             pageSizeOptions={[10, 20, 50]}
             sx={{ border: 0 }}
@@ -137,3 +140,5 @@ export default function Home() {
     </Box>
   );
 }
+
+//TODO: Add edit and delete buttons to the table: https://mui.com/x/react-data-grid/editing/

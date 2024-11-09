@@ -1,7 +1,12 @@
-import { AddIcon } from "@imtf/icons";
-import { AppBar, Avatar, Button, Toolbar, Typography } from "@mui/material";
+import { AppBar, Avatar, Button, Icon, Toolbar, Typography } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
+import { useState } from "react";
+import CreateTransaction from "./modal/createTransaction";
 
 function App() {
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
   return (
     <>
       <AppBar
@@ -18,9 +23,11 @@ function App() {
             variant="contained"
             startIcon={<AddIcon fontSize="inherit" />}
             sx={{ marginRight: 2 }}
+            onClick={handleOpen}
           >
             Create Expense
           </Button>
+          <CreateTransaction open={open} handleClose={handleClose} />
           <Avatar />
         </Toolbar>
       </AppBar>

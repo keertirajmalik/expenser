@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ["@imtf/eslint-config-react"],
+  // extends: ["@imtf/eslint-config-react"],
   settings: {
     "import/resolver": {
       typescript: {
