@@ -33,7 +33,7 @@ func main() {
 
 	transactionData := model.Data{DBConfig: &dbConfig}
 
-	mux.HandleFunc("POST /login", handler.HandleUserLogin(transactionData))
+	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(transactionData))
 
 	mux.HandleFunc("GET /home", handler.HandleHome(&transactionData))
 
