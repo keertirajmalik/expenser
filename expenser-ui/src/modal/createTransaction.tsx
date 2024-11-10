@@ -1,7 +1,6 @@
-import { Button, FormGroup, MenuItem, Paper, TextField } from "@mui/material";
+import { Box, Button, FormGroup, MenuItem, Paper, TextField } from "@mui/material";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
-import { DateField } from "@mui/x-date-pickers";
 import { useState } from "react";
 
 const style = {
@@ -9,7 +8,7 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: 600,
   bgcolor: "background.paper",
   padding: 3,
 };
@@ -80,7 +79,8 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
               margin="normal"
               value={name}
               onChange={(e) => setName(e.target.value)}
-            />
+          />
+          <Box style={{ display: "flex", alignItems: "center", gap:"16px"}}>
             <TextField
               required
               select
@@ -89,6 +89,7 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
               margin="normal"
               value={type}
               onChange={(e) => setType(e.target.value)}
+              style={{ flex: 1 }}
             >
               {currencies.map((option) => (
                 <MenuItem key={option.value} value={option.value}>
@@ -96,6 +97,15 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
                 </MenuItem>
               ))}
             </TextField>
+            <Button
+              variant="contained"
+              color="primary"
+              href="/transactionType"
+              sx={{ padding:"8px 16px" }}
+            >
+              Create Transaction Type
+            </Button>
+          </Box>
             <TextField
               required
               label="Amount"

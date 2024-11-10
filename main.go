@@ -42,7 +42,7 @@ func main() {
 	mux.HandleFunc("DELETE /transaction/{id}", handler.HandleTransactionDelete(&transactionData))
 
 	mux.HandleFunc("GET /type", handler.HandleTransactionTypeGet(&transactionData))
-	mux.HandleFunc("POST /type", handler.HandleTransactionTypeCreate(&transactionData))
+	mux.HandleFunc("POST /cxf/type", handler.HandleTransactionTypeCreate(&transactionData))
 	mux.HandleFunc("DELETE /type/{id}", handler.HandleTransactionTypeDelete(&transactionData))
 
 	handler := cors.Default().Handler(mux)
