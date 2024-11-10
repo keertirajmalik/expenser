@@ -5,6 +5,7 @@ import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { TransactionType } from "../types/transactions type";
 import CreateTransactionType from "./createTransactionType";
+import { useTransactions } from "../providers/TransactionsContext";
 
 const style = {
   position: "absolute",
@@ -33,6 +34,7 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
     [],
   );
   const [nestedModalOpen, setNestedModalOpen] = useState(false);
+  const { fetchTransactions } = useTransactions();
 
   useEffect(() => {
     if (open && !nestedModalOpen) {
@@ -76,8 +78,10 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(transactionData),
+    }).then(() => {
+      handleClose();
+      fetchTransactions();
     });
-    handleClose();
   };
 
   const handleNestedModalOpen = () => {

@@ -6,13 +6,18 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
-import App from "./App.tsx";
-import TransactionTable from "./home.tsx";
+import NavigationBar from "./NavigationBar.tsx";
+import TransactionTable from "./TransactionTable.tsx";
+import { TransactionsProvider } from "./providers/TransactionsContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <CssBaseline />
-    <App />
-    <TransactionTable />
-  </StrictMode>,
+  <TransactionsProvider>
+    <StrictMode>
+      <CssBaseline />
+      <NavigationBar />
+      <TransactionTable />
+    </StrictMode>
+  </TransactionsProvider>,
 );
+
+// TODO: create sidebar with navigation links to transactions and types pages

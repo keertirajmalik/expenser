@@ -1,10 +1,10 @@
 import { Box } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { PaginationModel } from "./types/pagination";
-import { Transaction } from "./types/transactions";
+import { useTransactions } from "./providers/TransactionsContext";
 
 const columns: GridColDef[] = [
   {
@@ -52,40 +52,15 @@ const calculateHeight = (pageSize: number) => {
 };
 
 export default function TransactionTable() {
+  const { transactions } = useTransactions();
   const [pageSize, setPageSize] = useState(paginationModel.pageSize);
-  const [rows, setRows] = useState<Transaction[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("cxf/transaction");
-        const data = await response.json();
-        if (Array.isArray(data.transaction)) {
-          const formattedData = data.transaction.map((item: Transaction) => ({
-            id: item.ID,
-            name: item.Name,
-            type: item.TransactionType,
-            amount: item.Amount,
-            date: item.Date,
-            note: item.Note,
-          }));
-          setRows(formattedData);
-        } else {
-          console.error("Expected an array but got:", data.transaction);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const handlePaginationModelChange = (newPaginationModel: PaginationModel) => {
     setPageSize(
       Math.min(
         newPaginationModel.pageSize,
-        rows.length - newPaginationModel.page * newPaginationModel.pageSize,
+        transactions.length -
+          newPaginationModel.page * newPaginationModel.pageSize,
       ),
     );
   };
@@ -125,7 +100,7 @@ export default function TransactionTable() {
       >
         <Box sx={dataGridStyles}>
           <DataGrid
-            rows={rows}
+            rows={transactions}
             columns={columns}
             initialState={{
               pagination: { paginationModel },
