@@ -1,4 +1,12 @@
-import { Box, Button, FormGroup, MenuItem, Paper, TextField } from "@mui/material";
+import React from "react";
+import {
+  Box,
+  Button,
+  FormGroup,
+  MenuItem,
+  Paper,
+  TextField,
+} from "@mui/material";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
@@ -61,26 +69,26 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
   }
 
   return (
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Paper sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Create Transaction
-          </Typography>
-          <FormGroup>
-            <TextField
-              required
-              label="Name"
-              size="small"
-              margin="normal"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+    <Modal
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Paper sx={style}>
+        <Typography id="modal-modal-title" variant="h6" component="h2">
+          Create Transaction
+        </Typography>
+        <FormGroup>
+          <TextField
+            required
+            label="Name"
+            size="small"
+            margin="normal"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
-          <Box style={{ display: "flex", alignItems: "center", gap:"16px"}}>
+          <Box style={{ display: "flex", alignItems: "center", gap: "16px" }}>
             <TextField
               required
               select
@@ -101,46 +109,46 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
               variant="contained"
               color="primary"
               href="/transactionType"
-              sx={{ padding:"8px 16px" }}
+              sx={{ padding: "8px 16px" }}
             >
               Create Transaction Type
             </Button>
           </Box>
-            <TextField
-              required
-              label="Amount"
-              size="small"
-              margin="normal"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-            />
-            <TextField
-              required
-              label="Date"
-              type="date"
-              size="small"
-              margin="normal"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-            <TextField
-              label="Note"
-              multiline
-              rows={4}
-              size="small"
-              margin="normal"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
-              Submit
-            </Button>
-          </FormGroup>
-        </Paper>
-      </Modal>
+          <TextField
+            required
+            label="Amount"
+            size="small"
+            margin="normal"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+          <TextField
+            required
+            label="Date"
+            type="date"
+            size="small"
+            margin="normal"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+          <TextField
+            label="Note"
+            multiline
+            rows={4}
+            size="small"
+            margin="normal"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+          <Button variant="contained" color="primary" onClick={handleSubmit}>
+            Submit
+          </Button>
+        </FormGroup>
+      </Paper>
+    </Modal>
   );
 };
 

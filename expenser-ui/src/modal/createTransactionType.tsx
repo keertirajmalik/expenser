@@ -1,4 +1,5 @@
-import { Box, Button, FormGroup, MenuItem, Paper, TextField } from "@mui/material";
+import React from "react";
+import { Button, FormGroup, Paper, TextField } from "@mui/material";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
@@ -18,7 +19,10 @@ interface CreateTransactionProps {
   handleClose: () => void;
 }
 
-const CreateTransactionType = ({ open, handleClose }: CreateTransactionProps) => {
+const CreateTransactionType = ({
+  open,
+  handleClose,
+}: CreateTransactionProps) => {
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
 
@@ -43,45 +47,48 @@ const CreateTransactionType = ({ open, handleClose }: CreateTransactionProps) =>
         handleClose();
       })
       .catch((error) => {
-        console.error("There was an error creating the transaction type!", error);
+        console.error(
+          "There was an error creating the transaction type!",
+          error,
+        );
       });
   }
 
   return (
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Paper sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Create Transaction Type
-          </Typography>
-          <FormGroup>
-            <TextField
-              required
-              label="Name"
-              size="small"
-              margin="normal"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+    <Modal
+      open={open}
+      onClose={handleClose}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Paper sx={style}>
+        <Typography id="modal-modal-title" variant="h6" component="h2">
+          Create Transaction Type
+        </Typography>
+        <FormGroup>
+          <TextField
+            required
+            label="Name"
+            size="small"
+            margin="normal"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
-            <TextField
-              label="Note"
-              multiline
-              rows={4}
-              size="small"
-              margin="normal"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-            <Button variant="contained" color="primary" onClick={handleSubmit}>
-              Submit
-            </Button>
-          </FormGroup>
-        </Paper>
-      </Modal>
+          <TextField
+            label="Note"
+            multiline
+            rows={4}
+            size="small"
+            margin="normal"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+          <Button variant="contained" color="primary" onClick={handleSubmit}>
+            Submit
+          </Button>
+        </FormGroup>
+      </Paper>
+    </Modal>
   );
 };
 

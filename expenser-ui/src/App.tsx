@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { AppBar, Toolbar, Typography, Button, ButtonGroup, Avatar, Menu, MenuItem } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  ButtonGroup,
+  Avatar,
+  Menu,
+  MenuItem,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CreateTransactionType from "./modal/createTransactionType";
 import CreateTransaction from "./modal/createTransaction";
@@ -45,7 +54,10 @@ function App() {
             Expenser
           </Typography>
           <ButtonGroup variant="contained" sx={{ marginRight: 2 }}>
-            <Button startIcon={<AddIcon fontSize="inherit" />} onClick={handleTransactionOpen}>
+            <Button
+              startIcon={<AddIcon fontSize="inherit" />}
+              onClick={handleTransactionOpen}
+            >
               Create Expense
             </Button>
             <Button onClick={handleMenuOpen}>▼</Button>
@@ -55,17 +67,27 @@ function App() {
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={() => handleMenuItemClick("expense")}>Create Expense</MenuItem>
-            <MenuItem onClick={() => handleMenuItemClick("transactionType")}>Create Transaction Type</MenuItem>
+            <MenuItem onClick={() => handleMenuItemClick("expense")}>
+              Create Expense
+            </MenuItem>
+            <MenuItem onClick={() => handleMenuItemClick("transactionType")}>
+              Create Transaction Type
+            </MenuItem>
           </Menu>
-          <CreateTransaction open={openTransaction} handleClose={closeTransactionModal} />
-          <CreateTransactionType open={openTransactionType} handleClose={closeTransactionTypeModal} />
+          <CreateTransaction
+            open={openTransaction}
+            handleClose={closeTransactionModal}
+          />
+          <CreateTransactionType
+            open={openTransactionType}
+            handleClose={closeTransactionTypeModal}
+          />
           <Avatar />
           {/* TODO: Add a profile menu https://mui.com/material-ui/react-menu/ */}
         </Toolbar>
       </AppBar>
     </>
-  )
+  );
 }
 
 export default App;

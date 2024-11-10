@@ -43,9 +43,6 @@ const columns: GridColDef[] = [
   },
 ];
 
-
-
-
 const paginationModel = { page: 0, pageSize: 10 };
 const rowHeight = 52; // Default row height in DataGrid
 const headerHeight = 56; // Default header height in DataGrid
