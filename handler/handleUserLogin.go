@@ -3,27 +3,21 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
+	"github.com/keertirajmalik/expenser/internal/auth"
 	"github.com/keertirajmalik/expenser/model"
 )
 
-func HandleHome(data *model.Data) http.HandlerFunc {
-	type response struct {
-		Transaction      []model.Transaction     `json:"transaction"`
-		TransactionTypes []model.TransactionType `json:"types"`
-	}
-	return func(w http.ResponseWriter, r *http.Request) {
-		respondWithJson(w, http.StatusOK, response{
-			Transaction:      data.GetData().Transactions,
-			TransactionTypes: data.GetData().TransactionTypes,
-		})
-	}
-}
-
-func HandleUserLogin(data model.Data) http.HandlerFunc {
+func HandleUserLogin(data model.Data, secret string) http.HandlerFunc {
 	type parameters struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
+	}
+
+	type response struct {
+		model.User
+		Token string `json:"token"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -35,12 +29,30 @@ func HandleUserLogin(data model.Data) http.HandlerFunc {
 			return
 		}
 
-		// In a real application, you would validate the credentials against a database
-		if params.Username == "admin" && params.Password == "password" {
-
-			w.WriteHeader(http.StatusNoContent)
-		} else {
-			w.WriteHeader(http.StatusUnauthorized)
+		user, err := data.GetUserByUsernameFromDB(params.Username)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Couldn't get user")
+			return
 		}
+
+		err = auth.CheckPasswordHash(params.Password, user.HashedPassword)
+		if err != nil {
+			respondWithError(w, http.StatusUnauthorized, "Invalid password")
+			return
+		}
+
+		accessToken, err := auth.MakeJWT(user.ID, secret, time.Hour)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Couldn't create JWT")
+			return
+		}
+
+		respondWithJson(w, http.StatusOK, response{
+			User: model.User{
+				Username: user.Username,
+			},
+			Token: accessToken,
+		})
 	}
+
 }

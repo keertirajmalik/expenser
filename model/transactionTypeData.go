@@ -10,7 +10,10 @@ import (
 	"github.com/keertirajmalik/expenser/internal/database"
 )
 
-func (d Data) GetTransactionTypesFromDB(context context.Context) []TransactionType {
+func (d Data) GetTransactionTypesFromDB() []TransactionType {
+	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+	defer cancel()
+
 	dbTransactionTypes, err := d.DBConfig.DB.GetTransactionType(context)
 	if err != nil {
 		log.Println("Couldn't get transaction type from in DB", err)

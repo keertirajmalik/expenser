@@ -27,15 +27,20 @@ func main() {
 		log.Fatal("DB_URL is not found in the enviornment")
 	}
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET enviornment variable is not set")
+	}
+
 	dbConfig := db.CreateDbConnection(dbURL)
 
 	mux := http.NewServeMux()
 
 	transactionData := model.Data{DBConfig: &dbConfig}
 
-	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(transactionData))
+	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(transactionData, jwtSecret))
 
-	mux.HandleFunc("GET /home", handler.HandleHome(&transactionData))
+	mux.HandleFunc("POST /cxf/user", handler.HandleUserCreate(&transactionData))
 
 	mux.HandleFunc("GET /cxf/transaction", handler.HandleTransactionGet(&transactionData))
 	mux.HandleFunc("POST /cxf/transaction", handler.HandleTransactionCreate(&transactionData))

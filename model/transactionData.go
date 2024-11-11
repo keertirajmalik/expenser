@@ -10,7 +10,9 @@ import (
 	"github.com/keertirajmalik/expenser/internal/database"
 )
 
-func (d Data) GetTransactionsFromDB(context context.Context) []Transaction {
+func (d Data) GetTransactionsFromDB() []Transaction {
+	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+	defer cancel()
 	dbTransactions, err := d.DBConfig.DB.GetTransaction(context)
 	if err != nil {
 		log.Println("Couldn't get transaction from in DB", err)
