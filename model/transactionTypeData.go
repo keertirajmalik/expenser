@@ -33,7 +33,7 @@ func convertDBTransactionTypesToTransactionTypes(dbTransactions []database.Trans
 	return transactionTypes
 }
 
-func (d *Data) AddTransactionTypeData(transactionType TransactionType) {
+func (d *Data) AddTransactionTypeData(transactionType TransactionType) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -45,11 +45,13 @@ func (d *Data) AddTransactionTypeData(transactionType TransactionType) {
 
 	if err != nil {
 		log.Println("Couldn't create transaction type in DB", err)
+		return err
 	}
 
 	transactionTypes := convertDBTransactionTypesToTransactionTypes([]database.TransactionType{dbTransactionType})
 
 	d.TransactionTypes = append(d.TransactionTypes, transactionTypes...)
+	return nil
 }
 
 func (d Data) DeleteTransactionTypeData(id uuid.UUID) error {
