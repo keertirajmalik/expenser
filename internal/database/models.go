@@ -25,3 +25,9 @@ type TransactionType struct {
 	Name        string
 	Description sql.NullString
 }
+
+type User struct {
+	ID             uuid.UUID
+	Username       string
+	HashedPassword string
+}

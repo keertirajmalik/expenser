@@ -14,7 +14,7 @@ func HandleTransactionGet(data *model.Data) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		respondWithJson(w, http.StatusOK, validResponse{
-			Transactions: data.GetData().Transactions,
+			Transactions: data.GetTransactionsFromDB(),
 		})
 	}
 }

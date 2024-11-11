@@ -19,12 +19,12 @@ const fetchTransactions = async (
 
     if (Array.isArray(data.transaction)) {
       const formattedData = data.transaction.map((item: Transaction) => ({
-        id: item.ID,
-        name: item.Name,
-        type: item.TransactionType,
-        amount: item.Amount,
-        date: item.Date,
-        note: item.Note,
+        id: item.id,
+        name: item.name,
+        type: item.type,
+        amount: item.amount,
+        date: item.date,
+        note: item.note,
       }));
       setTransactions(formattedData);
     } else {
