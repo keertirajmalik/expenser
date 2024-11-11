@@ -22,7 +22,7 @@ const Login = ({ onLogin }: LoginProps) => {
     // Check if the user is already authenticated
     const authStatus = localStorage.getItem("isAuthenticated");
     if (authStatus === "true") {
-      navigate("/dashboard"); // Redirect to the dashboard or any other page
+      navigate("/");
     }
   }, [navigate]);
 
@@ -36,6 +36,7 @@ const Login = ({ onLogin }: LoginProps) => {
       body: JSON.stringify({ username, password }),
     }).then(() => {
       localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("loginTime", new Date().toISOString());
       onLogin();
       navigate("/"); // Redirect to the dashboard or any other page
     });

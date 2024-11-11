@@ -19,7 +19,13 @@ const App = () => {
   useEffect(() => {
     // Check if the user is already authenticated
     const authStatus = localStorage.getItem("isAuthenticated");
-    if (authStatus === "true") {
+    const loginTime = localStorage.getItem("loginTime");
+
+    if (
+      authStatus === "true" &&
+      loginTime &&
+      new Date(loginTime) > new Date(new Date().getTime() - 1000 * 60)
+    ) {
       setIsLoggedIn(true);
     }
     setLoading(false);
