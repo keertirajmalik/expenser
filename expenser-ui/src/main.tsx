@@ -1,54 +1,21 @@
-import { Box, CircularProgress, CssBaseline } from "@mui/material";
-import { StrictMode, useState, useEffect } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "@fontsource/roboto/300.css";
-import "@fontsource/roboto/400.css";
-import "@fontsource/roboto/500.css";
-import "@fontsource/roboto/700.css";
-
-import NavigationBar from "./NavigationBar.tsx";
-import TransactionTable from "./TransactionTable.tsx";
-import { TransactionsProvider } from "./providers/TransactionsContext.tsx";
-import Login from "./Login.tsx";
-import { BrowserRouter as Router } from "react-router-dom";
+import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
+import { CssBaseline, Box, CircularProgress } from "@mui/material";
+import TransactionTable from "./TransactionTable";
+import { TransactionsProvider } from "./providers/TransactionsContext";
+import NavigationBar from "./NavigationBar";
+import Login from "./Login";
+import SignUp from "./Signup";
+import { useAuth, AuthProvider } from "./providers/AuthContext";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Check if the user is already authenticated
-    const authStatus = localStorage.getItem("isAuthenticated");
-    const loginTime = localStorage.getItem("loginTime");
-
-    if (
-      authStatus === "true" &&
-      loginTime &&
-      new Date(loginTime) > new Date(new Date().getTime() - 1000 * 60)
-    ) {
-      setIsLoggedIn(true);
-    }
-    setLoading(false);
-  }, []);
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
+  const { isLoggedIn, loading, handleLogin } = useAuth();
 
   if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
+    return <LoadingSpinner />;
   }
+
   return (
     <StrictMode>
       <CssBaseline />
@@ -64,9 +31,36 @@ const App = () => {
   );
 };
 
-createRoot(document.getElementById("root")!).render(
-  <Router>
-    <App />
-  </Router>,
+const LoadingSpinner = () => (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "100vh",
+    }}
+  >
+    <CircularProgress />
+  </Box>
 );
-// TODO: create sidebar with navigation links to transactions and types pages
+
+const Main = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route
+          path="/auth/login"
+          element={<Login onLogin={useAuth().handleLogin} />}
+        />
+        <Route path="/auth/signup" element={<SignUp />} />
+        <Route path="/*" element={<App />} />
+      </Routes>
+    </Router>
+  );
+};
+
+createRoot(document.getElementById("root")!).render(
+  <AuthProvider>
+    <Main />
+  </AuthProvider>,
+);

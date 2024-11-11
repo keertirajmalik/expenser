@@ -4,7 +4,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { TransactionType } from "../types/transactions type";
-import CreateTransactionType from "./createTransactionType";
+import CreateTransactionType from "./CreateTransactionType";
 import { useTransactions } from "../providers/TransactionsContext";
 
 const style = {

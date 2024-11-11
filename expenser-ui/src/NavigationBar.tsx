@@ -10,8 +10,8 @@ import {
   MenuItem,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import CreateTransactionType from "./modal/createTransactionType";
-import CreateTransaction from "./modal/createTransaction";
+import CreateTransactionType from "./modal/CreateTransactionType";
+import CreateTransaction from "./modal/CreateTransaction";
 
 export default function NavigationBar() {
   const [openTransactionType, setTransactionTypeModalOpen] = useState(false);
