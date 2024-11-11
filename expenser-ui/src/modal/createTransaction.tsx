@@ -121,8 +121,8 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
               >
                 {transactionTypes.length > 0 ? (
                   transactionTypes.map((option) => (
-                    <MenuItem key={option.Name} value={option.Name}>
-                      {option.Name}
+                    <MenuItem key={option.name} value={option.name}>
+                      {option.name}
                     </MenuItem>
                   ))
                 ) : (

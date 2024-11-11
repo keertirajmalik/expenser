@@ -19,7 +19,6 @@ const Login = ({ onLogin }: LoginProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if the user is already authenticated
     const authStatus = localStorage.getItem("isAuthenticated");
     if (authStatus === "true") {
       navigate("/");
@@ -34,13 +33,25 @@ const Login = ({ onLogin }: LoginProps) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ username, password }),
-    }).then(() => {
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("loginTime", new Date().toISOString());
-      onLogin();
-      navigate("/"); // Redirect to the dashboard or any other page
-    });
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("loginTime", new Date().toISOString());
+        localStorage.setItem("token", data.token);
+        onLogin();
+        navigate("/"); // Redirect to the dashboard or any other page
+      })
+      .catch(() => {
+        return;
+      });
   };
+
   return (
     <Box
       sx={{

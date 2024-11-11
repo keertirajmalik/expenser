@@ -31,7 +31,7 @@ func HandleUserLogin(data model.Data, secret string) http.HandlerFunc {
 
 		user, err := data.GetUserByUsernameFromDB(params.Username)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "Couldn't get user")
+			respondWithError(w, http.StatusUnauthorized, "Invalid user")
 			return
 		}
 
