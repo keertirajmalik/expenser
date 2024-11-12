@@ -12,37 +12,53 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users(id, username, hashed_password)
-VALUES ($1, $2, $3)
-RETURNING id, username, hashed_password
+INSERT INTO users(id, name,username, hashed_password)
+VALUES ($1, $2, $3, $4)
+RETURNING id, name, username, hashed_password
 `
 
 type CreateUserParams struct {
 	ID             uuid.UUID
+	Name           string
 	Username       string
 	HashedPassword string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.ID, arg.Username, arg.HashedPassword)
+	row := q.db.QueryRowContext(ctx, createUser,
+		arg.ID,
+		arg.Name,
+		arg.Username,
+		arg.HashedPassword,
+	)
 	var i User
-	err := row.Scan(&i.ID, &i.Username, &i.HashedPassword)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Username,
+		&i.HashedPassword,
+	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, username, hashed_password from users where username=$1
+SELECT id, name, username, hashed_password from users where username=$1
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
 	row := q.db.QueryRowContext(ctx, getUserByUsername, username)
 	var i User
-	err := row.Scan(&i.ID, &i.Username, &i.HashedPassword)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Username,
+		&i.HashedPassword,
+	)
 	return i, err
 }
 
 const getUsers = `-- name: GetUsers :many
-SELECT id, username, hashed_password from users
+SELECT id, name, username, hashed_password from users
 `
 
 func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
@@ -54,7 +70,12 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 	var items []User
 	for rows.Next() {
 		var i User
-		if err := rows.Scan(&i.ID, &i.Username, &i.HashedPassword); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Username,
+			&i.HashedPassword,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

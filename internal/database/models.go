@@ -28,6 +28,7 @@ type TransactionType struct {
 
 type User struct {
 	ID             uuid.UUID
+	Name           string
 	Username       string
 	HashedPassword string
 }

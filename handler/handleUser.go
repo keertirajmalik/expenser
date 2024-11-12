@@ -10,6 +10,7 @@ import (
 
 func HandleUserCreate(data *model.Data) http.HandlerFunc {
 	type parameters struct {
+		Name     string `json:"name"`
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
@@ -33,7 +34,7 @@ func HandleUserCreate(data *model.Data) http.HandlerFunc {
 			return
 		}
 
-		user := model.NewUser(params.Username, hashedPassword)
+		user := model.NewUser(params.Name, params.Username, hashedPassword)
 		user, err = data.AddUserToDB(user)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -42,6 +43,7 @@ func HandleUserCreate(data *model.Data) http.HandlerFunc {
 		respondWithJson(w, http.StatusCreated, model.User{
 			ID:       user.ID,
 			Username: user.Username,
+			Name:     user.Name,
 		})
 	}
 

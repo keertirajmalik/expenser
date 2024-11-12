@@ -1,52 +1,58 @@
-import React, {
+import {
   createContext,
-  useContext,
   useState,
+  useContext,
   useEffect,
   ReactNode,
 } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   isLoggedIn: boolean;
   loading: boolean;
-  handleLogin: () => void;
+  handleLogin: (token: string) => void;
+  handleLogout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuthStatus = () => {
-      const authStatus = localStorage.getItem("isAuthenticated");
-      const expireAt = localStorage.getItem("expireAt");
-      const sessionTimeout = expireAt ? new Date(expireAt) > new Date() : false;
+    const token = localStorage.getItem("token");
+    const expireAt = localStorage.getItem("expireAt");
 
-      if (authStatus === "true" && sessionTimeout) {
+    if (token && expireAt) {
+      if (new Date(expireAt) > new Date()) {
         setIsLoggedIn(true);
       } else {
-        localStorage.setItem("isAuthenticated", "false");
-        localStorage.removeItem("expireAt");
-        localStorage.removeItem("token");
+        localStorage.clear();
+        navigate("/auth/login");
       }
-      setLoading(false);
-    };
+    }
+    setLoading(false);
+  }, [navigate]);
 
-    checkAuthStatus();
-  }, []);
-
-  const handleLogin = () => {
+  const handleLogin = (token: string) => {
+    const expireAt = new Date(Date.now() + 1000 * 60).toISOString();
+    localStorage.setItem("token", token);
+    localStorage.setItem("expireAt", expireAt);
     setIsLoggedIn(true);
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/auth/login");
+  };
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, loading, handleLogin }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, loading, handleLogin, handleLogout }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -54,7 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;

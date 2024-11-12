@@ -1,4 +1,10 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  ReactNode,
+} from "react";
 import { Transaction } from "../types/transactions";
 
 interface TransactionsContextProps {
@@ -35,9 +41,7 @@ const fetchTransactions = async (
   }
 };
 
-export const TransactionsProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const TransactionsProvider = ({ children }: { children: ReactNode }) => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
