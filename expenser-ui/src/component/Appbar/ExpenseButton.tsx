@@ -8,10 +8,8 @@ import CreateTransaction from "../../modal/CreateTransaction";
 import CreateTransactionType from "../../modal/CreateTransactionType";
 
 const ExpenseButtonMenu: React.FC = () => {
-  const handleTransactionOpen = () => setTransactionModalOpen(true);
-  const [openTransactionType, setTransactionTypeModalOpen] = useState(false);
   const [openTransaction, setTransactionModalOpen] = useState(false);
-
+  const [openTransactionType, setTransactionTypeModalOpen] = useState(false);
   const [anchorExpenseEl, setExpenseAnchorEl] = useState<null | HTMLElement>(
     null,
   );
@@ -19,8 +17,12 @@ const ExpenseButtonMenu: React.FC = () => {
   const handleTransactionTypeOpen = () => setTransactionTypeModalOpen(true);
   const closeTransactionTypeModal = () => setTransactionTypeModalOpen(false);
 
+  const handleTransactionOpen = () => setTransactionModalOpen(true);
   const closeTransactionModal = () => setTransactionModalOpen(false);
 
+  const handleExpenseMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setExpenseAnchorEl(event.currentTarget);
+  };
   const handleExpenseMenuClose = () => {
     setExpenseAnchorEl(null);
   };
@@ -32,9 +34,6 @@ const ExpenseButtonMenu: React.FC = () => {
       handleTransactionTypeOpen();
     }
     handleExpenseMenuClose();
-  };
-  const handleExpenseMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setExpenseAnchorEl(event.currentTarget);
   };
 
   return (

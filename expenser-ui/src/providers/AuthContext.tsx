@@ -45,9 +45,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("expireAt");
-    setIsLoggedIn(false);
+    localStorage.clear();
+    navigate("/auth/login");
   };
 
   return (

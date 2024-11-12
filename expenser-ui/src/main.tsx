@@ -1,17 +1,22 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  BrowserRouter as Router,
+  Navigate,
+} from "react-router-dom";
 import { CssBaseline, Box, CircularProgress } from "@mui/material";
 import { TransactionsProvider } from "./providers/TransactionsContext";
-import { useAuth, AuthProvider } from "./providers/AuthContext";
-import { UserProvider } from "./providers/UserContext";
+import { AuthProvider, useAuth } from "./providers/AuthContext";
 import Appbar from "./component/Appbar/AppBar";
 import SignUp from "./component/Signup";
 import TransactionTable from "./component/TransactionTable";
 import Login from "./component/Login";
+import { UserProvider } from "./providers/UserContext";
 
 const App = () => {
-  const { loading } = useAuth();
+  const { isLoggedIn, loading } = useAuth();
 
   if (loading) {
     return <LoadingSpinner />;
@@ -20,10 +25,14 @@ const App = () => {
   return (
     <StrictMode>
       <CssBaseline />
-      <TransactionsProvider>
-        <Appbar />
-        <TransactionTable />
-      </TransactionsProvider>
+      {isLoggedIn ? (
+        <TransactionsProvider>
+          <Appbar />
+          <TransactionTable />
+        </TransactionsProvider>
+      ) : (
+        <Navigate to="/auth/login" />
+      )}
     </StrictMode>
   );
 };
