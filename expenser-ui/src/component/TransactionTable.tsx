@@ -2,9 +2,8 @@ import { Box } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useState } from "react";
-
-import { PaginationModel } from "./types/pagination";
-import { useTransactions } from "./providers/TransactionsContext";
+import { useTransactions } from "../providers/TransactionsContext";
+import { PaginationModel } from "../types/pagination";
 
 const columns: GridColDef[] = [
   {

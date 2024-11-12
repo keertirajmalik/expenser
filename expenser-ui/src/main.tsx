@@ -2,16 +2,16 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
 import { CssBaseline, Box, CircularProgress } from "@mui/material";
-import TransactionTable from "./TransactionTable";
 import { TransactionsProvider } from "./providers/TransactionsContext";
-import NavigationBar from "./NavigationBar";
-import Login from "./Login";
-import SignUp from "./Signup";
 import { useAuth, AuthProvider } from "./providers/AuthContext";
 import { UserProvider } from "./providers/UserContext";
+import Appbar from "./component/Appbar/AppBar";
+import SignUp from "./component/Signup";
+import TransactionTable from "./component/TransactionTable";
+import Login from "./component/Login";
 
 const App = () => {
-  const { isLoggedIn, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) {
     return <LoadingSpinner />;
@@ -20,14 +20,10 @@ const App = () => {
   return (
     <StrictMode>
       <CssBaseline />
-      {isLoggedIn ? (
-        <TransactionsProvider>
-          <NavigationBar />
-          <TransactionTable />
-        </TransactionsProvider>
-      ) : (
-        <Login />
-      )}
+      <TransactionsProvider>
+        <Appbar />
+        <TransactionTable />
+      </TransactionsProvider>
     </StrictMode>
   );
 };
@@ -48,19 +44,17 @@ const LoadingSpinner = () => (
 const Main = () => {
   return (
     <Router>
-      <Routes>
-        <Route path="/auth/login" element={<Login />} />
-        <Route path="/auth/signup" element={<SignUp />} />
-        <Route path="/*" element={<App />} />
-      </Routes>
+      <AuthProvider>
+        <UserProvider>
+          <Routes>
+            <Route path="/auth/login" element={<Login />} />
+            <Route path="/auth/signup" element={<SignUp />} />
+            <Route path="/*" element={<App />} />
+          </Routes>
+        </UserProvider>
+      </AuthProvider>
     </Router>
   );
 };
 
-createRoot(document.getElementById("root")!).render(
-  <AuthProvider>
-    <UserProvider>
-      <Main />
-    </UserProvider>
-  </AuthProvider>,
-);
+createRoot(document.getElementById("root")!).render(<Main />);

@@ -5,6 +5,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -19,6 +20,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const expireAt = localStorage.getItem("expireAt");
@@ -28,10 +31,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsLoggedIn(true);
       } else {
         localStorage.clear();
+        navigate("/auth/login");
       }
     }
     setLoading(false);
-  }, []);
+  }, [navigate]);
 
   const handleLogin = (token: string) => {
     const expireAt = new Date(Date.now() + 1000 * 60).toISOString();

@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Box, Paper, TextField, Button, Typography } from "@mui/material";
-import { useUser } from "./providers/UserContext";
-import { useAuth } from "./providers/AuthContext";
+import { useAuth } from "../providers/AuthContext";
+import { useUser } from "../providers/UserContext";
 
 const Login = () => {
   const [username, setUsername] = useState("");
