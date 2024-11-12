@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Box, Paper, TextField, Button, Typography } from "@mui/material";
 import { useAuth } from "../providers/AuthContext";
@@ -11,7 +11,7 @@ const Login = () => {
   const { handleLogin } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     fetch("/cxf/login", {
       method: "POST",
@@ -28,7 +28,7 @@ const Login = () => {
       })
       .then((data) => {
         handleLogin(data.token);
-        setContextUsername(data.username);
+        setContextUsername(data.name);
         navigate("/");
       });
   };
@@ -65,6 +65,7 @@ const Login = () => {
         </Typography>
         <form onSubmit={handleSubmit}>
           <TextField
+            required
             label="Username"
             size="small"
             margin="normal"

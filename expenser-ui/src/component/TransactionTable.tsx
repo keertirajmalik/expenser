@@ -50,6 +50,23 @@ const calculateHeight = (pageSize: number) => {
   return headerHeight + footerHeight + rowHeight * pageSize;
 };
 
+const dataGridStyles = {
+  "& .home-table-header": {
+    backgroundColor: "#1c2543",
+    color: "white",
+    fontWeight: "bold",
+  },
+  "& .MuiDataGrid-iconButtonContainer": {
+    color: "white", // Change the color of the sort and filter icons
+  },
+  "& .MuiDataGrid-sortIcon": {
+    color: "white", // Change the color of the sort icon
+  },
+  "& .MuiDataGrid-menuIconButton": {
+    color: "white", // Change the color of the menu icon
+  },
+};
+
 export default function TransactionTable() {
   const { transactions } = useTransactions();
   const [pageSize, setPageSize] = useState(paginationModel.pageSize);
@@ -62,23 +79,6 @@ export default function TransactionTable() {
           newPaginationModel.page * newPaginationModel.pageSize,
       ),
     );
-  };
-
-  const dataGridStyles = {
-    "& .home-table-header": {
-      backgroundColor: "#1c2543",
-      color: "white",
-      fontWeight: "bold",
-    },
-    "& .MuiDataGrid-iconButtonContainer": {
-      color: "white", // Change the color of the sort and filter icons
-    },
-    "& .MuiDataGrid-sortIcon": {
-      color: "white", // Change the color of the sort icon
-    },
-    "& .MuiDataGrid-menuIconButton": {
-      color: "white", // Change the color of the menu icon
-    },
   };
 
   return (

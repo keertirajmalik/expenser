@@ -49,6 +49,7 @@ func HandleUserLogin(data model.Data, secret string) http.HandlerFunc {
 
 		respondWithJson(w, http.StatusOK, response{
 			User: model.User{
+				Name:     user.Name,
 				Username: user.Username,
 			},
 			Token: accessToken,

@@ -4,6 +4,7 @@ import { Box, Paper, TextField, Button, Typography } from "@mui/material";
 
 const SignUp = () => {
   const [username, setUsername] = useState("");
+  const [fullname, setFullname] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
@@ -14,7 +15,7 @@ const SignUp = () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ name: fullname, username, password }),
     })
       .then((response) => {
         if (!response.ok) {
@@ -52,21 +53,35 @@ const SignUp = () => {
       >
         <form onSubmit={handleSubmit}>
           <TextField
+            required
+            label="Full Name"
+            name="fullname"
+            value={fullname}
+            onChange={(e) => setFullname(e.target.value)}
+            fullWidth
+            size="small"
+            margin="dense"
+          />
+          <TextField
+            required
             label="Username"
+            name="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             fullWidth
             size="small"
-            margin="normal"
+            margin="dense"
           />
           <TextField
+            required
             type="password"
             label="Password"
-            size="small"
             name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
+            size="small"
+            margin="dense"
           />
           <Button
             type="submit"

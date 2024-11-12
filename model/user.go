@@ -12,13 +12,15 @@ import (
 
 type User struct {
 	ID             uuid.UUID `json:"-"`
+	Name           string    `json:"name"`
 	Username       string    `json:"username"`
 	HashedPassword string    `json:"-"`
 }
 
-func NewUser(username, password string) User {
+func NewUser(name, username, password string) User {
 	return User{
 		ID:             uuid.New(),
+		Name:           name,
 		Username:       username,
 		HashedPassword: password,
 	}
@@ -44,6 +46,7 @@ func (d *Data) AddUserToDB(user User) (User, error) {
 
 	dbUser, err := d.DBConfig.DB.CreateUser(context, database.CreateUserParams{
 		ID:             user.ID,
+		Name:           user.Name,
 		Username:       user.Username,
 		HashedPassword: user.HashedPassword,
 	})
@@ -86,6 +89,7 @@ func convertDBUserToUser(dbUsers []database.User) []User {
 	for _, user := range dbUsers {
 		users = append(users, User{
 			ID:             user.ID,
+			Name:           user.Name,
 			Username:       user.Username,
 			HashedPassword: user.HashedPassword,
 		})
