@@ -8,9 +8,10 @@ import NavigationBar from "./NavigationBar";
 import Login from "./Login";
 import SignUp from "./Signup";
 import { useAuth, AuthProvider } from "./providers/AuthContext";
+import { UserProvider } from "./providers/UserContext";
 
 const App = () => {
-  const { isLoggedIn, loading, handleLogin } = useAuth();
+  const { isLoggedIn, loading } = useAuth();
 
   if (loading) {
     return <LoadingSpinner />;
@@ -25,7 +26,7 @@ const App = () => {
           <TransactionTable />
         </TransactionsProvider>
       ) : (
-        <Login onLogin={handleLogin} />
+        <Login />
       )}
     </StrictMode>
   );
@@ -48,10 +49,7 @@ const Main = () => {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/auth/login"
-          element={<Login onLogin={useAuth().handleLogin} />}
-        />
+        <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/signup" element={<SignUp />} />
         <Route path="/*" element={<App />} />
       </Routes>
@@ -61,6 +59,8 @@ const Main = () => {
 
 createRoot(document.getElementById("root")!).render(
   <AuthProvider>
-    <Main />
+    <UserProvider>
+      <Main />
+    </UserProvider>
   </AuthProvider>,
 );

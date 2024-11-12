@@ -1,22 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Box, Paper, TextField, Button, Typography } from "@mui/material";
+import { useUser } from "./providers/UserContext";
+import { useAuth } from "./providers/AuthContext";
 
-interface LoginProps {
-  onLogin: () => void;
-}
-
-const Login = ({ onLogin }: LoginProps) => {
+const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { setUsername: setContextUsername } = useUser();
+  const { handleLogin } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const authStatus = localStorage.getItem("isAuthenticated");
-    if (authStatus === "true") {
-      navigate("/");
-    }
-  }, [navigate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,12 +27,9 @@ const Login = ({ onLogin }: LoginProps) => {
         return response.json();
       })
       .then((data) => {
-        const expireAt = new Date(Date.now() + 1000 * 60).toISOString();
-        localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("expireAt", expireAt);
-        localStorage.setItem("token", data.token);
-        onLogin();
-        navigate("/"); // Redirect to the dashboard or any other page
+        handleLogin(data.token);
+        setContextUsername(data.username);
+        navigate("/");
       })
       .catch(() => {
         return;
