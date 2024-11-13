@@ -4,8 +4,8 @@ import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 
 import { Menu, MenuItem } from "@mui/material";
-import CreateTransaction from "../../modal/CreateTransaction";
-import CreateTransactionType from "../../modal/CreateTransactionType";
+import CreateTransaction from "../CreateTransaction";
+import CreateTransactionType from "../CreateTransactionType";
 
 const ExpenseButtonMenu: React.FC = () => {
   const [openTransaction, setTransactionModalOpen] = useState(false);
