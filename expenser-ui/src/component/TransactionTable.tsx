@@ -22,18 +22,32 @@ export async function deleteTransaction(id: GridRowId) {
 }
 
 export async function updateTransaction(updatedRow: GridRowModel) {
+  const transactionData = {
+    ...updatedRow,
+    amount: parseInt(updatedRow.amount),
+    date: formatDate(updatedRow.date),
+  };
+
   const response = await fetch(`/cxf/transaction/${updatedRow.id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(updatedRow),
+    body: JSON.stringify(transactionData),
   });
   if (!response.ok) {
     throw new Error("Failed to update transaction");
   }
   return;
 }
+
+const formatDate = (date: string): string => {
+  const d = new Date(date);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+};
 
 export default function TransactionTable() {
   const { transactions, fetchTransactions } = useTransactions();
@@ -56,6 +70,7 @@ export default function TransactionTable() {
 
   const TypeSelectCell = (params: GridCellParams) => {
     const [types, setTypes] = useState<TransactionType[]>([]);
+    const [selectedValue, setSelectedValue] = useState<string>("");
 
     useEffect(() => {
       fetch("/cxf/type")
@@ -63,30 +78,34 @@ export default function TransactionTable() {
         .then((data) => {
           if (Array.isArray(data.transaction_types)) {
             setTypes(data.transaction_types);
+            const validValue = data.transaction_types.find(
+              (type: TransactionType) => type.name === params.value,
+            );
+            setSelectedValue(validValue ? (params.value as string) : "");
           } else {
             console.error("Fetched types data is not an array:", data);
           }
         })
         .catch((error) => console.error("Error fetching types:", error));
-    }, []);
+    }, [params.value]);
 
     const handleChange = (event: SelectChangeEvent<unknown>) => {
+      const newValue = event.target.value as string;
+      setSelectedValue(newValue);
       params.api.setEditCellValue({
         id: params.id,
         field: params.field,
-        value: event.target.value,
+        value: newValue,
       });
     };
 
     return (
-      <Select value={params.value} onChange={handleChange} fullWidth>
-        {types
-          .filter((type) => type.id !== params.value)
-          .map((type) => (
-            <MenuItem key={type.id} value={type.name}>
-              {type.name}
-            </MenuItem>
-          ))}
+      <Select value={selectedValue} onChange={handleChange} fullWidth>
+        {types.map((type) => (
+          <MenuItem key={type.id} value={type.name}>
+            {type.name}
+          </MenuItem>
+        ))}
       </Select>
     );
   };
