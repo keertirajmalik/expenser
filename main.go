@@ -44,7 +44,8 @@ func main() {
 
 	mux.HandleFunc("GET /cxf/transaction", handler.HandleTransactionGet(&transactionData))
 	mux.HandleFunc("POST /cxf/transaction", handler.HandleTransactionCreate(&transactionData))
-	mux.HandleFunc("DELETE /transaction/{id}", handler.HandleTransactionDelete(&transactionData))
+	mux.HandleFunc("DELETE /cxf/transaction/{id}", handler.HandleTransactionDelete(&transactionData))
+	mux.HandleFunc("PUT /cxf/transaction/{id}", handler.HandleTransactionUpdate(&transactionData))
 
 	mux.HandleFunc("GET /cxf/type", handler.HandleTransactionTypeGet(&transactionData))
 	mux.HandleFunc("POST /cxf/type", handler.HandleTransactionTypeCreate(&transactionData))

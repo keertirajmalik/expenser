@@ -7,23 +7,23 @@ import {
 } from "react";
 
 interface UserContextType {
-  username: string;
-  setUsername: (username: string) => void;
+  name: string;
+  setName: (name: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [username, setUsername] = useState<string>(() => {
-    return localStorage.getItem("username") || "";
+  const [name, setName] = useState<string>(() => {
+    return localStorage.getItem("name") || "";
   });
 
   useEffect(() => {
-    localStorage.setItem("username", username);
-  }, [username]);
+    localStorage.setItem("name", name);
+  }, [name]);
 
   return (
-    <UserContext.Provider value={{ username, setUsername }}>
+    <UserContext.Provider value={{ name, setName }}>
       {children}
     </UserContext.Provider>
   );

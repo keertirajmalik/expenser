@@ -24,14 +24,18 @@ const fetchTransactions = async (
     const data = await response.json();
 
     if (Array.isArray(data.transaction)) {
-      const formattedData = data.transaction.map((item: Transaction) => ({
-        id: item.id,
-        name: item.name,
-        type: item.type,
-        amount: item.amount,
-        date: item.date,
-        note: item.note,
-      }));
+      const formattedData = data.transaction.map((item: Transaction) => {
+        const [day, month, year] = item.date.toString().split("/");
+        const parsedDate = new Date(`${year}-${month}-${day}`);
+        return {
+          id: item.id,
+          name: item.name,
+          type: item.type,
+          amount: item.amount,
+          date: parsedDate,
+          note: item.note,
+        };
+      });
       setTransactions(formattedData);
     } else {
       console.error("Expected an array but got:", data.transactions);
