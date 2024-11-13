@@ -9,7 +9,7 @@ import (
 	"github.com/keertirajmalik/expenser/model"
 )
 
-func HandleUserLogin(data model.Data, secret string) http.HandlerFunc {
+func HandleUserLogin(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -41,7 +41,7 @@ func HandleUserLogin(data model.Data, secret string) http.HandlerFunc {
 			return
 		}
 
-		accessToken, err := auth.MakeJWT(user.ID, secret, time.Hour)
+		accessToken, err := auth.MakeJWT(user.ID, data.JWTSeceret, time.Hour)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "Couldn't create JWT")
 			return

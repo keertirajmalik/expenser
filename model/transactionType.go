@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -24,7 +25,7 @@ func NewTransactionType(name, description string) TransactionType {
 	}
 }
 
-func (d Data) GetTransactionTypesFromDB() []TransactionType {
+func (d Config) GetTransactionTypesFromDB() []TransactionType {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -50,7 +51,7 @@ func convertDBTransactionTypesToTransactionTypes(dbTransactions []database.Trans
 	return transactionTypes
 }
 
-func (d *Data) AddTransactionTypeData(transactionType TransactionType) error {
+func (d *Config) AddTransactionTypeData(transactionType TransactionType) (TransactionType, error) {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -62,33 +63,38 @@ func (d *Data) AddTransactionTypeData(transactionType TransactionType) error {
 
 	if err != nil {
 		log.Println("Couldn't create transaction type in DB", err)
-		return err
+		return TransactionType{}, err
 	}
 
 	transactionTypes := convertDBTransactionTypesToTransactionTypes([]database.TransactionType{dbTransactionType})
 
-	d.TransactionTypes = append(d.TransactionTypes, transactionTypes...)
-	return nil
+	return transactionTypes[0], nil
 }
 
-func (d Data) DeleteTransactionTypeData(id uuid.UUID) error {
+func (d Config) DeleteTransactionTypeFromDB(id uuid.UUID) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	err := d.DBConfig.DB.DeleteTransactionType(context, id)
-	if err != nil {
-		log.Println("Couldn't delete transaction type from DB", err)
-		return err
+	transactionTypes := d.GetTransactionTypesFromDB()
+
+	if transactionTypeExist(transactionTypes, id) {
+		err := d.DBConfig.DB.DeleteTransactionType(context, id)
+		if err != nil {
+			log.Println("Couldn't delete transaction type from DB", err)
+			return err
+		}
+
+		return nil
 	}
-	return nil
+
+	return errors.New("Invalid transaction type id: " + id.String())
 }
 
-func (d Data) TransactionTypeIndexOf(id uuid.UUID) bool {
-	for _, transactionType := range d.TransactionTypes {
+func transactionTypeExist(transactionTypes []TransactionType, id uuid.UUID) bool {
+	for _, transactionType := range transactionTypes {
 		if transactionType.ID == id {
 			return true
 		}
 	}
-
 	return false
 }

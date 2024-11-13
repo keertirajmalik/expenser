@@ -7,7 +7,8 @@ CREATE TABLE transactions(
     type TEXT NOT NULL REFERENCES transaction_types(name),
 -- cascade on delete of the transaction type
     date DATE NOT NULL,
-    note TEXT
+    note TEXT,
+    user_id UUID NOT NULL REFERENCES users(id)
 );
 
 -- +goose Down

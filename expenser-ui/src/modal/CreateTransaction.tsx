@@ -4,7 +4,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
 import { TransactionType } from "../types/transactions type";
-import CreateTransactionType from "./CreateTransactionType";
+import CreateTransactionType from "../modal/CreateTransactionType";
 import { useTransactions } from "../providers/TransactionsContext";
 
 const style = {
@@ -23,11 +23,19 @@ interface CreateTransactionProps {
 }
 
 const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
+  const getTodayDate = () => {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, "0");
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const year = today.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+
   const [formData, setFormData] = useState({
     name: "",
     type: "",
     amount: "",
-    date: "",
+    date: getTodayDate(),
     note: "",
   });
   const [transactionTypes, setTransactionTypes] = useState<TransactionType[]>(
@@ -40,7 +48,11 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
     if (open && !nestedModalOpen) {
       const fetchTransactionTypes = async () => {
         try {
-          const response = await fetch("/cxf/type");
+          const response = await fetch("/cxf/type", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
           const data = await response.json();
           setTransactionTypes(data.transaction_types ?? []);
         } catch (error) {
@@ -76,6 +88,7 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify(transactionData),
     }).then(() => {
