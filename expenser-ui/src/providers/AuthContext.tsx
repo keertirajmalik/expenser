@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 interface AuthContextType {
   isLoggedIn: boolean;
   loading: boolean;
-  handleLogin: (token: string) => void;
+  handleLogin: (token: string, name: string) => void;
   handleLogout: () => void;
 }
 
@@ -37,10 +37,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setLoading(false);
   }, [navigate]);
 
-  const handleLogin = (token: string) => {
+  const handleLogin = (token: string, name: string) => {
     const expireAt = new Date(Date.now() + 1000 * 60).toISOString();
     localStorage.setItem("token", token);
     localStorage.setItem("expireAt", expireAt);
+    localStorage.setItem("name", name);
     setIsLoggedIn(true);
   };
 

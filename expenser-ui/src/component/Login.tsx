@@ -7,7 +7,7 @@ import { useUser } from "../providers/UserContext";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { setUsername: setContextUsername } = useUser();
+  const { setName: setContextName } = useUser();
   const { handleLogin } = useAuth();
   const navigate = useNavigate();
 
@@ -27,8 +27,8 @@ const Login = () => {
         return response.json();
       })
       .then((data) => {
-        handleLogin(data.token);
-        setContextUsername(data.name);
+        handleLogin(data.token, data.name);
+        setContextName(data.name);
         navigate("/");
       });
   };

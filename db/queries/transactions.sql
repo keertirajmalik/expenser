@@ -8,3 +8,13 @@ SELECT * from transactions;
 
 -- name: DeleteTransaction :exec
 DELETE FROM transactions where id = $1;
+
+-- name: UpdateTransaction :one
+UPDATE transactions
+SET name = $2,
+    amount = $3,
+    type =  $4,
+    date = $5,
+    note = $6
+WHERE id = $1
+RETURNING *;

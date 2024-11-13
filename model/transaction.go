@@ -30,6 +30,17 @@ func NewTransaction(transaction, transactionType, note string, amount int, date 
 	}
 }
 
+func ConvertTransacton(id uuid.UUID, transaction, transactionType, note string, amount int, date string) Transaction {
+	return Transaction{
+		ID:              id,
+		Name:            transaction,
+		Amount:          amount,
+		TransactionType: transactionType,
+		Date:            date,
+		Note:            note,
+	}
+}
+
 func (d Data) GetTransactionsFromDB() []Transaction {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
@@ -64,7 +75,7 @@ func (d *Data) AddTransactionData(transaction Transaction) error {
 
 	parsedDate, _ := time.Parse("02/01/2006", transaction.Date)
 
-	dbTransaction, err := d.DBConfig.DB.CreateTransaction(context, database.CreateTransactionParams{
+	_, err := d.DBConfig.DB.CreateTransaction(context, database.CreateTransactionParams{
 		ID:     uuid.New(),
 		Name:   transaction.Name,
 		Type:   transaction.TransactionType,
@@ -78,9 +89,29 @@ func (d *Data) AddTransactionData(transaction Transaction) error {
 		return err
 	}
 
-	transactions := convertDBTransactionToTransaction([]database.Transaction{dbTransaction})
+	return nil
+}
 
-	d.Transactions = append(d.Transactions, transactions...)
+func (d *Data) UpdateTransactionData(transaction Transaction) error {
+	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+	defer cancel()
+
+	parsedDate, _ := time.Parse("02/01/2006", transaction.Date)
+	log.Println(transaction)
+	_, err := d.DBConfig.DB.UpdateTransaction(context, database.UpdateTransactionParams{
+		ID:     transaction.ID,
+		Name:   transaction.Name,
+		Type:   transaction.TransactionType,
+		Amount: int32(transaction.Amount),
+		Date:   parsedDate,
+		Note:   db.ConvertStringToSqlNullString(transaction.Note, transaction.Note != ""),
+	})
+
+	if err != nil {
+		log.Println("Couldn't update transaction in DB", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -88,7 +119,10 @@ func (d Data) DeleteTransactionData(id uuid.UUID) {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	if transactionExist(d, id) {
+	dbTransactions, _ := d.DBConfig.DB.GetTransaction(context)
+	transactions := convertDBTransactionToTransaction(dbTransactions)
+
+	if transactionExist(transactions, id) {
 		err := d.DBConfig.DB.DeleteTransaction(context, id)
 		if err != nil {
 			log.Println("Couldn't delete transaction from DB", err)
@@ -100,8 +134,8 @@ func (d Data) DeleteTransactionData(id uuid.UUID) {
 	log.Println("Invalid transaction id", id)
 }
 
-func transactionExist(d Data, id uuid.UUID) bool {
-	for _, transaction := range d.Transactions {
+func transactionExist(transactions []Transaction, id uuid.UUID) bool {
+	for _, transaction := range transactions {
 		if transaction.ID == id {
 			return true
 		}
