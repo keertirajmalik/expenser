@@ -4,9 +4,12 @@ import {
   GridRowId,
   GridRowModel,
   GridColDef,
+  GridCellParams,
 } from "@mui/x-data-grid";
 import { useTransactions } from "../providers/TransactionsContext";
 import DataGridTable from "./DataGridTable";
+import { Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import { TransactionType } from "../types/transactions type";
 
 export async function deleteTransaction(id: GridRowId) {
   const response = await fetch(`/cxf/transaction/${id}`, {
@@ -51,6 +54,43 @@ export default function TransactionTable() {
     return newRow;
   };
 
+  const TypeSelectCell = (params: GridCellParams) => {
+    const [types, setTypes] = useState<TransactionType[]>([]);
+
+    useEffect(() => {
+      fetch("/cxf/type")
+        .then((response) => response.json())
+        .then((data) => {
+          if (Array.isArray(data.transaction_types)) {
+            setTypes(data.transaction_types);
+          } else {
+            console.error("Fetched types data is not an array:", data);
+          }
+        })
+        .catch((error) => console.error("Error fetching types:", error));
+    }, []);
+
+    const handleChange = (event: SelectChangeEvent<unknown>) => {
+      params.api.setEditCellValue({
+        id: params.id,
+        field: params.field,
+        value: event.target.value,
+      });
+    };
+
+    return (
+      <Select value={params.value} onChange={handleChange} fullWidth>
+        {types
+          .filter((type) => type.id !== params.value)
+          .map((type) => (
+            <MenuItem key={type.id} value={type.name}>
+              {type.name}
+            </MenuItem>
+          ))}
+      </Select>
+    );
+  };
+
   const columns: GridColDef[] = [
     {
       field: "name",
@@ -63,22 +103,25 @@ export default function TransactionTable() {
       field: "type",
       headerName: "Type",
       headerClassName: "home-table-header",
-      width: 250,
+      headerAlign: "center",
+      align: "center",
+      width: 100,
       editable: true,
+      renderEditCell: (params) => <TypeSelectCell {...params} />,
     },
     {
       field: "amount",
       headerName: "Amount",
       type: "number",
       headerClassName: "home-table-header",
-      width: 200,
+      width: 150,
       editable: true,
     },
     {
       field: "date",
       headerName: "Date",
       headerClassName: "home-table-header",
-      width: 200,
+      width: 100,
       align: "center",
       headerAlign: "center",
       editable: true,
@@ -87,6 +130,7 @@ export default function TransactionTable() {
     {
       field: "note",
       headerName: "Note",
+      headerAlign: "center",
       flex: 1,
       sortable: false,
       headerClassName: "home-table-header",
