@@ -20,7 +20,11 @@ const fetchTransactions = async (
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>,
 ) => {
   try {
-    const response = await fetch("/cxf/transaction");
+    const response = await fetch("/cxf/transaction", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
     const data = await response.json();
 
     if (Array.isArray(data.transaction)) {

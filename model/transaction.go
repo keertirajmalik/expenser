@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -17,9 +18,10 @@ type Transaction struct {
 	TransactionType string    `json:"type"`
 	Date            string    `json:"date"`
 	Note            string    `json:"note"`
+	UserID          uuid.UUID `json:"user_id"`
 }
 
-func NewTransaction(transaction, transactionType, note string, amount int, date string) Transaction {
+func NewTransaction(transaction, transactionType, note string, amount int, date string, userID uuid.UUID) Transaction {
 	return Transaction{
 		ID:              uuid.New(),
 		Name:            transaction,
@@ -27,10 +29,11 @@ func NewTransaction(transaction, transactionType, note string, amount int, date 
 		TransactionType: transactionType,
 		Date:            date,
 		Note:            note,
+		UserID:          userID,
 	}
 }
 
-func ConvertTransacton(id uuid.UUID, transaction, transactionType, note string, amount int, date string) Transaction {
+func ConvertTransacton(id uuid.UUID, transaction, transactionType, note string, amount int, date string, userID uuid.UUID) Transaction {
 	return Transaction{
 		ID:              id,
 		Name:            transaction,
@@ -38,12 +41,14 @@ func ConvertTransacton(id uuid.UUID, transaction, transactionType, note string, 
 		TransactionType: transactionType,
 		Date:            date,
 		Note:            note,
+		UserID:          userID,
 	}
 }
 
 func (d Data) GetTransactionsFromDB() []Transaction {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
+
 	dbTransactions, err := d.DBConfig.DB.GetTransaction(context)
 	if err != nil {
 		log.Println("Couldn't get transaction from in DB", err)
@@ -63,13 +68,14 @@ func convertDBTransactionToTransaction(dbTransactions []database.Transaction) []
 			TransactionType: transaction.Type,
 			Date:            transaction.Date.Format("02/01/2006"),
 			Note:            db.ConvertSqlNullStringToString(transaction.Note),
+			UserID:          transaction.UserID,
 		})
 	}
 
 	return transactions
 }
 
-func (d *Data) AddTransactionData(transaction Transaction) error {
+func (d *Data) AddTransactionToDB(transaction Transaction) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -82,6 +88,7 @@ func (d *Data) AddTransactionData(transaction Transaction) error {
 		Amount: int32(transaction.Amount),
 		Date:   parsedDate,
 		Note:   db.ConvertStringToSqlNullString(transaction.Note, transaction.Note != ""),
+		UserID: transaction.UserID,
 	})
 
 	if err != nil {
@@ -92,7 +99,7 @@ func (d *Data) AddTransactionData(transaction Transaction) error {
 	return nil
 }
 
-func (d *Data) UpdateTransactionData(transaction Transaction) error {
+func (d *Data) UpdateTransactionInDB(transaction Transaction) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -115,23 +122,24 @@ func (d *Data) UpdateTransactionData(transaction Transaction) error {
 	return nil
 }
 
-func (d Data) DeleteTransactionData(id uuid.UUID) {
+func (d Data) DeleteTransactionFromDB(id uuid.UUID) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	dbTransactions, _ := d.DBConfig.DB.GetTransaction(context)
-	transactions := convertDBTransactionToTransaction(dbTransactions)
+	transactions := d.GetTransactionsFromDB()
 
 	if transactionExist(transactions, id) {
 		err := d.DBConfig.DB.DeleteTransaction(context, id)
 		if err != nil {
 			log.Println("Couldn't delete transaction from DB", err)
+			return err
 		}
 
-		return
+		return nil
 	}
 
-	log.Println("Invalid transaction id", id)
+	return errors.New("Invalid transaction id: " + id.String())
+
 }
 
 func transactionExist(transactions []Transaction, id uuid.UUID) bool {

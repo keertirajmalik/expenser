@@ -18,6 +18,7 @@ type Transaction struct {
 	Type   string
 	Date   time.Time
 	Note   sql.NullString
+	UserID uuid.UUID
 }
 
 type TransactionType struct {

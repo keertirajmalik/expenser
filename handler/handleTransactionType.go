@@ -15,7 +15,7 @@ func HandleTransactionTypeGet(data *model.Data) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		respondWithJson(w, http.StatusOK, validResponse{
-			TransactionTypes: data.GetData().TransactionTypes,
+			TransactionTypes: data.GetTransactionTypesFromDB(),
 		})
 	}
 }
@@ -40,7 +40,7 @@ func HandleTransactionTypeCreate(data *model.Data) http.HandlerFunc {
 		}
 
 		transactionType := model.NewTransactionType(params.Name, params.Description)
-		err = data.AddTransactionTypeData(transactionType)
+		transactionType, err = data.AddTransactionTypeData(transactionType)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
@@ -62,7 +62,7 @@ func HandleTransactionTypeDelete(data *model.Data) http.HandlerFunc {
 			return
 		}
 
-		err = data.DeleteTransactionTypeData(id)
+		err = data.DeleteTransactionTypeFromDB(id)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
