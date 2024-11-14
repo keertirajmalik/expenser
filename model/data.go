@@ -5,14 +5,6 @@ import (
 )
 
 type Data struct {
-	Transactions     []Transaction
-	TransactionTypes []TransactionType
-	DBConfig         *db.DBConfig
-}
-
-func (d *Data) GetData() Data {
-	d.Transactions = d.GetTransactionsFromDB()
-	d.TransactionTypes = d.GetTransactionTypesFromDB()
-
-	return *d
+	DBConfig   *db.DBConfig
+	JWTSeceret string
 }
