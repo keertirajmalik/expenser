@@ -26,7 +26,7 @@ func NewUser(name, username, password string) User {
 	}
 }
 
-func (d Data) GetUsersFromDB(context context.Context) []User {
+func (d Config) GetUsersFromDB(context context.Context) []User {
 	dbUsers, err := d.DBConfig.DB.GetUsers(context)
 	if err != nil {
 		log.Println("Couldn't get users from in DB", err)
@@ -35,7 +35,7 @@ func (d Data) GetUsersFromDB(context context.Context) []User {
 	return convertDBUserToUser(dbUsers)
 }
 
-func (d *Data) AddUserToDB(user User) (User, error) {
+func (d *Config) AddUserToDB(user User) (User, error) {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -61,7 +61,7 @@ func (d *Data) AddUserToDB(user User) (User, error) {
 	return users[0], nil
 }
 
-func (d *Data) GetUserByUsernameFromDB(username string) (User, error) {
+func (d *Config) GetUserByUsernameFromDB(username string) (User, error) {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 

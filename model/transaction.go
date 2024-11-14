@@ -45,7 +45,7 @@ func ConvertTransacton(id uuid.UUID, transaction, transactionType, note string, 
 	}
 }
 
-func (d Data) GetTransactionsFromDB() []Transaction {
+func (d Config) GetTransactionsFromDB() []Transaction {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -75,7 +75,7 @@ func convertDBTransactionToTransaction(dbTransactions []database.Transaction) []
 	return transactions
 }
 
-func (d *Data) AddTransactionToDB(transaction Transaction) error {
+func (d *Config) AddTransactionToDB(transaction Transaction) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -99,12 +99,11 @@ func (d *Data) AddTransactionToDB(transaction Transaction) error {
 	return nil
 }
 
-func (d *Data) UpdateTransactionInDB(transaction Transaction) error {
+func (d *Config) UpdateTransactionInDB(transaction Transaction) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
 	parsedDate, _ := time.Parse("02/01/2006", transaction.Date)
-	log.Println(transaction)
 	_, err := d.DBConfig.DB.UpdateTransaction(context, database.UpdateTransactionParams{
 		ID:     transaction.ID,
 		Name:   transaction.Name,
@@ -122,7 +121,7 @@ func (d *Data) UpdateTransactionInDB(transaction Transaction) error {
 	return nil
 }
 
-func (d Data) DeleteTransactionFromDB(id uuid.UUID) error {
+func (d Config) DeleteTransactionFromDB(id uuid.UUID) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 

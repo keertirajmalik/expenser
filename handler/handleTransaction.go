@@ -9,7 +9,7 @@ import (
 	"github.com/keertirajmalik/expenser/model"
 )
 
-func HandleTransactionGet(data model.Data) http.HandlerFunc {
+func HandleTransactionGet(data model.Config) http.HandlerFunc {
 	type validResponse struct {
 		Transactions []model.Transaction `json:"transaction"`
 	}
@@ -21,7 +21,7 @@ func HandleTransactionGet(data model.Data) http.HandlerFunc {
 	}
 }
 
-func HandleTransactionCreate(data model.Data) http.HandlerFunc {
+func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Name   string `json:"name"`
 		Amount int    `json:"amount"`
@@ -68,7 +68,7 @@ func HandleTransactionCreate(data model.Data) http.HandlerFunc {
 	}
 }
 
-func HandleTransactionUpdate(data model.Data) http.HandlerFunc {
+func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Name   string `json:"name"`
 		Amount int    `json:"amount"`
@@ -123,7 +123,7 @@ func HandleTransactionUpdate(data model.Data) http.HandlerFunc {
 	}
 }
 
-func HandleTransactionDelete(data model.Data) http.HandlerFunc {
+func HandleTransactionDelete(data model.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 

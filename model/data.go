@@ -4,7 +4,7 @@ import (
 	"github.com/keertirajmalik/expenser/db"
 )
 
-type Data struct {
+type Config struct {
 	DBConfig   *db.DBConfig
 	JWTSeceret string
 }
