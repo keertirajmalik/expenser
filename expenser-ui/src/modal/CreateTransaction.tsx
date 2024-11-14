@@ -48,7 +48,11 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
     if (open && !nestedModalOpen) {
       const fetchTransactionTypes = async () => {
         try {
-          const response = await fetch("/cxf/type");
+          const response = await fetch("/cxf/type", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
           const data = await response.json();
           setTransactionTypes(data.transaction_types ?? []);
         } catch (error) {

@@ -14,6 +14,9 @@ import { TransactionType } from "../types/transactions type";
 export async function deleteTransaction(id: GridRowId) {
   const response = await fetch(`/cxf/transaction/${id}`, {
     method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
   });
   if (!response.ok) {
     throw new Error("Failed to delete transaction");
@@ -32,6 +35,7 @@ export async function updateTransaction(updatedRow: GridRowModel) {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
     body: JSON.stringify(transactionData),
   });
@@ -73,7 +77,11 @@ export default function TransactionTable() {
     const [selectedValue, setSelectedValue] = useState<string>("");
 
     useEffect(() => {
-      fetch("/cxf/type")
+      fetch("/cxf/type", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
         .then((response) => response.json())
         .then((data) => {
           if (Array.isArray(data.transaction_types)) {
