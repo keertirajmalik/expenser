@@ -9,7 +9,7 @@ import (
 	"github.com/keertirajmalik/expenser/model"
 )
 
-func HandleUserLogin(data model.Data) http.HandlerFunc {
+func HandleUserLogin(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Username string `json:"username"`
 		Password string `json:"password"`

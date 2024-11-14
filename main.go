@@ -11,7 +11,6 @@ import (
 	"github.com/keertirajmalik/expenser/middleware"
 	"github.com/keertirajmalik/expenser/model"
 	_ "github.com/lib/pq"
-	"github.com/rs/cors"
 )
 
 func main() {
@@ -36,28 +35,32 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	transactionData := model.Data{
+	config := model.Config{
 		DBConfig:   &dbConfig,
 		JWTSeceret: jwtSecret,
 	}
 
-	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(transactionData))
+	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(config))
 
-	mux.HandleFunc("POST /cxf/user", handler.HandleUserCreate(transactionData))
+	mux.HandleFunc("POST /cxf/user", handler.HandleUserCreate(config))
 
-	mux.HandleFunc("GET /cxf/transaction", handler.HandleTransactionGet(transactionData))
-	mux.HandleFunc("POST /cxf/transaction", handler.HandleTransactionCreate(transactionData))
-	mux.HandleFunc("DELETE /cxf/transaction/{id}", handler.HandleTransactionDelete(transactionData))
-	mux.HandleFunc("PUT /cxf/transaction/{id}", handler.HandleTransactionUpdate(transactionData))
+	mux.HandleFunc("GET /cxf/transaction", handler.HandleTransactionGet(config))
+	mux.HandleFunc("POST /cxf/transaction", handler.HandleTransactionCreate(config))
+	mux.HandleFunc("DELETE /cxf/transaction/{id}", handler.HandleTransactionDelete(config))
+	mux.HandleFunc("PUT /cxf/transaction/{id}", handler.HandleTransactionUpdate(config))
 
-	mux.HandleFunc("GET /cxf/type", handler.HandleTransactionTypeGet(&transactionData))
-	mux.HandleFunc("POST /cxf/type", handler.HandleTransactionTypeCreate(&transactionData))
-	mux.HandleFunc("DELETE /type/{id}", handler.HandleTransactionTypeDelete(&transactionData))
+	mux.HandleFunc("GET /cxf/type", handler.HandleTransactionTypeGet(config))
+	mux.HandleFunc("POST /cxf/type", handler.HandleTransactionTypeCreate(config))
+	mux.HandleFunc("DELETE /type/{id}", handler.HandleTransactionTypeDelete(config))
 
-	handler := cors.Default().Handler(mux)
+	stack := middleware.CreateStack(
+		middleware.Logging,
+		middleware.AllowCors,
+	)
+
 	server := &http.Server{
 		Addr:    ":" + port,
-		Handler: middleware.Logging(handler),
+		Handler: stack(mux),
 	}
 
 	log.Printf("Start of our new project on port:%s \n", port)

@@ -8,7 +8,7 @@ import (
 	"github.com/keertirajmalik/expenser/model"
 )
 
-func HandleUserCreate(data model.Data) http.HandlerFunc {
+func HandleUserCreate(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Name     string `json:"name"`
 		Username string `json:"username"`

@@ -25,7 +25,7 @@ func NewTransactionType(name, description string) TransactionType {
 	}
 }
 
-func (d Data) GetTransactionTypesFromDB() []TransactionType {
+func (d Config) GetTransactionTypesFromDB() []TransactionType {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -51,7 +51,7 @@ func convertDBTransactionTypesToTransactionTypes(dbTransactions []database.Trans
 	return transactionTypes
 }
 
-func (d *Data) AddTransactionTypeData(transactionType TransactionType) (TransactionType, error) {
+func (d *Config) AddTransactionTypeData(transactionType TransactionType) (TransactionType, error) {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -71,7 +71,7 @@ func (d *Data) AddTransactionTypeData(transactionType TransactionType) (Transact
 	return transactionTypes[0], nil
 }
 
-func (d Data) DeleteTransactionTypeFromDB(id uuid.UUID) error {
+func (d Config) DeleteTransactionTypeFromDB(id uuid.UUID) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
