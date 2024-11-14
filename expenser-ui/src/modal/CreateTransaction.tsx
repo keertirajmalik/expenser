@@ -84,6 +84,7 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify(transactionData),
     }).then(() => {

@@ -14,9 +14,9 @@ import (
 )
 
 const createTransaction = `-- name: CreateTransaction :one
-INSERT INTO transactions(id, name, amount, type, date, note)
-VALUES ($1, $2, $3, $4,$5, $6)
-RETURNING id, name, amount, type, date, note
+INSERT INTO transactions(id, name, amount, type, date, note, user_id)
+VALUES ($1, $2, $3, $4,$5, $6, $7)
+RETURNING id, name, amount, type, date, note, user_id
 `
 
 type CreateTransactionParams struct {
@@ -26,6 +26,7 @@ type CreateTransactionParams struct {
 	Type   string
 	Date   time.Time
 	Note   sql.NullString
+	UserID uuid.UUID
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
@@ -36,6 +37,7 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 		arg.Type,
 		arg.Date,
 		arg.Note,
+		arg.UserID,
 	)
 	var i Transaction
 	err := row.Scan(
@@ -45,6 +47,7 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 		&i.Type,
 		&i.Date,
 		&i.Note,
+		&i.UserID,
 	)
 	return i, err
 }
@@ -59,7 +62,7 @@ func (q *Queries) DeleteTransaction(ctx context.Context, id uuid.UUID) error {
 }
 
 const getTransaction = `-- name: GetTransaction :many
-SELECT id, name, amount, type, date, note from transactions
+SELECT id, name, amount, type, date, note, user_id from transactions
 `
 
 func (q *Queries) GetTransaction(ctx context.Context) ([]Transaction, error) {
@@ -78,6 +81,7 @@ func (q *Queries) GetTransaction(ctx context.Context) ([]Transaction, error) {
 			&i.Type,
 			&i.Date,
 			&i.Note,
+			&i.UserID,
 		); err != nil {
 			return nil, err
 		}
@@ -100,7 +104,7 @@ SET name = $2,
     date = $5,
     note = $6
 WHERE id = $1
-RETURNING id, name, amount, type, date, note
+RETURNING id, name, amount, type, date, note, user_id
 `
 
 type UpdateTransactionParams struct {
@@ -129,6 +133,7 @@ func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionPa
 		&i.Type,
 		&i.Date,
 		&i.Note,
+		&i.UserID,
 	)
 	return i, err
 }
