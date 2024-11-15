@@ -1,4 +1,4 @@
-module github.com/keertirajmalik/expenser
+module github.com/keertirajmalik/expenser/expenser-server
 
 go 1.22.3
 
