@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/keertirajmalik/expenser/model"
+	"github.com/keertirajmalik/expenser/expenser-server/model"
 )
 
 func HandleTransactionTypeGet(data model.Config) http.HandlerFunc {

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/keertirajmalik/expenser/internal/database"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/database"
 )
 
 type DBConfig struct {

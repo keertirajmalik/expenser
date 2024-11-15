@@ -6,10 +6,10 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/keertirajmalik/expenser/db"
-	"github.com/keertirajmalik/expenser/handler"
-	"github.com/keertirajmalik/expenser/middleware"
-	"github.com/keertirajmalik/expenser/model"
+	"github.com/keertirajmalik/expenser/expenser-server/db"
+	"github.com/keertirajmalik/expenser/expenser-server/handler"
+	"github.com/keertirajmalik/expenser/expenser-server/middleware"
+	"github.com/keertirajmalik/expenser/expenser-server/model"
 	_ "github.com/lib/pq"
 )
 

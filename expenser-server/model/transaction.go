@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/keertirajmalik/expenser/db"
-	"github.com/keertirajmalik/expenser/internal/database"
+	"github.com/keertirajmalik/expenser/expenser-server/db"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/database"
 )
 
 type Transaction struct {
