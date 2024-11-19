@@ -18,6 +18,13 @@ func CreateDbConnection(dbURL string) DBConfig {
 		log.Fatal("Can't connect to database", err)
 	}
 
+	err = conn.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Print("DB connected successfully")
+
 	dbConfig := DBConfig{
 		DB: database.New(conn),
 	}

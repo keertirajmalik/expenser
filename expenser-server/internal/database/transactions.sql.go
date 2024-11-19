@@ -62,11 +62,11 @@ func (q *Queries) DeleteTransaction(ctx context.Context, id uuid.UUID) error {
 }
 
 const getTransaction = `-- name: GetTransaction :many
-SELECT id, name, amount, type, date, note, user_id from transactions
+SELECT id, name, amount, type, date, note, user_id from transactions where user_id=$1
 `
 
-func (q *Queries) GetTransaction(ctx context.Context) ([]Transaction, error) {
-	rows, err := q.db.QueryContext(ctx, getTransaction)
+func (q *Queries) GetTransaction(ctx context.Context, userID uuid.UUID) ([]Transaction, error) {
+	rows, err := q.db.QueryContext(ctx, getTransaction, userID)
 	if err != nil {
 		return nil, err
 	}

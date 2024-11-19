@@ -45,11 +45,11 @@ func ConvertTransacton(id uuid.UUID, transaction, transactionType, note string, 
 	}
 }
 
-func (d Config) GetTransactionsFromDB() []Transaction {
+func (d Config) GetTransactionsFromDB(userID uuid.UUID) []Transaction {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	dbTransactions, err := d.DBConfig.DB.GetTransaction(context)
+	dbTransactions, err := d.DBConfig.DB.GetTransaction(context, userID)
 	if err != nil {
 		log.Println("Couldn't get transaction from in DB", err)
 	}
@@ -121,11 +121,11 @@ func (d *Config) UpdateTransactionInDB(transaction Transaction) error {
 	return nil
 }
 
-func (d Config) DeleteTransactionFromDB(id uuid.UUID) error {
+func (d Config) DeleteTransactionFromDB(id, userID uuid.UUID) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	transactions := d.GetTransactionsFromDB()
+	transactions := d.GetTransactionsFromDB(userID)
 
 	if transactionExist(transactions, id) {
 		err := d.DBConfig.DB.DeleteTransaction(context, id)

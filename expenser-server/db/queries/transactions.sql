@@ -4,7 +4,7 @@ VALUES ($1, $2, $3, $4,$5, $6, $7)
 RETURNING *;
 
 -- name: GetTransaction :many
-SELECT * from transactions;
+SELECT * from transactions where user_id=$1;
 
 -- name: DeleteTransaction :exec
 DELETE FROM transactions where id = $1;
