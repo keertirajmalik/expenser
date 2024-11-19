@@ -15,8 +15,20 @@ func HandleTransactionGet(data model.Config) http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		token, err := auth.GetBearerToken(r.Header)
+		if err != nil {
+			respondWithError(w, http.StatusUnauthorized, err.Error())
+			return
+		}
+
+		userID, err := auth.ValidateJWT(token, data.JWTSeceret)
+		if err != nil {
+			respondWithError(w, http.StatusUnauthorized, err.Error())
+			return
+		}
+
 		respondWithJson(w, http.StatusOK, validResponse{
-			Transactions: data.GetTransactionsFromDB(),
+			Transactions: data.GetTransactionsFromDB(userID),
 		})
 	}
 }
@@ -125,6 +137,17 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 
 func HandleTransactionDelete(data model.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		token, err := auth.GetBearerToken(r.Header)
+		if err != nil {
+			respondWithError(w, http.StatusUnauthorized, err.Error())
+			return
+		}
+
+		userID, err := auth.ValidateJWT(token, data.JWTSeceret)
+		if err != nil {
+			respondWithError(w, http.StatusUnauthorized, "Couldn't validate JWT")
+			return
+		}
 		idStr := r.PathValue("id")
 
 		id, err := uuid.Parse(idStr)
@@ -133,7 +156,7 @@ func HandleTransactionDelete(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		data.DeleteTransactionFromDB(id)
+		data.DeleteTransactionFromDB(id, userID)
 
 		w.WriteHeader(http.StatusNoContent)
 	}
