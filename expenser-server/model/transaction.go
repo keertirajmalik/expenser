@@ -2,7 +2,7 @@ package model
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -45,16 +45,17 @@ func ConvertTransacton(id uuid.UUID, transaction, transactionType, note string, 
 	}
 }
 
-func (d Config) GetTransactionsFromDB(userID uuid.UUID) []Transaction {
+func (d Config) GetTransactionsFromDB(userID uuid.UUID) ([]Transaction, error) {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
 	dbTransactions, err := d.DBConfig.DB.GetTransaction(context, userID)
 	if err != nil {
 		log.Println("Couldn't get transaction from in DB", err)
+		return []Transaction{}, err
 	}
 
-	return convertDBTransactionToTransaction(dbTransactions)
+	return convertDBTransactionToTransaction(dbTransactions), nil
 }
 
 func convertDBTransactionToTransaction(dbTransactions []database.Transaction) []Transaction {
@@ -125,20 +126,19 @@ func (d Config) DeleteTransactionFromDB(id, userID uuid.UUID) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	transactions := d.GetTransactionsFromDB(userID)
-
-	if transactionExist(transactions, id) {
-		err := d.DBConfig.DB.DeleteTransaction(context, id)
-		if err != nil {
-			log.Println("Couldn't delete transaction from DB", err)
-			return err
-		}
-
-		return nil
+	result, err := d.DBConfig.DB.DeleteTransaction(context, database.DeleteTransactionParams{
+		ID:     id,
+		UserID: userID,
+	})
+	if err != nil {
+		log.Printf("Failed to delete transaction %s for user %s: %v", id, userID, err)
+		return err
+	}
+	if rowAffected, _ := result.RowsAffected(); rowAffected == 0 {
+		return fmt.Errorf("transaction %s not found for user %s", id, userID)
 	}
 
-	return errors.New("Invalid transaction id: " + id.String())
-
+	return nil
 }
 
 func transactionExist(transactions []Transaction, id uuid.UUID) bool {

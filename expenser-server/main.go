@@ -31,13 +31,16 @@ func main() {
 		log.Fatal("JWT_SECRET enviornment variable is not set")
 	}
 
-	dbConfig := db.CreateDbConnection(dbURL)
+	dbConfig, err := db.CreateDbConnection(dbURL)
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
 
 	mux := http.NewServeMux()
 
 	config := model.Config{
 		DBConfig:   &dbConfig,
-		JWTSeceret: jwtSecret,
+		JWTSecret: jwtSecret,
 	}
 
 	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(config))

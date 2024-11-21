@@ -6,8 +6,8 @@ RETURNING *;
 -- name: GetTransaction :many
 SELECT * from transactions where user_id=$1;
 
--- name: DeleteTransaction :exec
-DELETE FROM transactions where id = $1;
+-- name: DeleteTransaction :execresult
+DELETE FROM transactions where id = $1 AND user_id=$2;
 
 -- name: UpdateTransaction :one
 UPDATE transactions

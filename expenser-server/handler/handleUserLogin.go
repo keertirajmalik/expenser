@@ -41,7 +41,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		accessToken, err := auth.MakeJWT(user.ID, data.JWTSeceret, time.Hour)
+		accessToken, err := auth.MakeJWT(user.ID, data.JWTSecret, time.Hour)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "Couldn't create JWT")
 			return

@@ -6,5 +6,5 @@ import (
 
 type Config struct {
 	DBConfig   *db.DBConfig
-	JWTSeceret string
+	JWTSecret string
 }

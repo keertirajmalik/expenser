@@ -52,13 +52,17 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 	return i, err
 }
 
-const deleteTransaction = `-- name: DeleteTransaction :exec
-DELETE FROM transactions where id = $1
+const deleteTransaction = `-- name: DeleteTransaction :execresult
+DELETE FROM transactions where id = $1 AND user_id=$2
 `
 
-func (q *Queries) DeleteTransaction(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.ExecContext(ctx, deleteTransaction, id)
-	return err
+type DeleteTransactionParams struct {
+	ID     uuid.UUID
+	UserID uuid.UUID
+}
+
+func (q *Queries) DeleteTransaction(ctx context.Context, arg DeleteTransactionParams) (sql.Result, error) {
+	return q.db.ExecContext(ctx, deleteTransaction, arg.ID, arg.UserID)
 }
 
 const getTransaction = `-- name: GetTransaction :many
