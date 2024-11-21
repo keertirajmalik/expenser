@@ -14,8 +14,13 @@ func HandleTransactionTypeGet(data model.Config) http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		transactionTypes, err := data.GetTransactionTypesFromDB()
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Failed to retrieve transaction types")
+			return
+		}
 		respondWithJson(w, http.StatusOK, validResponse{
-			TransactionTypes: data.GetTransactionTypesFromDB(),
+			TransactionTypes: transactionTypes,
 		})
 	}
 }
@@ -35,7 +40,7 @@ func HandleTransactionTypeCreate(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err := decoder.Decode(&params)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
+			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
 			return
 		}
 

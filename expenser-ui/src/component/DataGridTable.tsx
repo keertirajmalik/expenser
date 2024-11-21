@@ -9,9 +9,9 @@ import {
   GridActionsCellItem,
   GridRowModes,
   GridRowId,
+  GridPaginationModel,
 } from "@mui/x-data-grid";
 import { Box, Paper } from "@mui/material";
-import { PaginationModel } from "../types/pagination";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
@@ -41,7 +41,7 @@ const dataGridStyles = {
   },
 };
 
-const paginationModel = { page: 0, pageSize: 10 };
+const paginationModel: GridPaginationModel = { page: 0, pageSize: 10 };
 const rowHeight = 52; // Default row height in DataGrid
 const headerHeight = 56; // Default header height in DataGrid
 const footerHeight = 56; // Default footer height in DataGrid
@@ -85,7 +85,9 @@ const DataGridTable: React.FC<TransactionDataGridProps> = ({
     setRowModesModel(newRowModesModel);
   };
 
-  const handlePaginationModelChange = (newPaginationModel: PaginationModel) => {
+  const handlePaginationModelChange = (
+    newPaginationModel: GridPaginationModel,
+  ) => {
     setPageSize(
       Math.min(
         newPaginationModel.pageSize,

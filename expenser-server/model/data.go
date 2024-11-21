@@ -5,6 +5,6 @@ import (
 )
 
 type Config struct {
-	DBConfig   *db.DBConfig
-	JWTSecret string
+	DBConfig  db.DBConfig
+	JWTSecret []byte
 }

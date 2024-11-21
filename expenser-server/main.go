@@ -41,8 +41,8 @@ func main() {
 	mux := http.NewServeMux()
 
 	config := model.Config{
-		DBConfig:  &dbConfig,
-		JWTSecret: jwtSecret,
+		DBConfig:  dbConfig,
+		JWTSecret: []byte(jwtSecret),
 	}
 
 	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(config))
@@ -68,6 +68,6 @@ func main() {
 		Handler: stack(mux),
 	}
 
-    log.Printf("Server is running on port %s\n", port)
+	log.Printf("Server is running on port %s\n", port)
 	log.Fatal(server.ListenAndServe())
 }

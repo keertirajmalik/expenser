@@ -9,7 +9,7 @@ import {
 import { useTransactions } from "../providers/TransactionsContext";
 import DataGridTable from "./DataGridTable";
 import { Select, MenuItem, SelectChangeEvent } from "@mui/material";
-import { TransactionType } from "../types/transactions type";
+import { TransactionType } from "../types/transactionType";
 
 export async function deleteTransaction(id: GridRowId) {
   const response = await fetch(`/cxf/transaction/${id}`, {
@@ -67,7 +67,9 @@ export default function TransactionTable() {
 
   const processRowUpdate = (newRow: GridRowModel) => {
     const updatedRow = { ...newRow, isNew: false };
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+    setRows((prevRows) =>
+      prevRows.map((row) => (row.id === newRow.id ? updatedRow : row)),
+    );
     updateTransaction(newRow).then(fetchTransactions);
     return newRow;
   };

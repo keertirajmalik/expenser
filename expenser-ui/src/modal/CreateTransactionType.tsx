@@ -25,11 +25,21 @@ const CreateTransactionType = ({
 }: CreateTransactionProps) => {
   const [name, setName] = useState("");
   const [note, setNote] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   function handleSubmit(
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): void {
     event.preventDefault();
+    setError("");
+
+    if (!name.trim()) {
+      setError("Name is required");
+      return;
+    }
+    setIsLoading(true);
+
     const transactionTypeData = {
       name,
       note,
@@ -48,10 +58,10 @@ const CreateTransactionType = ({
         handleClose();
       })
       .catch((error) => {
-        console.error(
-          "There was an error creating the transaction type!",
-          error,
-        );
+        setError(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }
 
@@ -66,7 +76,7 @@ const CreateTransactionType = ({
         <Typography id="modal-modal-title" variant="h6" component="h2">
           Create Transaction Type
         </Typography>
-        <FormGroup>
+        <FormGroup role="form">
           <TextField
             required
             label="Name"
@@ -74,6 +84,10 @@ const CreateTransactionType = ({
             margin="normal"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            error={!!error}
+            helperText={error}
+            disabled={isLoading}
+            aria-label="Transaction type name"
           />
           <TextField
             label="Note"
@@ -83,9 +97,17 @@ const CreateTransactionType = ({
             margin="normal"
             value={note}
             onChange={(e) => setNote(e.target.value)}
+            disabled={isLoading}
+            aria-label="Transaction type note"
           />
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Submit
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+            disabled={isLoading}
+            aria-busy={isLoading}
+          >
+            {isLoading ? "Creating..." : "Create"}
           </Button>
         </FormGroup>
       </Paper>

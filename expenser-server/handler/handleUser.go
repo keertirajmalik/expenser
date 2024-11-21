@@ -16,6 +16,7 @@ func HandleUserCreate(data model.Config) http.HandlerFunc {
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
+		decoder.DisallowUnknownFields()
 		params := parameters{}
 		err := decoder.Decode(&params)
 		if err != nil {

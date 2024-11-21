@@ -3,7 +3,7 @@ import { Box, Button, FormGroup, Paper, TextField } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
-import { TransactionType } from "../types/transactions type";
+import { TransactionType } from "../types/transactionType";
 import CreateTransactionType from "../modal/CreateTransactionType";
 import { useTransactions } from "../providers/TransactionsContext";
 
@@ -80,7 +80,7 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
     event.preventDefault();
     const transactionData = {
       ...formData,
-      amount: parseInt(formData.amount),
+      amount: parseFloat(formData.amount),
       date: formatDate(formData.date),
     };
 

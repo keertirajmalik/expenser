@@ -7,9 +7,37 @@ const SignUp = () => {
   const [fullname, setFullname] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [errors, setErrors] = useState({
+    username: "",
+    password: "",
+    fullname: "",
+    submit: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
+  const validatePassword = (pass: string) => {
+    if (pass.length < 8) {
+      return "Password must be at least 8 characters long";
+    }
+    if (!/[A-Z]/.test(pass)) {
+      return "Password must contain at least one uppercase letter";
+    }
+    if (!/[0-9]/.test(pass)) {
+      return "Password must contain at least one number";
+    }
+    return "";
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setErrors((prev) => ({
+        ...prev,
+        password: passwordError,
+      }));
+      return;
+    }
     fetch("/cxf/user", {
       method: "POST",
       headers: {
@@ -17,17 +45,24 @@ const SignUp = () => {
       },
       body: JSON.stringify({ name: fullname, username, password }),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          const data = await response.json();
+          throw new Error(data.message);
         }
         return response.json();
       })
       .then(() => {
         navigate("/auth/login");
       })
-      .catch(() => {
-        return;
+      .catch((error) => {
+        setErrors((prev) => ({
+          ...prev,
+          submit: error.message,
+        }));
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -51,7 +86,12 @@ const SignUp = () => {
           borderRadius: 2,
         }}
       >
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate aria-label="Sign up form">
+          {errors.submit && (
+            <Typography color="error" align="center">
+              {errors.submit}
+            </Typography>
+          )}
           <TextField
             required
             label="Full Name"
@@ -61,6 +101,9 @@ const SignUp = () => {
             fullWidth
             size="small"
             margin="dense"
+            error={!!errors.fullname}
+            helperText={errors.fullname}
+            aria-label="Full Name input"
           />
           <TextField
             required
@@ -71,6 +114,9 @@ const SignUp = () => {
             fullWidth
             size="small"
             margin="dense"
+            error={!!errors.username}
+            helperText={errors.username}
+            aria-label="Username input"
           />
           <TextField
             required
@@ -82,6 +128,9 @@ const SignUp = () => {
             fullWidth
             size="small"
             margin="dense"
+            error={!!errors.password}
+            helperText={errors.password}
+            aria-label="Password input"
           />
           <Button
             type="submit"
@@ -89,8 +138,9 @@ const SignUp = () => {
             color="primary"
             sx={{ marginTop: 2 }}
             fullWidth
+            disabled={isLoading}
           >
-            Sign Up
+            {isLoading ? "Loading..." : "Sign Up"}
           </Button>
         </form>
         <Typography variant="body2" align="center" sx={{ marginTop: 2 }}>

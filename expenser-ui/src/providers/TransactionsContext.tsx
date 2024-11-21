@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { Transaction } from "../types/transactions";
+import { Transaction } from "../types/transaction";
 
 interface TransactionsContextProps {
   transactions: Transaction[];
@@ -27,8 +27,8 @@ const fetchTransactions = async (
     });
     const data = await response.json();
 
-    if (Array.isArray(data.transaction)) {
-      const formattedData = data.transaction.map((item: Transaction) => {
+    if (Array.isArray(data.transactions)) {
+      const formattedData = data.transactions.map((item: Transaction) => {
         const [day, month, year] = item.date.toString().split("/");
         const parsedDate = new Date(`${year}-${month}-${day}`);
         return {
@@ -46,6 +46,7 @@ const fetchTransactions = async (
     }
   } catch (error) {
     console.error("Error fetching data:", error);
+    setTransactions([]);
   }
 };
 

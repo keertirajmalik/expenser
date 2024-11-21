@@ -25,7 +25,7 @@ func CheckPasswordHash(password, hash string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 }
 
-func MakeJWT(userId uuid.UUID, tokenSecret string, expiresIn time.Duration) (string, error) {
+func MakeJWT(userId uuid.UUID, tokenSecret []byte, expiresIn time.Duration) (string, error) {
 	signingKey := []byte(tokenSecret)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
@@ -53,7 +53,7 @@ func GetBearerToken(header http.Header) (string, error) {
 	return splitAuth[1], nil
 }
 
-func ValidateJWT(tokenString, tokenSecret string) (uuid.UUID, error) {
+func ValidateJWT(tokenString string, tokenSecret []byte) (uuid.UUID, error) {
 	claimStruct := jwt.RegisteredClaims{}
 
 	token, err := jwt.ParseWithClaims(tokenString, &claimStruct, func(t *jwt.Token) (interface{}, error) {

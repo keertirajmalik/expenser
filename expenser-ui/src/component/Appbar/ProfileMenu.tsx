@@ -6,7 +6,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useUser } from "../../providers/UserContext";
 import { useAuth } from "../../providers/AuthContext";
 import { PersonAdd, Logout } from "@mui/icons-material";
@@ -81,16 +81,16 @@ const ProfileMenu: React.FC = () => {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+  const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
+  }, []);
+  const handleClose = useCallback(() => {
     setAnchorEl(null);
-  };
+  }, []);
 
-  const handleNewAccount = () => {
+  const handleNewAccount = useCallback(() => {
     navigate("/auth/signup");
-  };
+  }, [navigate]);
 
   return (
     <>
@@ -103,13 +103,15 @@ const ProfileMenu: React.FC = () => {
         onClick={handleClose}
         MenuListProps={{
           "aria-labelledby": "fade-button",
+          role: "menu",
+          "aria-label": "User profile menu",
         }}
         TransitionComponent={Fade}
         slotProps={menuStyle}
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleClose} role="menu-item" tabIndex={0}>
           <Avatar /> Profile
         </MenuItem>
         {/* <MenuItem onClick={handleClose}>

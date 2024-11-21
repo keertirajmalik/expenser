@@ -11,7 +11,7 @@ import (
 
 func HandleTransactionGet(data model.Config) http.HandlerFunc {
 	type validResponse struct {
-		Transactions []model.Transaction `json:"transaction"`
+		Transactions []model.Transaction `json:"transactions"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +57,7 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err := decoder.Decode(&params)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
+			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
 			return
 		}
 
@@ -112,7 +112,7 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err = decoder.Decode(&params)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
+			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
 			return
 		}
 

@@ -7,12 +7,16 @@ import { useUser } from "../providers/UserContext";
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const { setName: setContextName } = useUser();
   const { handleLogin } = useAuth();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+
     fetch("/cxf/login", {
       method: "POST",
       headers: {
@@ -20,9 +24,10 @@ const Login = () => {
       },
       body: JSON.stringify({ username, password }),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          return;
+          const data = await response.json();
+          throw new Error(data.message);
         }
         return response.json();
       })
@@ -30,6 +35,12 @@ const Login = () => {
         handleLogin(data.token, data.name);
         setContextName(data.name);
         navigate("/");
+      })
+      .catch((error) => {
+        setError(error.message);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -64,6 +75,11 @@ const Login = () => {
           Expenser
         </Typography>
         <form onSubmit={handleSubmit}>
+          {error && (
+            <Typography variant="body2" color="error" align="center">
+              {error}
+            </Typography>
+          )}
           <TextField
             required
             label="Username"
@@ -73,6 +89,8 @@ const Login = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             fullWidth
+            aria-label="Username"
+            error={!!error}
           />
           <TextField
             required
@@ -84,6 +102,8 @@ const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             fullWidth
+            aria-label="Password"
+            error={!!error}
           />
           <Button
             type="submit"
@@ -91,8 +111,9 @@ const Login = () => {
             color="primary"
             sx={{ marginTop: 2 }}
             fullWidth
+            disabled={isLoading}
           >
-            Login
+            {isLoading ? "Loading..." : "Login"}
           </Button>
         </form>
         <Typography variant="body2" align="center" sx={{ marginTop: 2 }}>

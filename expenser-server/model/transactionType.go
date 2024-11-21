@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"log"
 	"time"
@@ -25,16 +26,17 @@ func NewTransactionType(name, description string) TransactionType {
 	}
 }
 
-func (d Config) GetTransactionTypesFromDB() []TransactionType {
-	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+func (d Config) GetTransactionTypesFromDB() ([]TransactionType, error) {
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	dbTransactionTypes, err := d.DBConfig.DB.GetTransactionType(context)
+	dbTransactionTypes, err := d.DBConfig.DB.GetTransactionType(ctx)
 	if err != nil {
 		log.Println("Couldn't get transaction type from in DB", err)
+		return []TransactionType{}, err
 	}
 
-	return convertDBTransactionTypesToTransactionTypes(dbTransactionTypes)
+	return convertDBTransactionTypesToTransactionTypes(dbTransactionTypes), nil
 }
 
 func convertDBTransactionTypesToTransactionTypes(dbTransactions []database.TransactionType) []TransactionType {
@@ -52,10 +54,10 @@ func convertDBTransactionTypesToTransactionTypes(dbTransactions []database.Trans
 }
 
 func (d *Config) AddTransactionTypeData(transactionType TransactionType) (TransactionType, error) {
-	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	dbTransactionType, err := d.DBConfig.DB.CreateTransactionType(context, database.CreateTransactionTypeParams{
+	dbTransactionType, err := d.DBConfig.DB.CreateTransactionType(ctx, database.CreateTransactionTypeParams{
 		ID:          uuid.New(),
 		Name:        transactionType.Name,
 		Description: db.ConvertStringToSqlNullString(transactionType.Description, transactionType.Description != ""),
@@ -72,22 +74,19 @@ func (d *Config) AddTransactionTypeData(transactionType TransactionType) (Transa
 }
 
 func (d Config) DeleteTransactionTypeFromDB(id uuid.UUID) error {
-	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	transactionTypes := d.GetTransactionTypesFromDB()
-
-	if transactionTypeExist(transactionTypes, id) {
-		err := d.DBConfig.DB.DeleteTransactionType(context, id)
-		if err != nil {
-			log.Println("Couldn't delete transaction type from DB", err)
-			return err
+	err := d.DBConfig.DB.DeleteTransactionType(ctx, id)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("Transaction type not found: " + id.String())
 		}
-
-		return nil
+		log.Println("Couldn't delete transaction type from DB", err)
+		return err
 	}
 
-	return errors.New("Invalid transaction type id: " + id.String())
+	return nil
 }
 
 func transactionTypeExist(transactionTypes []TransactionType, id uuid.UUID) bool {

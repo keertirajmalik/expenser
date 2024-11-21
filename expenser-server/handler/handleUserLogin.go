@@ -32,13 +32,13 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 
 		user, err := data.GetUserByUsernameFromDB(params.Username)
 		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, "Invalid user")
+			respondWithError(w, http.StatusUnauthorized, "Invalid credentials")
 			return
 		}
 
 		err = auth.CheckPasswordHash(params.Password, user.HashedPassword)
 		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, "Invalid password")
+			respondWithError(w, http.StatusUnauthorized, "Invalid credentials")
 			return
 		}
 
