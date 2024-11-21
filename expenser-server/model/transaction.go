@@ -118,6 +118,7 @@ func (d *Config) UpdateTransactionInDB(transaction Transaction) error {
 		Amount: int32(transaction.Amount),
 		Date:   parsedDate,
 		Note:   db.ConvertStringToSqlNullString(transaction.Note, transaction.Note != ""),
+		UserID: transaction.UserID,
 	})
 
 	if err != nil {
