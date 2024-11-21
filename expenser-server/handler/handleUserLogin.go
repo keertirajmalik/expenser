@@ -16,8 +16,9 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 	}
 
 	type response struct {
-		model.User
-		Token string `json:"token"`
+		Name     string `json:"name"`
+		Username string `json:"username"`
+		Token    string `json:"token"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +26,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err := decoder.Decode(&params)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
+			respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 			return
 		}
 
@@ -48,11 +49,9 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 		}
 
 		respondWithJson(w, http.StatusOK, response{
-			User: model.User{
-				Name:     user.Name,
-				Username: user.Username,
-			},
-			Token: accessToken,
+			Name:     user.Name,
+			Username: user.Username,
+			Token:    accessToken,
 		})
 	}
 
