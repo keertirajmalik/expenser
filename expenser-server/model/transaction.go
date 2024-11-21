@@ -33,7 +33,7 @@ func NewTransaction(transaction, transactionType, note string, amount int, date 
 	}
 }
 
-func ConvertTransacton(id uuid.UUID, transaction, transactionType, note string, amount int, date string, userID uuid.UUID) Transaction {
+func ConvertTransaction(id uuid.UUID, transaction, transactionType, note string, amount int, date string, userID uuid.UUID) Transaction {
 	return Transaction{
 		ID:              id,
 		Name:            transaction,
@@ -51,7 +51,7 @@ func (d Config) GetTransactionsFromDB(userID uuid.UUID) ([]Transaction, error) {
 
 	dbTransactions, err := d.DBConfig.DB.GetTransaction(context, userID)
 	if err != nil {
-		log.Println("Couldn't get transaction from in DB", err)
+		log.Println("Couldn't get transaction from DB", err)
 		return []Transaction{}, err
 	}
 
@@ -80,9 +80,12 @@ func (d *Config) AddTransactionToDB(transaction Transaction) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	parsedDate, _ := time.Parse("02/01/2006", transaction.Date)
+	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
+	if err != nil {
+		log.Println("Invalid date format:", err)
+	}
 
-	_, err := d.DBConfig.DB.CreateTransaction(context, database.CreateTransactionParams{
+	_, err = d.DBConfig.DB.CreateTransaction(context, database.CreateTransactionParams{
 		ID:     uuid.New(),
 		Name:   transaction.Name,
 		Type:   transaction.TransactionType,
@@ -104,8 +107,11 @@ func (d *Config) UpdateTransactionInDB(transaction Transaction) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	parsedDate, _ := time.Parse("02/01/2006", transaction.Date)
-	_, err := d.DBConfig.DB.UpdateTransaction(context, database.UpdateTransactionParams{
+	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
+	if err != nil {
+		log.Println("Invalid date format:", err)
+	}
+	_, err = d.DBConfig.DB.UpdateTransaction(context, database.UpdateTransactionParams{
 		ID:     transaction.ID,
 		Name:   transaction.Name,
 		Type:   transaction.TransactionType,
@@ -134,7 +140,13 @@ func (d Config) DeleteTransactionFromDB(id, userID uuid.UUID) error {
 		log.Printf("Failed to delete transaction %s for user %s: %v", id, userID, err)
 		return err
 	}
-	if rowAffected, _ := result.RowsAffected(); rowAffected == 0 {
+
+	rowAffected, err := result.RowsAffected()
+	if err != nil {
+		log.Printf("Error retrieving rows affected: %v", err)
+		return err
+	}
+	if rowAffected == 0 {
 		return fmt.Errorf("transaction %s not found for user %s", id, userID)
 	}
 

@@ -107,7 +107,7 @@ SET name = $2,
     type =  $4,
     date = $5,
     note = $6
-WHERE id = $1
+WHERE id = $1 AND user_id=$7
 RETURNING id, name, amount, type, date, note, user_id
 `
 
@@ -118,6 +118,7 @@ type UpdateTransactionParams struct {
 	Type   string
 	Date   time.Time
 	Note   sql.NullString
+	UserID uuid.UUID
 }
 
 func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) (Transaction, error) {
@@ -128,6 +129,7 @@ func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionPa
 		arg.Type,
 		arg.Date,
 		arg.Note,
+		arg.UserID,
 	)
 	var i Transaction
 	err := row.Scan(

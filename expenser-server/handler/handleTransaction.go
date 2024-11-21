@@ -128,7 +128,7 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		transaction := model.ConvertTransacton(id, params.Name, params.Type, params.Note, params.Amount, params.Date, userID)
+		transaction := model.ConvertTransaction(id, params.Name, params.Type, params.Note, params.Amount, params.Date, userID)
 
 		err = data.UpdateTransactionInDB(transaction)
 		if err != nil {

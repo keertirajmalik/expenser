@@ -10,7 +10,7 @@ export default function Appbar() {
         backgroundColor: "#1c2543",
       }}
     >
-      <Toolbar>
+      <Toolbar component="nav" aria-label="main navigation">
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Expenser
         </Typography>

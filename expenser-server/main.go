@@ -14,21 +14,23 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatal("PORT is not found in the enviornment")
+		log.Fatal("PORT is not found in the environment")
 	}
 
 	dbURL := os.Getenv("DB_URL")
 	if dbURL == "" {
-		log.Fatal("DB_URL is not found in the enviornment")
+		log.Fatal("DB_URL is not found in the environment")
 	}
 
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
-		log.Fatal("JWT_SECRET enviornment variable is not set")
+		log.Fatal("JWT_SECRET environment variable is not set")
 	}
 
 	dbConfig, err := db.CreateDbConnection(dbURL)
@@ -39,7 +41,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	config := model.Config{
-		DBConfig:   &dbConfig,
+		DBConfig:  &dbConfig,
 		JWTSecret: jwtSecret,
 	}
 
@@ -66,6 +68,6 @@ func main() {
 		Handler: stack(mux),
 	}
 
-	log.Printf("Start of our new project on port:%s \n", port)
+    log.Printf("Server is running on port %s\n", port)
 	log.Fatal(server.ListenAndServe())
 }
