@@ -64,7 +64,7 @@ Expenser is an expense tracking application designed to help users manage their 
    ```
    PORT=8080
    DB_URL=postgresql://<username>:<password>@localhost:5432/<database_name>?sslmode=disable
-   JWT_SECRET=your_jwt_secret_key
+   JWT_SECRET=<your_jwt_secret_key>
    ```
 
 3. **Install Dependencies**

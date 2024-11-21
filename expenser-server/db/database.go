@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/keertirajmalik/expenser/expenser-server/internal/database"
@@ -11,24 +12,24 @@ type DBConfig struct {
 	DB *database.Queries
 }
 
-func CreateDbConnection(dbURL string) DBConfig {
+func CreateDbConnection(dbURL string) (DBConfig, error) {
 
 	conn, err := sql.Open("postgres", dbURL)
 	if err != nil {
-		log.Fatal("Can't connect to database", err)
+		return DBConfig{}, fmt.Errorf("failed to open database: %w", err)
 	}
 
 	err = conn.Ping()
 	if err != nil {
-		log.Fatal(err)
+		return DBConfig{}, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	log.Print("DB connected successfully")
+	log.Print("Successfully connected to database")
 
 	dbConfig := DBConfig{
 		DB: database.New(conn),
 	}
-	return dbConfig
+	return dbConfig, nil
 }
 
 func ConvertStringToSqlNullString(str string, valid bool) sql.NullString {
