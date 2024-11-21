@@ -1,12 +1,3 @@
-<!-- This is an auto-generated reply by CodeRabbit -->
-> [!TIP]
-> For best results, initiate chat on the files or code changes.
-
-@keertirajmalik
-
-Here is a README file for your project:
-
-```markdown
 # Expenser
 
 Expenser is an expense tracking application designed to help users manage their personal finances effectively. The application consists of a backend server built with Go and a frontend user interface developed using React, TypeScript, and Vite.
@@ -189,7 +180,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Your Name - [@your_twitter_handle](https://twitter.com/your_twitter_handle) - your_email@example.com
-
+Keertiraj Malik - [@keertiraj_malik](https://x.com/keertiraj_malik) - keertirajmalik@icloud.com
 Project Link: [https://github.com/keertirajmalik/expenser](https://github.com/keertirajmalik/expenser)
-```
