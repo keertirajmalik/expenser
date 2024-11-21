@@ -149,7 +149,7 @@ func (d Config) DeleteTransactionFromDB(id, userID uuid.UUID) error {
 	if rowAffected == 0 {
 		return fmt.Errorf("transaction %s not found for user %s", id, userID)
 	}
-
+  
 	return nil
 }
 
