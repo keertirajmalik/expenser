@@ -75,7 +75,15 @@ Expenser is an expense tracking application designed to help users manage their 
 
 4. **Run Database Migrations**
 
-   Apply the SQL schema files located in `db/schema/` to your PostgreSQL database.
+   ```bash
+   # Using psql
+   psql -U <username> -d <database_name> -f db/schema/001_init.sql
+
+   # Or using a migration tool like golang-migrate
+   migrate -database "${DB_URL}" -path db/schema up
+   ```
+
+  Note: Ensure your database user has sufficient privileges to create tables and indexes.
 
 5. **Start the Server**
 

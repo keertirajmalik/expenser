@@ -2,7 +2,7 @@ package model
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -126,23 +126,19 @@ func (d Config) DeleteTransactionFromDB(id, userID uuid.UUID) error {
 	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	transactions, err := d.GetTransactionsFromDB(userID)
+	result, err := d.DBConfig.DB.DeleteTransaction(context, database.DeleteTransactionParams{
+		ID:     id,
+		UserID: userID,
+	})
 	if err != nil {
+		log.Printf("Failed to delete transaction %s for user %s: %v", id, userID, err)
 		return err
 	}
-
-	if transactionExist(transactions, id) {
-		err := d.DBConfig.DB.DeleteTransaction(context, id)
-		if err != nil {
-			log.Println("Couldn't delete transaction from DB", err)
-			return err
-		}
-
-		return nil
+	if rowAffected, _ := result.RowsAffected(); rowAffected == 0 {
+		return fmt.Errorf("transaction %s not found for user %s", id, userID)
 	}
 
-	return errors.New("Invalid transaction id: " + id.String())
-
+	return nil
 }
 
 func transactionExist(transactions []Transaction, id uuid.UUID) bool {
