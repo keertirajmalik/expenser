@@ -1,14 +1,16 @@
 import { FormEvent, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Box, Paper, TextField, Button, Typography } from "@mui/material";
+import { Box, Paper, TextField, Button, Typography, IconButton } from "@mui/material";
 import { useAuth } from "../providers/AuthContext";
 import { useUser } from "../providers/UserContext";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { setName: setContextName } = useUser();
+  const [showPassword, setShowPassword] = useState(false);
   const { handleLogin } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +78,7 @@ const Login = () => {
         </Typography>
         <form onSubmit={handleSubmit}>
           {error && (
-            <Typography variant="body2" color="error" align="center">
+            <Typography variant="body2" color="error" align="center" role="alert" aria-live="polite">
               {error}
             </Typography>
           )}
@@ -91,10 +93,11 @@ const Login = () => {
             fullWidth
             aria-label="Username"
             error={!!error}
+            autoComplete="username"
           />
           <TextField
             required
-            type="password"
+            type={showPassword ? "text" : "password"}
             label="Password"
             size="small"
             margin="normal"
@@ -104,6 +107,17 @@ const Login = () => {
             fullWidth
             aria-label="Password"
             error={!!error}
+            autoComplete="current-password"
+            InputProps={{
+              endAdornment: (
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={() => { setShowPassword(!showPassword) }}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+              ),
+            }}
           />
           <Button
             type="submit"

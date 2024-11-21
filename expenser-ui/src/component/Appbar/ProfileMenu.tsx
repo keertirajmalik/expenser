@@ -31,8 +31,21 @@ function stringToColor(string: string) {
 }
 
 function stringAvatar(name: string) {
-  const nameParts = name.split(" ");
-  const initials =
+  if (!name?.trim()) {
+    return {
+      sx: { bgcolor: '#757575' },
+      children: '?'
+    };
+  }
+  // Clean the name string
+  const cleanName = name.replace(/[^a-zA-Z\s]/g, '').trim();
+  if (!cleanName) {
+    return {
+      sx: { bgcolor: '#757575' },
+      children: name[0] || '?'
+    };
+  }
+  const nameParts = cleanName.split(" ");  const initials =
     nameParts.length > 1
       ? `${nameParts[0][0]}${nameParts[1][0]}`
       : nameParts[0][0];

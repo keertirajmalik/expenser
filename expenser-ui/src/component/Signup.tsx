@@ -30,6 +30,7 @@ const SignUp = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     const passwordError = validatePassword(password);
     if (passwordError) {
       setErrors((prev) => ({

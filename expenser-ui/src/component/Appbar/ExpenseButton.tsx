@@ -6,6 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Menu, MenuItem } from "@mui/material";
 import CreateTransaction from "../../modal/CreateTransaction";
 import CreateTransactionType from "../../modal/CreateTransactionType";
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 const ExpenseButtonMenu: React.FC = () => {
   const [openTransaction, setTransactionModalOpen] = useState(false);
@@ -57,7 +58,14 @@ const ExpenseButtonMenu: React.FC = () => {
         >
           Create Expense
         </Button>
-        <Button onClick={handleExpenseMenuOpen}>▼</Button>
+        <Button
+          onClick={handleExpenseMenuOpen}
+          aria-label="show more"
+          aria-haspopup="true"
+          aria-expanded={Boolean(anchorExpenseEl)}
+        >
+          <KeyboardArrowDownIcon fontSize="small" />
+        </Button>
       </ButtonGroup>
       <CreateTransaction
         open={openTransaction}

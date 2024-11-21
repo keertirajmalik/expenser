@@ -150,15 +150,6 @@ func (d Config) DeleteTransactionFromDB(id, userID uuid.UUID) error {
 	if rowAffected == 0 {
 		return fmt.Errorf("transaction %s not found for user %s", id, userID)
 	}
-  
-	return nil
-}
 
-func transactionExist(transactions []Transaction, id uuid.UUID) bool {
-	for _, transaction := range transactions {
-		if transaction.ID == id {
-			return true
-		}
-	}
-	return false
+	return nil
 }

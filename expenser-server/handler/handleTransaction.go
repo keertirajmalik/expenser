@@ -23,7 +23,7 @@ func HandleTransactionGet(data model.Config) http.HandlerFunc {
 
 		userID, err := auth.ValidateJWT(token, data.JWTSecret)
 		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, err.Error())
+			respondWithError(w, http.StatusUnauthorized, "Invalid token")
 			return
 		}
 
@@ -69,7 +69,7 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 
 		userID, err := auth.ValidateJWT(token, data.JWTSecret)
 		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, err.Error())
+			respondWithError(w, http.StatusUnauthorized, "Invalid token")
 			return
 		}
 

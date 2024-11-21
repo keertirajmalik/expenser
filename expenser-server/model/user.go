@@ -26,25 +26,21 @@ func NewUser(name, username, password string) User {
 	}
 }
 
-func (d Config) GetUsersFromDB(context context.Context) []User {
+func (d Config) GetUsersFromDB(context context.Context) ([]User, error) {
 	dbUsers, err := d.DBConfig.DB.GetUsers(context)
 	if err != nil {
-		log.Println("Couldn't get users from in DB", err)
+		log.Println("Couldn't get users from DB", err)
+		return []User{}, err
 	}
 
-	return convertDBUserToUser(dbUsers)
+	return convertDBUserToUser(dbUsers), nil
 }
 
-func (d *Config) AddUserToDB(user User) (User, error) {
-	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+func (d Config) AddUserToDB(user User) (User, error) {
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	dbUsers, _ := d.DBConfig.DB.GetUsers(context)
-	if userExist(dbUsers, user) {
-		return User{}, errors.New("User already exist")
-	}
-
-	dbUser, err := d.DBConfig.DB.CreateUser(context, database.CreateUserParams{
+	dbUser, err := d.DBConfig.DB.CreateUser(ctx, database.CreateUserParams{
 		ID:             user.ID,
 		Name:           user.Name,
 		Username:       user.Username,
@@ -61,11 +57,11 @@ func (d *Config) AddUserToDB(user User) (User, error) {
 	return users[0], nil
 }
 
-func (d *Config) GetUserByUsernameFromDB(username string) (User, error) {
-	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
+func (d Config) GetUserByUsernameFromDB(username string) (User, error) {
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
-	dbUser, err := d.DBConfig.DB.GetUserByUsername(context, username)
+	dbUser, err := d.DBConfig.DB.GetUserByUsername(ctx, username)
 	if err != nil {
 		return User{}, err
 	}

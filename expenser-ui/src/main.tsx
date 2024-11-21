@@ -9,7 +9,7 @@ import {
 import { CssBaseline, Box, CircularProgress } from "@mui/material";
 import { TransactionsProvider } from "./providers/TransactionsContext";
 import { AuthProvider, useAuth } from "./providers/AuthContext";
-import Appbar from "./component/Appbar/AppBar";
+import Appbar from "./component/AppBar/AppBar";
 import SignUp from "./component/Signup";
 import TransactionTable from "./component/TransactionTable";
 import Login from "./component/Login";

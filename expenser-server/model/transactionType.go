@@ -53,7 +53,7 @@ func convertDBTransactionTypesToTransactionTypes(dbTransactions []database.Trans
 	return transactionTypes
 }
 
-func (d *Config) AddTransactionTypeData(transactionType TransactionType) (TransactionType, error) {
+func (d Config) AddTransactionTypeData(transactionType TransactionType) (TransactionType, error) {
 	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
 	defer cancel()
 
@@ -79,7 +79,7 @@ func (d Config) DeleteTransactionTypeFromDB(id uuid.UUID) error {
 
 	err := d.DBConfig.DB.DeleteTransactionType(ctx, id)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err,sql.ErrNoRows) {
 			return errors.New("Transaction type not found: " + id.String())
 		}
 		log.Println("Couldn't delete transaction type from DB", err)
@@ -87,13 +87,4 @@ func (d Config) DeleteTransactionTypeFromDB(id uuid.UUID) error {
 	}
 
 	return nil
-}
-
-func transactionTypeExist(transactionTypes []TransactionType, id uuid.UUID) bool {
-	for _, transactionType := range transactionTypes {
-		if transactionType.ID == id {
-			return true
-		}
-	}
-	return false
 }

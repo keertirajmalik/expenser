@@ -84,7 +84,12 @@ export default function TransactionTable() {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to fetch typess: " + response.statusText);
+          }
+          return response.json();
+        })
         .then((data) => {
           if (Array.isArray(data.transaction_types)) {
             setTypes(data.transaction_types);
