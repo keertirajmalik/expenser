@@ -30,7 +30,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		user, err := data.GetUserByUsernameFromDB(params.Username)
+		user, err := data.GetUserByUsernameFromDB(r.Context(), params.Username)
 		if err != nil {
 			respondWithError(w, http.StatusUnauthorized, "Invalid credentials")
 			return

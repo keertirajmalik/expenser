@@ -2,13 +2,11 @@
 // versions:
 //   sqlc v1.27.0
 
-package database
+package repository
 
 import (
-	"database/sql"
-	"time"
-
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Transaction struct {
@@ -16,15 +14,15 @@ type Transaction struct {
 	Name   string
 	Amount int32
 	Type   string
-	Date   time.Time
-	Note   sql.NullString
+	Date   pgtype.Date
+	Note   *string
 	UserID uuid.UUID
 }
 
 type TransactionType struct {
 	ID          uuid.UUID
 	Name        string
-	Description sql.NullString
+	Description *string
 }
 
 type User struct {

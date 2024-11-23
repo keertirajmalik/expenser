@@ -3,14 +3,14 @@
 //   sqlc v1.27.0
 // source: transactions.sql
 
-package database
+package repository
 
 import (
 	"context"
-	"database/sql"
-	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createTransaction = `-- name: CreateTransaction :one
@@ -24,13 +24,13 @@ type CreateTransactionParams struct {
 	Name   string
 	Amount int32
 	Type   string
-	Date   time.Time
-	Note   sql.NullString
+	Date   pgtype.Date
+	Note   *string
 	UserID uuid.UUID
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
-	row := q.db.QueryRowContext(ctx, createTransaction,
+	row := q.db.QueryRow(ctx, createTransaction,
 		arg.ID,
 		arg.Name,
 		arg.Amount,
@@ -61,8 +61,8 @@ type DeleteTransactionParams struct {
 	UserID uuid.UUID
 }
 
-func (q *Queries) DeleteTransaction(ctx context.Context, arg DeleteTransactionParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, deleteTransaction, arg.ID, arg.UserID)
+func (q *Queries) DeleteTransaction(ctx context.Context, arg DeleteTransactionParams) (pgconn.CommandTag, error) {
+	return q.db.Exec(ctx, deleteTransaction, arg.ID, arg.UserID)
 }
 
 const getTransaction = `-- name: GetTransaction :many
@@ -70,7 +70,7 @@ SELECT id, name, amount, type, date, note, user_id from transactions where user_
 `
 
 func (q *Queries) GetTransaction(ctx context.Context, userID uuid.UUID) ([]Transaction, error) {
-	rows, err := q.db.QueryContext(ctx, getTransaction, userID)
+	rows, err := q.db.Query(ctx, getTransaction, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -90,9 +90,6 @@ func (q *Queries) GetTransaction(ctx context.Context, userID uuid.UUID) ([]Trans
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -116,13 +113,13 @@ type UpdateTransactionParams struct {
 	Name   string
 	Amount int32
 	Type   string
-	Date   time.Time
-	Note   sql.NullString
+	Date   pgtype.Date
+	Note   *string
 	UserID uuid.UUID
 }
 
 func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) (Transaction, error) {
-	row := q.db.QueryRowContext(ctx, updateTransaction,
+	row := q.db.QueryRow(ctx, updateTransaction,
 		arg.ID,
 		arg.Name,
 		arg.Amount,

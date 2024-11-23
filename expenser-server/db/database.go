@@ -1,45 +1,54 @@
 package db
 
 import (
-	"database/sql"
+	"context"
+	"errors"
 	"fmt"
-	"log"
+	"os"
 
-	"github.com/keertirajmalik/expenser/expenser-server/internal/database"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type DBConfig struct {
-	DB *database.Queries
-}
+var (
+	ErrMissingDatabaseURL = errors.New("DATABASE_URL env missing")
+)
 
-func CreateDbConnection(dbURL string) (DBConfig, error) {
+func loadConfigFromURL() (*pgxpool.Config, error) {
+	dbURL, ok := os.LookupEnv("DATABASE_URL")
+	if !ok {
+		return nil, fmt.Errorf("Must set DATABASE_URL env var")
+	}
 
-	conn, err := sql.Open("postgres", dbURL)
+	config, err := pgxpool.ParseConfig(dbURL)
 	if err != nil {
-		return DBConfig{}, fmt.Errorf("failed to open database: %w", err)
+		return nil, fmt.Errorf("failed to parse config: %w", err)
 	}
 
-	err = conn.Ping()
+	return config, nil
+}
+
+func loadConfig() (*pgxpool.Config, error) {
+	cfg, err := NewDatabase()
 	if err != nil {
-		return DBConfig{}, fmt.Errorf("failed to ping database: %w", err)
+		return loadConfigFromURL()
 	}
 
-	log.Print("Successfully connected to database")
-
-	dbConfig := DBConfig{
-		DB: database.New(conn),
-	}
-	return dbConfig, nil
+	return pgxpool.ParseConfig(fmt.Sprintf(
+		"user=%s password=%s host=%s port=%d dbname=%s sslmode=%s",
+		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode,
+	))
 }
 
-func ConvertStringToSqlNullString(str string, valid bool) sql.NullString {
-	return sql.NullString{String: str, Valid: valid}
-}
-
-func ConvertSqlNullStringToString(str sql.NullString) string {
-	if str.Valid {
-		return str.String
+func Connect(ctx context.Context) (*pgxpool.Pool, error) {
+	config, err := loadConfig()
+	if err != nil {
+		return nil, err
 	}
 
-	return ""
+	conn, err := pgxpool.NewWithConfig(ctx, config)
+	if err != nil {
+		return nil, fmt.Errorf("could not connect to database: %w", err)
+	}
+
+	return conn, nil
 }

@@ -5,11 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"log"
-	"time"
 
 	"github.com/google/uuid"
-	"github.com/keertirajmalik/expenser/expenser-server/db"
-	"github.com/keertirajmalik/expenser/expenser-server/internal/database"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 )
 
 type TransactionType struct {
@@ -26,11 +24,8 @@ func NewTransactionType(name, description string) TransactionType {
 	}
 }
 
-func (d Config) GetTransactionTypesFromDB() ([]TransactionType, error) {
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
-	defer cancel()
-
-	dbTransactionTypes, err := d.DBConfig.DB.GetTransactionType(ctx)
+func (d Config) GetTransactionTypesFromDB(ctx context.Context) ([]TransactionType, error) {
+	dbTransactionTypes, err := d.Queries.GetTransactionType(ctx)
 	if err != nil {
 		log.Println("Couldn't get transaction type from in DB", err)
 		return []TransactionType{}, err
@@ -39,28 +34,29 @@ func (d Config) GetTransactionTypesFromDB() ([]TransactionType, error) {
 	return convertDBTransactionTypesToTransactionTypes(dbTransactionTypes), nil
 }
 
-func convertDBTransactionTypesToTransactionTypes(dbTransactions []database.TransactionType) []TransactionType {
+func convertDBTransactionTypesToTransactionTypes(dbTransactions []repository.TransactionType) []TransactionType {
 	transactionTypes := []TransactionType{}
 
 	for _, transactionType := range dbTransactions {
+		descriptionValue := ""
+		if transactionType.Description != nil {
+			descriptionValue = *transactionType.Description
+		}
 		transactionTypes = append(transactionTypes, TransactionType{
 			ID:          transactionType.ID,
 			Name:        transactionType.Name,
-			Description: db.ConvertSqlNullStringToString(transactionType.Description),
+			Description: descriptionValue,
 		})
 	}
 
 	return transactionTypes
 }
 
-func (d Config) AddTransactionTypeData(transactionType TransactionType) (TransactionType, error) {
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
-	defer cancel()
-
-	dbTransactionType, err := d.DBConfig.DB.CreateTransactionType(ctx, database.CreateTransactionTypeParams{
+func (d Config) AddTransactionTypeData(ctx context.Context, transactionType TransactionType) (TransactionType, error) {
+	dbTransactionType, err := d.Queries.CreateTransactionType(ctx, repository.CreateTransactionTypeParams{
 		ID:          uuid.New(),
 		Name:        transactionType.Name,
-		Description: db.ConvertStringToSqlNullString(transactionType.Description, transactionType.Description != ""),
+		Description: &transactionType.Description,
 	})
 
 	if err != nil {
@@ -68,18 +64,15 @@ func (d Config) AddTransactionTypeData(transactionType TransactionType) (Transac
 		return TransactionType{}, err
 	}
 
-	transactionTypes := convertDBTransactionTypesToTransactionTypes([]database.TransactionType{dbTransactionType})
+	transactionTypes := convertDBTransactionTypesToTransactionTypes([]repository.TransactionType{dbTransactionType})
 
 	return transactionTypes[0], nil
 }
 
-func (d Config) DeleteTransactionTypeFromDB(id uuid.UUID) error {
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
-	defer cancel()
-
-	err := d.DBConfig.DB.DeleteTransactionType(ctx, id)
+func (d Config) DeleteTransactionTypeFromDB(ctx context.Context, id uuid.UUID) error {
+	err := d.Queries.DeleteTransactionType(ctx, id)
 	if err != nil {
-		if errors.Is(err,sql.ErrNoRows) {
+		if errors.Is(err, sql.ErrNoRows) {
 			return errors.New("Transaction type not found: " + id.String())
 		}
 		log.Println("Couldn't delete transaction type from DB", err)

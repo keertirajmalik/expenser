@@ -15,7 +15,7 @@ func HandleTransactionGet(data model.Config) http.HandlerFunc {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value("userID").(uuid.UUID)
-		transactions, err := data.GetTransactionsFromDB(userID)
+		transactions, err := data.GetTransactionsFromDB(r.Context(), userID)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return

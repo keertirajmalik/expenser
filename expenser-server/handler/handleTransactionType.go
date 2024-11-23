@@ -14,7 +14,7 @@ func HandleTransactionTypeGet(data model.Config) http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		transactionTypes, err := data.GetTransactionTypesFromDB()
+		transactionTypes, err := data.GetTransactionTypesFromDB(r.Context())
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "Failed to retrieve transaction types")
 			return
@@ -45,7 +45,7 @@ func HandleTransactionTypeCreate(data model.Config) http.HandlerFunc {
 		}
 
 		transactionType := model.NewTransactionType(params.Name, params.Description)
-		transactionType, err = data.AddTransactionTypeData(transactionType)
+		transactionType, err = data.AddTransactionTypeData(r.Context(), transactionType)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
@@ -67,7 +67,7 @@ func HandleTransactionTypeDelete(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		err = data.DeleteTransactionTypeFromDB(id)
+		err = data.DeleteTransactionTypeFromDB(r.Context(), id)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return

@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 
 	"github.com/joho/godotenv"
 	"github.com/keertirajmalik/expenser/expenser-server/db"
 	"github.com/keertirajmalik/expenser/expenser-server/handler"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 	"github.com/keertirajmalik/expenser/expenser-server/middleware"
 	"github.com/keertirajmalik/expenser/expenser-server/model"
 	_ "github.com/lib/pq"
@@ -23,25 +26,22 @@ func main() {
 		log.Fatal("PORT is not found in the environment")
 	}
 
-	dbURL := os.Getenv("DB_URL")
-	if dbURL == "" {
-		log.Fatal("DB_URL is not found in the environment")
-	}
-
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET environment variable is not set")
 	}
 
-	dbConfig, err := db.CreateDbConnection(dbURL)
-	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
-	}
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
 
+	db, err := db.Connect(ctx)
+	if err != nil {
+		log.Fatal("failed to connect to database: ", err)
+	}
 	mux := http.NewServeMux()
 
 	config := model.Config{
-		DBConfig:  dbConfig,
+        Queries: repository.New(db),
 		JWTSecret: []byte(jwtSecret),
 	}
 
