@@ -47,8 +47,7 @@ func (d Config) AddUserToDB(user User) (User, error) {
 	})
 
 	if err != nil {
-		log.Println("Couldn't create user in DB", err)
-
+		log.Printf("Failed to create user in DB - username: %s, error: %v", user.Username, err)
 		return User{}, err
 	}
 
@@ -63,6 +62,7 @@ func (d Config) GetUserByUsernameFromDB(username string) (User, error) {
 
 	dbUser, err := d.DBConfig.DB.GetUserByUsername(ctx, username)
 	if err != nil {
+		log.Printf("Failed to get user from DB - username: %s, error: %v", username, err)
 		return User{}, err
 	}
 

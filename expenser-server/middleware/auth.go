@@ -58,7 +58,6 @@ func respondWithJson(w http.ResponseWriter, err error) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(dat)))
 	w.WriteHeader(http.StatusUnauthorized)
 	w.Write(dat)
 }
