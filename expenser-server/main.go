@@ -59,8 +59,9 @@ func main() {
 	mux.HandleFunc("DELETE /type/{id}", handler.HandleTransactionTypeDelete(config))
 
 	stack := middleware.CreateStack(
-		middleware.Logging,
 		middleware.AllowCors,
+		middleware.Logging,
+		middleware.AuthMiddleware,
 	)
 
 	server := &http.Server{

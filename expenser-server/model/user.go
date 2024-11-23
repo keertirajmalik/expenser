@@ -48,6 +48,7 @@ func (d Config) AddUserToDB(user User) (User, error) {
 
 	if err != nil {
 		log.Println("Couldn't create user in DB", err)
+
 		return User{}, err
 	}
 
