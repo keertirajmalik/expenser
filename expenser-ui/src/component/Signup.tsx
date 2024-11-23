@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Box, Paper, TextField, Button, Typography } from "@mui/material";
 
-const SignUp = () => {
+const SignUp: React.FC = () => {
   const [username, setUsername] = useState("");
   const [fullname, setFullname] = useState("");
   const [password, setPassword] = useState("");
@@ -49,7 +49,7 @@ const SignUp = () => {
       .then(async (response) => {
         if (!response.ok) {
           const data = await response.json();
-          throw new Error(data.message);
+          throw new Error(data.error);
         }
         return response.json();
       })

@@ -50,7 +50,11 @@ const fetchTransactions = async (
   }
 };
 
-export const TransactionsProvider = ({ children }: { children: ReactNode }) => {
+export const TransactionsProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}): JSX.Element => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
@@ -69,7 +73,7 @@ export const TransactionsProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useTransactions = () => {
+export const useTransactions = (): TransactionsContextProps => {
   const context = useContext(TransactionsContext);
   if (!context) {
     throw new Error(

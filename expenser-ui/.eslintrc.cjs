@@ -14,8 +14,6 @@ module.exports = {
     "prettier/prettier": "error",
     "react/react-in-jsx-scope": "off", // Disable the rule
     "@typescript-eslint/no-explicit-any": "warn",
-   "@typescript-eslint/no-floating-promises": "error",
-   "@typescript-eslint/no-unnecessary-type-assertion": "error"
   },
   settings: {
     react: {

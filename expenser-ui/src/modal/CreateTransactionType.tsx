@@ -1,8 +1,12 @@
-import React from "react";
-import { Button, FormGroup, Paper, TextField } from "@mui/material";
-import Modal from "@mui/material/Modal";
-import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
+import {
+  Button,
+  FormGroup,
+  Paper,
+  TextField,
+  Modal,
+  Typography,
+} from "@mui/material";
 
 const style = {
   position: "absolute",
@@ -22,68 +26,74 @@ interface CreateTransactionProps {
 const CreateTransactionType = ({
   open,
   handleClose,
-}: CreateTransactionProps) => {
-  const [name, setName] = useState("");
-  const [note, setNote] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+}: CreateTransactionProps): JSX.Element => {
+  const [formState, setFormState] = useState({
+    name: "",
+    note: "",
+    error: "",
+    isLoading: false,
+  });
 
-  function handleSubmit(
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): void {
-    event.preventDefault();
-    setError("");
+  const { name, note, error, isLoading } = formState;
 
-    if (!name.trim()) {
-      setError("Name is required");
-      return;
-    }
-    setIsLoading(true);
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({ ...prevState, [name]: value }));
+  }, []);
 
-    const transactionTypeData = {
-      name,
-      note,
-    };
+  const handleSubmit = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+      event.preventDefault();
+      setFormState((prevState) => ({ ...prevState, error: "" }));
 
-    fetch("/cxf/type", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(transactionTypeData),
-    })
-      .then((response) => response.json())
-      .then(() => {
-        handleClose();
+      if (!name.trim()) {
+        setFormState((prevState) => ({
+          ...prevState,
+          error: "Name is required",
+        }));
+        return;
+      }
+      setFormState((prevState) => ({ ...prevState, isLoading: true }));
+
+      const transactionTypeData = {
+        name: formState.name,
+        note: formState.note,
+      };
+
+      fetch("/cxf/type", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(transactionTypeData),
       })
-      .catch((error) => {
-        setError(error.message);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
+        .then((response) => response.json())
+        .then(() => {
+          handleClose();
+        })
+        .catch((error) => {
+          setFormState((prevState) => ({ ...prevState, error: error.message }));
+        })
+        .finally(() => {
+          setFormState((prevState) => ({ ...prevState, isLoading: false }));
+        });
+    },
+    [name],
+  );
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
+    <Modal open={open} onClose={handleClose}>
       <Paper sx={style}>
-        <Typography id="modal-modal-title" variant="h6" component="h2">
-          Create Transaction Type
-        </Typography>
-        <FormGroup role="form">
+        <Typography variant="h6">Create Transaction Type</Typography>
+        <FormGroup>
           <TextField
-            required
             label="Name"
+            name="name"
             size="small"
             margin="normal"
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={handleChange}
             error={!!error}
             helperText={error}
             disabled={isLoading}
@@ -91,12 +101,13 @@ const CreateTransactionType = ({
           />
           <TextField
             label="Note"
+            name="note"
             multiline
             rows={4}
             size="small"
             margin="normal"
             value={note}
-            onChange={(e) => setNote(e.target.value)}
+            onChange={handleChange}
             disabled={isLoading}
             aria-label="Transaction type note"
           />

@@ -1,11 +1,18 @@
 import { FormEvent, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Box, Paper, TextField, Button, Typography, IconButton } from "@mui/material";
+import {
+  Box,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  IconButton,
+} from "@mui/material";
 import { useAuth } from "../providers/AuthContext";
 import { useUser } from "../providers/UserContext";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
-const Login = () => {
+const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -29,7 +36,7 @@ const Login = () => {
       .then(async (response) => {
         if (!response.ok) {
           const data = await response.json();
-          throw new Error(data.message);
+          throw new Error(data.error);
         }
         return response.json();
       })
@@ -78,7 +85,13 @@ const Login = () => {
         </Typography>
         <form onSubmit={handleSubmit}>
           {error && (
-            <Typography variant="body2" color="error" align="center" role="alert" aria-live="polite">
+            <Typography
+              variant="body2"
+              color="error"
+              align="center"
+              role="alert"
+              aria-live="polite"
+            >
               {error}
             </Typography>
           )}
@@ -110,12 +123,14 @@ const Login = () => {
             autoComplete="current-password"
             InputProps={{
               endAdornment: (
-                  <IconButton
-                    aria-label="toggle password visibility"
-                    onClick={() => { setShowPassword(!showPassword) }}
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={() => {
+                    setShowPassword(!showPassword);
+                  }}
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
               ),
             }}
           />

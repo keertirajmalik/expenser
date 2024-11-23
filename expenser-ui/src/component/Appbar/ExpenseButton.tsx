@@ -6,7 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { Menu, MenuItem } from "@mui/material";
 import CreateTransaction from "../../modal/CreateTransaction";
 import CreateTransactionType from "../../modal/CreateTransactionType";
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 const ExpenseButtonMenu: React.FC = () => {
   const [openTransaction, setTransactionModalOpen] = useState(false);

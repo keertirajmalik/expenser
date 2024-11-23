@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import { TransactionType } from "../types/transactionType";
 import CreateTransactionType from "../modal/CreateTransactionType";
 import { useTransactions } from "../providers/TransactionsContext";
+import { formatDate } from "../util/dateUtil";
 
 const style = {
   position: "absolute",
@@ -22,7 +23,10 @@ interface CreateTransactionProps {
   handleClose: () => void;
 }
 
-const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
+const CreateTransaction = ({
+  open,
+  handleClose,
+}: CreateTransactionProps): JSX.Element => {
   const getTodayDate = () => {
     const today = new Date();
     const day = String(today.getDate()).padStart(2, "0");
@@ -43,6 +47,11 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
   );
   const [nestedModalOpen, setNestedModalOpen] = useState(false);
   const { fetchTransactions } = useTransactions();
+  const [errors, setErrors] = useState<{
+    name?: string;
+    type?: string;
+    amount?: string;
+  }>({});
 
   useEffect(() => {
     if (open && !nestedModalOpen) {
@@ -69,15 +78,23 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const formatDate = (dateString: string): string => {
-    const [year, month, day] = dateString.split("-");
-    return `${day}/${month}/${year}`;
+  const validateForm = () => {
+    const errors: { name?: string; type?: string; amount?: string } = {};
+    if (!formData.name) errors.name = "Name is required";
+    if (!formData.type) errors.type = "Type is required";
+    if (!formData.amount) errors.amount = "Amount is required";
+    return errors;
   };
 
-  const handleSubmit = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): void => {
+  const handleSubmit = (event: { preventDefault: () => void }) => {
     event.preventDefault();
+    const newErrors = validateForm();
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     const transactionData = {
       ...formData,
       amount: parseFloat(formData.amount),
@@ -119,6 +136,8 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
               name="name"
               value={formData.name}
               onChange={handleChange}
+              error={!!errors.name}
+              helperText={errors.name}
             />
             <Box display="flex" alignItems="center" gap="16px">
               <TextField
@@ -131,6 +150,8 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
                 value={formData.type}
                 onChange={handleChange}
                 style={{ flex: 1 }}
+                error={!!errors.type}
+                helperText={errors.type}
               >
                 {transactionTypes.length > 0 ? (
                   transactionTypes.map((option) => (
@@ -159,6 +180,8 @@ const CreateTransaction = ({ open, handleClose }: CreateTransactionProps) => {
               name="amount"
               value={formData.amount}
               onChange={handleChange}
+              error={!!errors.amount}
+              helperText={errors.amount}
             />
             <TextField
               required

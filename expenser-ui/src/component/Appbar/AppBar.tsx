@@ -2,7 +2,9 @@ import { AppBar, Toolbar, Typography } from "@mui/material";
 import ExpenseButtonMenu from "./ExpenseButton";
 import ProfileMenu from "./ProfileMenu";
 
-export default function Appbar() {
+import React from "react";
+
+export default function Appbar(): React.ReactElement {
   return (
     <AppBar
       position="static"

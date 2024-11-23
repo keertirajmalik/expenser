@@ -2,7 +2,6 @@ package model
 
 import (
 	"context"
-	"errors"
 	"log"
 	"time"
 
