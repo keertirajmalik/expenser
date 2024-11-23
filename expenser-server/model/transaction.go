@@ -51,7 +51,7 @@ func (d Config) GetTransactionsFromDB(userID uuid.UUID) ([]Transaction, error) {
 
 	dbTransactions, err := d.DBConfig.DB.GetTransaction(context, userID)
 	if err != nil {
-        log.Printf("Couldn't get transaction from DB: %v", err)
+		log.Printf("Couldn't get transaction from DB: %v", err)
 		return []Transaction{}, err
 	}
 
@@ -83,6 +83,8 @@ func (d *Config) AddTransactionToDB(transaction Transaction) error {
 	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
 	if err != nil {
 		log.Printf("Invalid date format: %v", err)
+		return fmt.Errorf("invalid date format: %w", err)
+
 	}
 
 	_, err = d.DBConfig.DB.CreateTransaction(context, database.CreateTransactionParams{
@@ -110,6 +112,7 @@ func (d *Config) UpdateTransactionInDB(transaction Transaction) error {
 	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
 	if err != nil {
 		log.Printf("Invalid date format: %v", err)
+		return fmt.Errorf("invalid date format: %w", err)
 	}
 	_, err = d.DBConfig.DB.UpdateTransaction(context, database.UpdateTransactionParams{
 		ID:     transaction.ID,

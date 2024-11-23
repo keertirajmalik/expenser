@@ -28,6 +28,11 @@ func main() {
 		log.Fatal("DB_URL is not found in the environment")
 	}
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET environment variable is not set")
+	}
+
 	dbConfig, err := db.CreateDbConnection(dbURL)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
@@ -37,6 +42,7 @@ func main() {
 
 	config := model.Config{
 		DBConfig:  dbConfig,
+		JWTSecret: []byte(jwtSecret),
 	}
 
 	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(config))

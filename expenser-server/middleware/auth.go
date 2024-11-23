@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -37,6 +36,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		userID, err := auth.ValidateJWT(token, []byte(jwtSecret))
 		if err != nil {
+            log.Print("I am here")
 			respondWithJson(w, err)
 			return
 		}
