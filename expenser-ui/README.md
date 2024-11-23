@@ -4,19 +4,18 @@ Frontend for the Expenser application built with React, TypeScript, and Vite.
 
 ## Prerequisites
 
-- Node.js (version X.X.X)
+- Node.js (version 20)
 - npm/yarn
 
 ## Quick Start
 
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Set up environment variables: Copy `.env.example` to `.env`
-4. Start development server: `npm run dev`
+1. Install dependencies: `npm install`
+2. Set up environment variables: `.env`
+3. Start development server: `npm run dev`
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run lint` - Run ESLint
-- `npm run test` - Run tests
+- `npm run dev` - Starts the development server on <http://localhost:3000> with hot-reload enabled
+- `npm run build` - Creates an optimized production build in the `dist` directory
+- `npm run lint` - Runs ESLint to check for code style and potential errors
+- `npm run test` - Executes the test suite using [test framework]
