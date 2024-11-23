@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/keertirajmalik/expenser/expenser-server/internal/auth"
 	"github.com/keertirajmalik/expenser/expenser-server/model"
 )
 
@@ -15,18 +14,7 @@ func HandleTransactionGet(data model.Config) http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		token, err := auth.GetBearerToken(r.Header)
-		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, err.Error())
-			return
-		}
-
-		userID, err := auth.ValidateJWT(token, data.JWTSecret)
-		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, "Invalid token")
-			return
-		}
-
+		userID := r.Context().Value("userID").(uuid.UUID)
 		transactions, err := data.GetTransactionsFromDB(userID)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -61,17 +49,7 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		token, err := auth.GetBearerToken(r.Header)
-		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, err.Error())
-			return
-		}
-
-		userID, err := auth.ValidateJWT(token, data.JWTSecret)
-		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, "Invalid token")
-			return
-		}
+		userID := r.Context().Value("userID").(uuid.UUID)
 
 		transaction := model.NewTransaction(params.Name, params.Type, params.Note, params.Amount, params.Date, userID)
 
@@ -116,18 +94,7 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		token, err := auth.GetBearerToken(r.Header)
-		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, err.Error())
-			return
-		}
-
-		userID, err := auth.ValidateJWT(token, data.JWTSecret)
-		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, "Couldn't validate JWT")
-			return
-		}
-
+		userID := r.Context().Value("userID").(uuid.UUID)
 		transaction := model.ConvertTransaction(id, params.Name, params.Type, params.Note, params.Amount, params.Date, userID)
 
 		err = data.UpdateTransactionInDB(transaction)
@@ -143,17 +110,6 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 
 func HandleTransactionDelete(data model.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		token, err := auth.GetBearerToken(r.Header)
-		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, err.Error())
-			return
-		}
-
-		userID, err := auth.ValidateJWT(token, data.JWTSecret)
-		if err != nil {
-			respondWithError(w, http.StatusUnauthorized, "Couldn't validate JWT")
-			return
-		}
 		idStr := r.PathValue("id")
 
 		id, err := uuid.Parse(idStr)
@@ -162,6 +118,7 @@ func HandleTransactionDelete(data model.Config) http.HandlerFunc {
 			return
 		}
 
+		userID := r.Context().Value("userID").(uuid.UUID)
 		err = data.DeleteTransactionFromDB(id, userID)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())

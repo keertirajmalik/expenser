@@ -30,7 +30,7 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 		return
 	}
 
-    w.Header().Set("Content-Length", fmt.Sprintf("%d", len(dat)))
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(dat)))
 	w.WriteHeader(code)
 	w.Write(dat)
 }

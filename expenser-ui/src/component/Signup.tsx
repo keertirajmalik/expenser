@@ -37,6 +37,7 @@ const SignUp: React.FC = () => {
         ...prev,
         password: passwordError,
       }));
+      setIsLoading(false);
       return;
     }
     fetch("/cxf/user", {
