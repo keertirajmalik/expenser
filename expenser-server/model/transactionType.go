@@ -2,11 +2,11 @@ package model
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"log"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 )
 
@@ -72,7 +72,7 @@ func (d Config) AddTransactionTypeData(ctx context.Context, transactionType Tran
 func (d Config) DeleteTransactionTypeFromDB(ctx context.Context, id uuid.UUID) error {
 	err := d.Queries.DeleteTransactionType(ctx, id)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return errors.New("Transaction type not found: " + id.String())
 		}
 		log.Println("Couldn't delete transaction type from DB", err)

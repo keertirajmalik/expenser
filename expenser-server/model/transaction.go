@@ -63,12 +63,17 @@ func convertDBTransactionToTransaction(dbTransactions []repository.Transaction) 
 		if transaction.Note != nil {
 			noteValue = *transaction.Note
 		}
+		date := ""
+		if transaction.Date.Valid {
+			date = transaction.Date.Time.Format("02/01/2006")
+		}
+
 		transactions = append(transactions, Transaction{
 			ID:              transaction.ID,
 			Name:            transaction.Name,
 			Amount:          int(transaction.Amount),
 			TransactionType: transaction.Type,
-			Date:            transaction.Date.Time.Format("02/01/2006"),
+			Date:            date,
 			Note:            noteValue,
 			UserID:          transaction.UserID,
 		})
@@ -85,7 +90,7 @@ func (d *Config) AddTransactionToDB(ctx context.Context, transaction Transaction
 
 	}
 
-    _, err = d.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
+	_, err = d.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
 		ID:     uuid.New(),
 		Name:   transaction.Name,
 		Type:   transaction.TransactionType,
@@ -100,7 +105,7 @@ func (d *Config) AddTransactionToDB(ctx context.Context, transaction Transaction
 
 	if err != nil {
 		log.Printf("Couldn't create transaction in DB: %v", err)
-        return fmt.Errorf("failed to create transaction: %w", err)
+		return fmt.Errorf("failed to create transaction: %w", err)
 	}
 
 	return nil

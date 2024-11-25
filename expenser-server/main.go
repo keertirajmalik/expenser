@@ -14,7 +14,6 @@ import (
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 	"github.com/keertirajmalik/expenser/expenser-server/middleware"
 	"github.com/keertirajmalik/expenser/expenser-server/model"
-	_ "github.com/lib/pq"
 )
 
 func main() {

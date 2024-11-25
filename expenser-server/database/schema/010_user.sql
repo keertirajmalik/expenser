@@ -10,16 +10,10 @@ CREATE TABLE users(
 
 CREATE INDEX idx_users_username ON users(username);
 
-CREATE OR REPLACE FUNCTION trigger_set_timestamp()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$ BEGIN NEW.updated_at = CURRENT_TIMESTAMP; RETURN NEW; END; $$;
-
-CREATE TRIGGER set_timestamp
+CREATE TRIGGER update_users_updated_at
     BEFORE UPDATE ON users
     FOR EACH ROW
     EXECUTE FUNCTION trigger_set_timestamp();
 
 -- +goose Down
-DROP FUNCTION trigger_set_timestamp() CASCADE;
 DROP TABLE users;
