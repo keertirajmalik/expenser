@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -32,7 +33,7 @@ func loadConfigFromURL() (*pgxpool.Config, error) {
 func loadConfig() (*pgxpool.Config, error) {
 	cfg, err := NewDatabase()
 	if err != nil {
-		log.Printf("Failed to load config from NewDatabase: %v, falling back to URL", err)
+		log.Printf("Failed to load config from NewDatabase, falling back to URL")
 		return loadConfigFromURL()
 	}
 
@@ -63,6 +64,15 @@ func Connect(ctx context.Context) (*pgxpool.Pool, error) {
 	conn, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("could not connect to database: %w", err)
+	}
+
+	// Verify connection
+	connCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+    defer cancel()
+
+	if err := conn.Ping(connCtx); err != nil {
+		conn.Close()
+		return nil, fmt.Errorf("failed to verify database connection: %w", err)
 	}
 
 	return conn, nil

@@ -100,7 +100,7 @@ func (d *Config) AddTransactionToDB(ctx context.Context, transaction Transaction
 
 	if err != nil {
 		log.Printf("Couldn't create transaction in DB: %v", err)
-		return err
+        return fmt.Errorf("failed to create transaction: %w", err)
 	}
 
 	return nil

@@ -15,7 +15,6 @@ SET name = $2,
     amount = $3,
     type =  $4,
     date = $5,
-    note = $6,
-    updated_at = CURRENT_TIMESTAMP
+    note = $6
 WHERE id = $1 AND user_id=$7
 RETURNING *;
