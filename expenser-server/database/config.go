@@ -73,7 +73,7 @@ func NewDatabase() (*Database, error) {
 
 	sslmode, ok := os.LookupEnv("POSTGRES_SSLMODE")
 	if !ok {
-		return nil, fmt.Errorf("no SSLMode env variable set")
+		return nil, fmt.Errorf("no POSTGRES_SSLMODE env variable set")
 	}
 
 	config := &Database{

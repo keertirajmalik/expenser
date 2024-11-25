@@ -44,6 +44,15 @@ func HandleTransactionTypeCreate(data model.Config) http.HandlerFunc {
 			return
 		}
 
+		if len(params.Name) == 0 {
+			respondWithError(w, http.StatusBadRequest, "Transaction type name cannot be empty")
+			return
+		}
+		if len(params.Name) > 50 {
+			respondWithError(w, http.StatusBadRequest, "Transaction type name too long")
+			return
+		}
+
 		transactionType := model.NewTransactionType(params.Name, params.Description)
 		transactionType, err = data.AddTransactionTypeData(r.Context(), transactionType)
 		if err != nil {

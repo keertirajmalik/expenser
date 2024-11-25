@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"net/url"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -16,7 +18,7 @@ var (
 func loadConfigFromURL() (*pgxpool.Config, error) {
 	dbURL, ok := os.LookupEnv("DATABASE_URL")
 	if !ok {
-		return nil, fmt.Errorf("Must set DATABASE_URL env var")
+		return nil, ErrMissingDatabaseURL
 	}
 
 	config, err := pgxpool.ParseConfig(dbURL)
@@ -30,13 +32,26 @@ func loadConfigFromURL() (*pgxpool.Config, error) {
 func loadConfig() (*pgxpool.Config, error) {
 	cfg, err := NewDatabase()
 	if err != nil {
+		log.Printf("Failed to load config from NewDatabase: %v, falling back to URL", err)
 		return loadConfigFromURL()
 	}
 
-	return pgxpool.ParseConfig(fmt.Sprintf(
+	// Validate config parameters
+	if cfg.Username == "" || cfg.Host == "" || cfg.DBName == "" {
+		return nil, fmt.Errorf("invalid config: missing required parameters")
+	}
+
+	// Use proper escaping for connection string parameters
+	connStr := fmt.Sprintf(
 		"user=%s password=%s host=%s port=%d dbname=%s sslmode=%s",
-		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode,
-	))
+		url.QueryEscape(cfg.Username),
+		url.QueryEscape(cfg.Password),
+		url.QueryEscape(cfg.Host),
+		cfg.Port,
+		url.QueryEscape(cfg.DBName),
+		url.QueryEscape(cfg.SSLMode),
+	)
+	return pgxpool.ParseConfig(connStr)
 }
 
 func Connect(ctx context.Context) (*pgxpool.Pool, error) {

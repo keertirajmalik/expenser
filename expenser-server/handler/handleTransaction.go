@@ -53,7 +53,7 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 
 		transaction := model.NewTransaction(params.Name, params.Type, params.Note, params.Amount, params.Date, userID)
 
-		err = data.AddTransactionToDB(transaction)
+		err = data.AddTransactionToDB(r.Context(), transaction)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
@@ -97,7 +97,7 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 		userID := r.Context().Value("userID").(uuid.UUID)
 		transaction := model.ConvertTransaction(id, params.Name, params.Type, params.Note, params.Amount, params.Date, userID)
 
-		err = data.UpdateTransactionInDB(transaction)
+		err = data.UpdateTransactionInDB(r.Context(), transaction)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
@@ -119,7 +119,7 @@ func HandleTransactionDelete(data model.Config) http.HandlerFunc {
 		}
 
 		userID := r.Context().Value("userID").(uuid.UUID)
-		err = data.DeleteTransactionFromDB(id, userID)
+		err = data.DeleteTransactionFromDB(r.Context(), id, userID)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
