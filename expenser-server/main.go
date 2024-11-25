@@ -8,7 +8,7 @@ import (
 	"os/signal"
 
 	"github.com/joho/godotenv"
-	"github.com/keertirajmalik/expenser/expenser-server/db"
+	"github.com/keertirajmalik/expenser/expenser-server/database"
 	"github.com/keertirajmalik/expenser/expenser-server/handler"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 	"github.com/keertirajmalik/expenser/expenser-server/middleware"
@@ -34,14 +34,14 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	db, err := db.Connect(ctx)
+	db, err := database.Connect(ctx)
 	if err != nil {
 		log.Fatal("failed to connect to database: ", err)
 	}
 	mux := http.NewServeMux()
 
 	config := model.Config{
-        Queries: repository.New(db),
+		Queries:   repository.New(db),
 		JWTSecret: []byte(jwtSecret),
 	}
 

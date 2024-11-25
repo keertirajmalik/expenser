@@ -10,24 +10,30 @@ import (
 )
 
 type Transaction struct {
-	ID     uuid.UUID
-	Name   string
-	Amount int32
-	Type   string
-	Date   pgtype.Date
-	Note   *string
-	UserID uuid.UUID
+	ID        uuid.UUID          `json:"id"`
+	Name      string             `json:"name"`
+	Amount    int32              `json:"amount"`
+	Type      string             `json:"type"`
+	Date      pgtype.Date        `json:"date"`
+	Note      *string            `json:"note"`
+	UserID    uuid.UUID          `json:"user_id"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 type TransactionType struct {
-	ID          uuid.UUID
-	Name        string
-	Description *string
+	ID          uuid.UUID          `json:"id"`
+	Name        string             `json:"name"`
+	Description *string            `json:"description"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
 }
 
 type User struct {
-	ID             uuid.UUID
-	Name           string
-	Username       string
-	HashedPassword string
+	ID             uuid.UUID          `json:"id"`
+	Name           string             `json:"name"`
+	Username       string             `json:"username"`
+	HashedPassword string             `json:"hashed_password"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
 }

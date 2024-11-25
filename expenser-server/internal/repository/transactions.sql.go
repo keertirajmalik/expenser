@@ -16,17 +16,17 @@ import (
 const createTransaction = `-- name: CreateTransaction :one
 INSERT INTO transactions(id, name, amount, type, date, note, user_id)
 VALUES ($1, $2, $3, $4,$5, $6, $7)
-RETURNING id, name, amount, type, date, note, user_id
+RETURNING id, name, amount, type, date, note, user_id, created_at, updated_at
 `
 
 type CreateTransactionParams struct {
-	ID     uuid.UUID
-	Name   string
-	Amount int32
-	Type   string
-	Date   pgtype.Date
-	Note   *string
-	UserID uuid.UUID
+	ID     uuid.UUID   `json:"id"`
+	Name   string      `json:"name"`
+	Amount int32       `json:"amount"`
+	Type   string      `json:"type"`
+	Date   pgtype.Date `json:"date"`
+	Note   *string     `json:"note"`
+	UserID uuid.UUID   `json:"user_id"`
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
@@ -48,6 +48,8 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 		&i.Date,
 		&i.Note,
 		&i.UserID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -57,8 +59,8 @@ DELETE FROM transactions where id = $1 AND user_id=$2
 `
 
 type DeleteTransactionParams struct {
-	ID     uuid.UUID
-	UserID uuid.UUID
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
 }
 
 func (q *Queries) DeleteTransaction(ctx context.Context, arg DeleteTransactionParams) (pgconn.CommandTag, error) {
@@ -66,7 +68,7 @@ func (q *Queries) DeleteTransaction(ctx context.Context, arg DeleteTransactionPa
 }
 
 const getTransaction = `-- name: GetTransaction :many
-SELECT id, name, amount, type, date, note, user_id from transactions where user_id=$1
+SELECT id, name, amount, type, date, note, user_id, created_at, updated_at from transactions where user_id=$1
 `
 
 func (q *Queries) GetTransaction(ctx context.Context, userID uuid.UUID) ([]Transaction, error) {
@@ -86,6 +88,8 @@ func (q *Queries) GetTransaction(ctx context.Context, userID uuid.UUID) ([]Trans
 			&i.Date,
 			&i.Note,
 			&i.UserID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -103,19 +107,20 @@ SET name = $2,
     amount = $3,
     type =  $4,
     date = $5,
-    note = $6
+    note = $6,
+    updated_at = CURRENT_TIMESTAMP
 WHERE id = $1 AND user_id=$7
-RETURNING id, name, amount, type, date, note, user_id
+RETURNING id, name, amount, type, date, note, user_id, created_at, updated_at
 `
 
 type UpdateTransactionParams struct {
-	ID     uuid.UUID
-	Name   string
-	Amount int32
-	Type   string
-	Date   pgtype.Date
-	Note   *string
-	UserID uuid.UUID
+	ID     uuid.UUID   `json:"id"`
+	Name   string      `json:"name"`
+	Amount int32       `json:"amount"`
+	Type   string      `json:"type"`
+	Date   pgtype.Date `json:"date"`
+	Note   *string     `json:"note"`
+	UserID uuid.UUID   `json:"user_id"`
 }
 
 func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) (Transaction, error) {
@@ -137,6 +142,8 @@ func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionPa
 		&i.Date,
 		&i.Note,
 		&i.UserID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }

@@ -8,7 +8,9 @@ CREATE TABLE transactions(
 -- cascade on delete of the transaction type
     date DATE NOT NULL,
     note TEXT,
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- +goose Down
