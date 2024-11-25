@@ -1,10 +1,10 @@
 package model
 
 import (
-	"github.com/keertirajmalik/expenser/expenser-server/db"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 )
 
 type Config struct {
-	DBConfig  db.DBConfig
+	Queries  *repository.Queries
 	JWTSecret []byte
 }

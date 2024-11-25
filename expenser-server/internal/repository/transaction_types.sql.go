@@ -3,11 +3,10 @@
 //   sqlc v1.27.0
 // source: transaction_types.sql
 
-package database
+package repository
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -15,19 +14,25 @@ import (
 const createTransactionType = `-- name: CreateTransactionType :one
 INSERT INTO transaction_types(id, name, description)
 VALUES ($1, $2, $3)
-RETURNING id, name, description
+RETURNING id, name, description, created_at, updated_at
 `
 
 type CreateTransactionTypeParams struct {
-	ID          uuid.UUID
-	Name        string
-	Description sql.NullString
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
 }
 
 func (q *Queries) CreateTransactionType(ctx context.Context, arg CreateTransactionTypeParams) (TransactionType, error) {
-	row := q.db.QueryRowContext(ctx, createTransactionType, arg.ID, arg.Name, arg.Description)
+	row := q.db.QueryRow(ctx, createTransactionType, arg.ID, arg.Name, arg.Description)
 	var i TransactionType
-	err := row.Scan(&i.ID, &i.Name, &i.Description)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
 	return i, err
 }
 
@@ -36,16 +41,16 @@ DELETE FROM transaction_types where id=$1
 `
 
 func (q *Queries) DeleteTransactionType(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.ExecContext(ctx, deleteTransactionType, id)
+	_, err := q.db.Exec(ctx, deleteTransactionType, id)
 	return err
 }
 
 const getTransactionType = `-- name: GetTransactionType :many
-SELECT id, name, description from transaction_types
+SELECT id, name, description, created_at, updated_at from transaction_types
 `
 
 func (q *Queries) GetTransactionType(ctx context.Context) ([]TransactionType, error) {
-	rows, err := q.db.QueryContext(ctx, getTransactionType)
+	rows, err := q.db.Query(ctx, getTransactionType)
 	if err != nil {
 		return nil, err
 	}
@@ -53,13 +58,16 @@ func (q *Queries) GetTransactionType(ctx context.Context) ([]TransactionType, er
 	var items []TransactionType
 	for rows.Next() {
 		var i TransactionType
-		if err := rows.Scan(&i.ID, &i.Name, &i.Description); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

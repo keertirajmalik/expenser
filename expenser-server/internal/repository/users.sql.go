@@ -3,7 +3,7 @@
 //   sqlc v1.27.0
 // source: users.sql
 
-package database
+package repository
 
 import (
 	"context"
@@ -14,18 +14,18 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users(id, name,username, hashed_password)
 VALUES ($1, $2, $3, $4)
-RETURNING id, name, username, hashed_password
+RETURNING id, name, username, hashed_password, created_at, updated_at
 `
 
 type CreateUserParams struct {
-	ID             uuid.UUID
-	Name           string
-	Username       string
-	HashedPassword string
+	ID             uuid.UUID `json:"id"`
+	Name           string    `json:"name"`
+	Username       string    `json:"username"`
+	HashedPassword string    `json:"hashed_password"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser,
+	row := q.db.QueryRow(ctx, createUser,
 		arg.ID,
 		arg.Name,
 		arg.Username,
@@ -37,32 +37,36 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Name,
 		&i.Username,
 		&i.HashedPassword,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getUserByUsername = `-- name: GetUserByUsername :one
-SELECT id, name, username, hashed_password from users where username=$1
+SELECT id, name, username, hashed_password, created_at, updated_at from users where username=$1
 `
 
 func (q *Queries) GetUserByUsername(ctx context.Context, username string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByUsername, username)
+	row := q.db.QueryRow(ctx, getUserByUsername, username)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Username,
 		&i.HashedPassword,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const getUsers = `-- name: GetUsers :many
-SELECT id, name, username, hashed_password from users
+SELECT id, name, username, hashed_password, created_at, updated_at from users
 `
 
 func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, getUsers)
+	rows, err := q.db.Query(ctx, getUsers)
 	if err != nil {
 		return nil, err
 	}
@@ -75,13 +79,12 @@ func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
 			&i.Name,
 			&i.Username,
 			&i.HashedPassword,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

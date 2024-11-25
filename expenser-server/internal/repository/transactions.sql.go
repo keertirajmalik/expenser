@@ -3,34 +3,34 @@
 //   sqlc v1.27.0
 // source: transactions.sql
 
-package database
+package repository
 
 import (
 	"context"
-	"database/sql"
-	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createTransaction = `-- name: CreateTransaction :one
 INSERT INTO transactions(id, name, amount, type, date, note, user_id)
 VALUES ($1, $2, $3, $4,$5, $6, $7)
-RETURNING id, name, amount, type, date, note, user_id
+RETURNING id, name, amount, type, date, note, user_id, created_at, updated_at
 `
 
 type CreateTransactionParams struct {
-	ID     uuid.UUID
-	Name   string
-	Amount int32
-	Type   string
-	Date   time.Time
-	Note   sql.NullString
-	UserID uuid.UUID
+	ID     uuid.UUID   `json:"id"`
+	Name   string      `json:"name"`
+	Amount int32       `json:"amount"`
+	Type   string      `json:"type"`
+	Date   pgtype.Date `json:"date"`
+	Note   *string     `json:"note"`
+	UserID uuid.UUID   `json:"user_id"`
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
-	row := q.db.QueryRowContext(ctx, createTransaction,
+	row := q.db.QueryRow(ctx, createTransaction,
 		arg.ID,
 		arg.Name,
 		arg.Amount,
@@ -48,6 +48,8 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 		&i.Date,
 		&i.Note,
 		&i.UserID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
@@ -57,20 +59,20 @@ DELETE FROM transactions where id = $1 AND user_id=$2
 `
 
 type DeleteTransactionParams struct {
-	ID     uuid.UUID
-	UserID uuid.UUID
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
 }
 
-func (q *Queries) DeleteTransaction(ctx context.Context, arg DeleteTransactionParams) (sql.Result, error) {
-	return q.db.ExecContext(ctx, deleteTransaction, arg.ID, arg.UserID)
+func (q *Queries) DeleteTransaction(ctx context.Context, arg DeleteTransactionParams) (pgconn.CommandTag, error) {
+	return q.db.Exec(ctx, deleteTransaction, arg.ID, arg.UserID)
 }
 
 const getTransaction = `-- name: GetTransaction :many
-SELECT id, name, amount, type, date, note, user_id from transactions where user_id=$1
+SELECT id, name, amount, type, date, note, user_id, created_at, updated_at from transactions where user_id=$1
 `
 
 func (q *Queries) GetTransaction(ctx context.Context, userID uuid.UUID) ([]Transaction, error) {
-	rows, err := q.db.QueryContext(ctx, getTransaction, userID)
+	rows, err := q.db.Query(ctx, getTransaction, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -86,13 +88,12 @@ func (q *Queries) GetTransaction(ctx context.Context, userID uuid.UUID) ([]Trans
 			&i.Date,
 			&i.Note,
 			&i.UserID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err
@@ -108,21 +109,21 @@ SET name = $2,
     date = $5,
     note = $6
 WHERE id = $1 AND user_id=$7
-RETURNING id, name, amount, type, date, note, user_id
+RETURNING id, name, amount, type, date, note, user_id, created_at, updated_at
 `
 
 type UpdateTransactionParams struct {
-	ID     uuid.UUID
-	Name   string
-	Amount int32
-	Type   string
-	Date   time.Time
-	Note   sql.NullString
-	UserID uuid.UUID
+	ID     uuid.UUID   `json:"id"`
+	Name   string      `json:"name"`
+	Amount int32       `json:"amount"`
+	Type   string      `json:"type"`
+	Date   pgtype.Date `json:"date"`
+	Note   *string     `json:"note"`
+	UserID uuid.UUID   `json:"user_id"`
 }
 
 func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) (Transaction, error) {
-	row := q.db.QueryRowContext(ctx, updateTransaction,
+	row := q.db.QueryRow(ctx, updateTransaction,
 		arg.ID,
 		arg.Name,
 		arg.Amount,
@@ -140,6 +141,8 @@ func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionPa
 		&i.Date,
 		&i.Note,
 		&i.UserID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }

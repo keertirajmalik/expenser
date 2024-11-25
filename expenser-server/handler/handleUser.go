@@ -36,7 +36,7 @@ func HandleUserCreate(data model.Config) http.HandlerFunc {
 		}
 
 		user := model.NewUser(params.Name, params.Username, hashedPassword)
-		user, err = data.AddUserToDB(user)
+		user, err = data.AddUserToDB(r.Context(), user)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return

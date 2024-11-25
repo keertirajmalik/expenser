@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/keertirajmalik/expenser/expenser-server/db"
-	"github.com/keertirajmalik/expenser/expenser-server/internal/database"
+	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 )
 
 type Transaction struct {
@@ -45,11 +45,8 @@ func ConvertTransaction(id uuid.UUID, transaction, transactionType, note string,
 	}
 }
 
-func (d Config) GetTransactionsFromDB(userID uuid.UUID) ([]Transaction, error) {
-	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
-	defer cancel()
-
-	dbTransactions, err := d.DBConfig.DB.GetTransaction(context, userID)
+func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]Transaction, error) {
+	dbTransactions, err := d.Queries.GetTransaction(ctx, userID)
 	if err != nil {
 		log.Printf("Couldn't get transaction from DB: %v", err)
 		return []Transaction{}, err
@@ -58,17 +55,26 @@ func (d Config) GetTransactionsFromDB(userID uuid.UUID) ([]Transaction, error) {
 	return convertDBTransactionToTransaction(dbTransactions), nil
 }
 
-func convertDBTransactionToTransaction(dbTransactions []database.Transaction) []Transaction {
+func convertDBTransactionToTransaction(dbTransactions []repository.Transaction) []Transaction {
 	transactions := []Transaction{}
 
 	for _, transaction := range dbTransactions {
+		noteValue := ""
+		if transaction.Note != nil {
+			noteValue = *transaction.Note
+		}
+		date := ""
+		if transaction.Date.Valid {
+			date = transaction.Date.Time.Format("02/01/2006")
+		}
+
 		transactions = append(transactions, Transaction{
 			ID:              transaction.ID,
 			Name:            transaction.Name,
 			Amount:          int(transaction.Amount),
 			TransactionType: transaction.Type,
-			Date:            transaction.Date.Format("02/01/2006"),
-			Note:            db.ConvertSqlNullStringToString(transaction.Note),
+			Date:            date,
+			Note:            noteValue,
 			UserID:          transaction.UserID,
 		})
 	}
@@ -76,10 +82,7 @@ func convertDBTransactionToTransaction(dbTransactions []database.Transaction) []
 	return transactions
 }
 
-func (d *Config) AddTransactionToDB(transaction Transaction) error {
-	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
-	defer cancel()
-
+func (d *Config) AddTransactionToDB(ctx context.Context, transaction Transaction) error {
 	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
 	if err != nil {
 		log.Printf("Invalid date format: %v", err)
@@ -87,40 +90,43 @@ func (d *Config) AddTransactionToDB(transaction Transaction) error {
 
 	}
 
-	_, err = d.DBConfig.DB.CreateTransaction(context, database.CreateTransactionParams{
+	_, err = d.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
 		ID:     uuid.New(),
 		Name:   transaction.Name,
 		Type:   transaction.TransactionType,
 		Amount: int32(transaction.Amount),
-		Date:   parsedDate,
-		Note:   db.ConvertStringToSqlNullString(transaction.Note, transaction.Note != ""),
+		Date: pgtype.Date{
+			Time:  parsedDate,
+			Valid: true,
+		},
+		Note:   &transaction.Note,
 		UserID: transaction.UserID,
 	})
 
 	if err != nil {
 		log.Printf("Couldn't create transaction in DB: %v", err)
-		return err
+		return fmt.Errorf("failed to create transaction: %w", err)
 	}
 
 	return nil
 }
 
-func (d *Config) UpdateTransactionInDB(transaction Transaction) error {
-	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
-	defer cancel()
-
+func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction Transaction) error {
 	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
 	if err != nil {
 		log.Printf("Invalid date format: %v", err)
 		return fmt.Errorf("invalid date format: %w", err)
 	}
-	_, err = d.DBConfig.DB.UpdateTransaction(context, database.UpdateTransactionParams{
+	_, err = d.Queries.UpdateTransaction(ctx, repository.UpdateTransactionParams{
 		ID:     transaction.ID,
 		Name:   transaction.Name,
 		Type:   transaction.TransactionType,
 		Amount: int32(transaction.Amount),
-		Date:   parsedDate,
-		Note:   db.ConvertStringToSqlNullString(transaction.Note, transaction.Note != ""),
+		Date: pgtype.Date{
+			Time:  parsedDate,
+			Valid: true,
+		},
+		Note:   &transaction.Note,
 		UserID: transaction.UserID,
 	})
 
@@ -132,11 +138,8 @@ func (d *Config) UpdateTransactionInDB(transaction Transaction) error {
 	return nil
 }
 
-func (d Config) DeleteTransactionFromDB(id, userID uuid.UUID) error {
-	context, cancel := context.WithDeadline(context.Background(), time.Now().Add(30*time.Second))
-	defer cancel()
-
-	result, err := d.DBConfig.DB.DeleteTransaction(context, database.DeleteTransactionParams{
+func (d Config) DeleteTransactionFromDB(ctx context.Context, id, userID uuid.UUID) error {
+	result, err := d.Queries.DeleteTransaction(ctx, repository.DeleteTransactionParams{
 		ID:     id,
 		UserID: userID,
 	})
@@ -145,11 +148,7 @@ func (d Config) DeleteTransactionFromDB(id, userID uuid.UUID) error {
 		return err
 	}
 
-	rowAffected, err := result.RowsAffected()
-	if err != nil {
-		log.Printf("Error retrieving rows affected: %v", err)
-		return err
-	}
+	rowAffected := result.RowsAffected()
 	if rowAffected == 0 {
 		return fmt.Errorf("transaction %s not found for user %s", id, userID)
 	}
