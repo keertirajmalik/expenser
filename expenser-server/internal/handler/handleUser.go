@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/keertirajmalik/expenser/expenser-server/internal/auth"
-	"github.com/keertirajmalik/expenser/expenser-server/model"
+	"github.com/keertirajmalik/expenser/expenser-server/auth"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 )
 
 func HandleUserCreate(data model.Config) http.HandlerFunc {

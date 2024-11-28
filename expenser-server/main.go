@@ -10,10 +10,10 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/keertirajmalik/expenser/expenser-server/database"
-	"github.com/keertirajmalik/expenser/expenser-server/handler"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/handler"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 	"github.com/keertirajmalik/expenser/expenser-server/middleware"
-	"github.com/keertirajmalik/expenser/expenser-server/model"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 )
 
 func main() {

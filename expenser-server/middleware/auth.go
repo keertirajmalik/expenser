@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/keertirajmalik/expenser/expenser-server/internal/auth"
+	"github.com/keertirajmalik/expenser/expenser-server/auth"
 )
 
 type errorResponse struct {
