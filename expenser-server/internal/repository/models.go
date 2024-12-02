@@ -12,7 +12,7 @@ import (
 type Transaction struct {
 	ID        uuid.UUID          `json:"id"`
 	Name      string             `json:"name"`
-	Amount    int32              `json:"amount"`
+	Amount    pgtype.Numeric     `json:"amount"`
 	Type      string             `json:"type"`
 	Date      pgtype.Date        `json:"date"`
 	Note      *string            `json:"note"`

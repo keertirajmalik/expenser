@@ -14,14 +14,14 @@ import (
 type Transaction struct {
 	ID              uuid.UUID `json:"id"`
 	Name            string    `json:"name"`
-	Amount          int       `json:"amount"`
+	Amount          float64   `json:"amount"`
 	TransactionType string    `json:"type"`
 	Date            string    `json:"date"`
 	Note            string    `json:"note"`
 	UserID          uuid.UUID `json:"user_id"`
 }
 
-func NewTransaction(transaction, transactionType, note string, amount int, date string, userID uuid.UUID) Transaction {
+func NewTransaction(transaction, transactionType, note string, amount float64, date string, userID uuid.UUID) Transaction {
 	return Transaction{
 		ID:              uuid.New(),
 		Name:            transaction,
@@ -33,7 +33,7 @@ func NewTransaction(transaction, transactionType, note string, amount int, date 
 	}
 }
 
-func ConvertTransaction(id uuid.UUID, transaction, transactionType, note string, amount int, date string, userID uuid.UUID) Transaction {
+func ConvertTransaction(id uuid.UUID, transaction, transactionType, note string, amount float64, date string, userID uuid.UUID) Transaction {
 	return Transaction{
 		ID:              id,
 		Name:            transaction,
@@ -51,7 +51,6 @@ func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]
 		log.Printf("Couldn't get transaction from DB: %v", err)
 		return []Transaction{}, err
 	}
-
 	return convertDBTransactionToTransaction(dbTransactions), nil
 }
 
@@ -67,11 +66,17 @@ func convertDBTransactionToTransaction(dbTransactions []repository.Transaction) 
 		if transaction.Date.Valid {
 			date = transaction.Date.Time.Format("02/01/2006")
 		}
+		money := 0.00
+		if transaction.Amount.Valid {
+			money64, _ := transaction.Amount.Float64Value()
+			money = money64.Float64
 
+			log.Println(money)
+		}
 		transactions = append(transactions, Transaction{
 			ID:              transaction.ID,
 			Name:            transaction.Name,
-			Amount:          int(transaction.Amount),
+			Amount:          money,
 			TransactionType: transaction.Type,
 			Date:            date,
 			Note:            noteValue,
@@ -90,11 +95,17 @@ func (d *Config) AddTransactionToDB(ctx context.Context, transaction Transaction
 
 	}
 
+	money := &pgtype.Numeric{}
+	err = money.Scan(fmt.Sprintf("%.4f", transaction.Amount)) // .4 specifies precision
+	if err != nil {
+		log.Printf("Invalid amount formt: %v", err)
+	}
+
 	_, err = d.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
 		ID:     uuid.New(),
 		Name:   transaction.Name,
 		Type:   transaction.TransactionType,
-		Amount: int32(transaction.Amount),
+		Amount: *money,
 		Date: pgtype.Date{
 			Time:  parsedDate,
 			Valid: true,
@@ -117,11 +128,17 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction Transact
 		log.Printf("Invalid date format: %v", err)
 		return fmt.Errorf("invalid date format: %w", err)
 	}
+	money := &pgtype.Numeric{}
+	err = money.Scan(fmt.Sprintf("%.4f", transaction.Amount)) // .4 specifies precision
+	if err != nil {
+		log.Printf("Invalid amount formt: %v", err)
+	}
+
 	_, err = d.Queries.UpdateTransaction(ctx, repository.UpdateTransactionParams{
 		ID:     transaction.ID,
 		Name:   transaction.Name,
 		Type:   transaction.TransactionType,
-		Amount: int32(transaction.Amount),
+		Amount: *money,
 		Date: pgtype.Date{
 			Time:  parsedDate,
 			Valid: true,

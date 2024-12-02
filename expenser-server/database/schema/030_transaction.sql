@@ -3,7 +3,7 @@
 CREATE TABLE transactions(
     id UUID PRIMARY KEY,
     name TEXT NOT NULL,
-    amount INTEGER NOT NULL,
+    amount NUMERIC(8,4) NOT NULL,
     type TEXT NOT NULL REFERENCES transaction_types(name) ON DELETE CASCADE,
     date DATE NOT NULL,
     note TEXT,
