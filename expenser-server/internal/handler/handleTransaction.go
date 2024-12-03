@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
+	"github.com/shopspring/decimal"
 )
 
 func HandleTransactionGet(data model.Config) http.HandlerFunc {
@@ -29,11 +30,11 @@ func HandleTransactionGet(data model.Config) http.HandlerFunc {
 
 func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 	type parameters struct {
-		Name   string  `json:"name"`
-		Amount float64 `json:"amount"`
-		Type   string  `json:"type"`
-		Date   string  `json:"date"`
-		Note   string  `json:"note"`
+		Name   string          `json:"name"`
+		Amount decimal.Decimal `json:"amount"`
+		Type   string          `json:"type"`
+		Date   string          `json:"date"`
+		Note   string          `json:"note"`
 	}
 
 	type response struct {
@@ -66,11 +67,11 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 
 func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 	type parameters struct {
-		Name   string  `json:"name"`
-		Amount float64 `json:"amount"`
-		Type   string  `json:"type"`
-		Date   string  `json:"date"`
-		Note   string  `json:"note"`
+		Name   string          `json:"name"`
+		Amount decimal.Decimal `json:"amount"`
+		Type   string          `json:"type"`
+		Date   string          `json:"date"`
+		Note   string          `json:"note"`
 	}
 
 	type response struct {

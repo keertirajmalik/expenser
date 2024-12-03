@@ -9,19 +9,20 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
+	"github.com/shopspring/decimal"
 )
 
 type Transaction struct {
-	ID              uuid.UUID `json:"id"`
-	Name            string    `json:"name"`
-	Amount          float64   `json:"amount"`
-	TransactionType string    `json:"type"`
-	Date            string    `json:"date"`
-	Note            string    `json:"note"`
-	UserID          uuid.UUID `json:"user_id"`
+	ID              uuid.UUID       `json:"id"`
+	Name            string          `json:"name"`
+	Amount          decimal.Decimal `json:"amount"`
+	TransactionType string          `json:"type"`
+	Date            string          `json:"date"`
+	Note            string          `json:"note"`
+	UserID          uuid.UUID       `json:"user_id"`
 }
 
-func NewTransaction(transaction, transactionType, note string, amount float64, date string, userID uuid.UUID) Transaction {
+func NewTransaction(transaction, transactionType, note string, amount decimal.Decimal, date string, userID uuid.UUID) Transaction {
 	return Transaction{
 		ID:              uuid.New(),
 		Name:            transaction,
@@ -33,7 +34,7 @@ func NewTransaction(transaction, transactionType, note string, amount float64, d
 	}
 }
 
-func ConvertTransaction(id uuid.UUID, transaction, transactionType, note string, amount float64, date string, userID uuid.UUID) Transaction {
+func ConvertTransaction(id uuid.UUID, transaction, transactionType, note string, amount decimal.Decimal, date string, userID uuid.UUID) Transaction {
 	return Transaction{
 		ID:              id,
 		Name:            transaction,
@@ -66,12 +67,13 @@ func convertDBTransactionToTransaction(dbTransactions []repository.Transaction) 
 		if transaction.Date.Valid {
 			date = transaction.Date.Time.Format("02/01/2006")
 		}
-		money := 0.00
-		if transaction.Amount.Valid {
-			money64, _ := transaction.Amount.Float64Value()
-			money = money64.Float64
 
-			log.Println(money)
+		var money decimal.Decimal
+		if transaction.Amount.Valid {
+			err := money.Scan(transaction.Amount)
+			if err != nil {
+				log.Printf("Failed to convert Amount: %v", err)
+			}
 		}
 		transactions = append(transactions, Transaction{
 			ID:              transaction.ID,
@@ -96,9 +98,10 @@ func (d *Config) AddTransactionToDB(ctx context.Context, transaction Transaction
 	}
 
 	money := &pgtype.Numeric{}
-	err = money.Scan(fmt.Sprintf("%.4f", transaction.Amount)) // .4 specifies precision
+	err = money.Scan(transaction.Amount)
 	if err != nil {
-		log.Printf("Invalid amount formt: %v", err)
+        log.Print("I failed here")
+		log.Printf("Invalid amount format: %v", err)
 	}
 
 	_, err = d.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
@@ -128,10 +131,11 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction Transact
 		log.Printf("Invalid date format: %v", err)
 		return fmt.Errorf("invalid date format: %w", err)
 	}
+
 	money := &pgtype.Numeric{}
-	err = money.Scan(fmt.Sprintf("%.4f", transaction.Amount)) // .4 specifies precision
+	err = money.Scan(transaction.Amount)
 	if err != nil {
-		log.Printf("Invalid amount formt: %v", err)
+		log.Printf("Invalid amount format: %v", err)
 	}
 
 	_, err = d.Queries.UpdateTransaction(ctx, repository.UpdateTransactionParams{
