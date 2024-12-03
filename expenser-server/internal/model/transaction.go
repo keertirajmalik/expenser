@@ -70,9 +70,11 @@ func convertDBTransactionToTransaction(dbTransactions []repository.Transaction) 
 
 		var money decimal.Decimal
 		if transaction.Amount.Valid {
-			err := money.Scan(transaction.Amount)
+			moneyFloat, err := transaction.Amount.Float64Value()
 			if err != nil {
-				log.Printf("Failed to convert Amount: %v", err)
+				log.Printf("Failed to convert Amount to float64: %v", err)
+			} else {
+				money = decimal.NewFromFloat(moneyFloat.Float64)
 			}
 		}
 		transactions = append(transactions, Transaction{
@@ -98,10 +100,10 @@ func (d *Config) AddTransactionToDB(ctx context.Context, transaction Transaction
 	}
 
 	money := &pgtype.Numeric{}
-	err = money.Scan(transaction.Amount)
+	err = money.Scan(transaction.Amount.String())
 	if err != nil {
-        log.Print("I failed here")
 		log.Printf("Invalid amount format: %v", err)
+		return fmt.Errorf("Failed to convert amount type: %w", err)
 	}
 
 	_, err = d.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
@@ -133,9 +135,10 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction Transact
 	}
 
 	money := &pgtype.Numeric{}
-	err = money.Scan(transaction.Amount)
+	err = money.Scan(transaction.Amount.String())
 	if err != nil {
 		log.Printf("Invalid amount format: %v", err)
+		return fmt.Errorf("Failed to convert amount type: %w", err)
 	}
 
 	_, err = d.Queries.UpdateTransaction(ctx, repository.UpdateTransactionParams{
