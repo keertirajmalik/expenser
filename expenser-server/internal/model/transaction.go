@@ -70,11 +70,16 @@ func convertDBTransactionToTransaction(dbTransactions []repository.Transaction) 
 
 		var money decimal.Decimal
 		if transaction.Amount.Valid {
-			moneyFloat, err := transaction.Amount.Float64Value()
+
+			numStr := transaction.Amount.Int.String()
+			if transaction.Amount.Exp != 0 {
+				numStr = fmt.Sprintf("%se%d", numStr, transaction.Amount.Exp)
+			}
+
+			var err error
+			money, err = decimal.NewFromString(numStr)
 			if err != nil {
-				log.Printf("Failed to convert Amount to float64: %v", err)
-			} else {
-				money = decimal.NewFromFloat(moneyFloat.Float64)
+				log.Printf("Failed to convert Amount: %v", err)
 			}
 		}
 		transactions = append(transactions, Transaction{
