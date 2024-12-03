@@ -1,6 +1,6 @@
+import ExpenseButtonMenu from "@/component/AppBar/ExpenseButton";
+import ProfileMenu from "@/component/AppBar/ProfileMenu";
 import { AppBar, Toolbar, Typography } from "@mui/material";
-import ExpenseButtonMenu from "./ExpenseButton";
-import ProfileMenu from "./ProfileMenu";
 
 import React from "react";
 

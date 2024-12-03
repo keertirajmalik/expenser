@@ -7,10 +7,10 @@ import {
   MenuItem,
 } from "@mui/material";
 import React, { useCallback, useState } from "react";
-import { useUser } from "../../providers/UserContext";
-import { useAuth } from "../../providers/AuthContext";
 import { PersonAdd, Logout } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/providers/AuthContext";
+import { useUser } from "@/providers/UserContext";
 
 function stringToColor(string: string) {
   let hash = 0;
