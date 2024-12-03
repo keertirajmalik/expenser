@@ -7,13 +7,13 @@ import {
   Navigate,
 } from "react-router-dom";
 import { CssBaseline, Box, CircularProgress } from "@mui/material";
-import { TransactionsProvider } from "./providers/TransactionsContext";
-import { AuthProvider, useAuth } from "./providers/AuthContext";
-import Appbar from "./component/AppBar/AppBar";
-import SignUp from "./component/Signup";
-import TransactionTable from "./component/TransactionTable";
-import Login from "./component/Login";
-import { UserProvider } from "./providers/UserContext";
+import Appbar from "@/component/AppBar/AppBar";
+import SignUp from "@/component/Signup";
+import TransactionTable from "@/component/TransactionTable";
+import { useAuth, AuthProvider } from "@/providers/AuthContext";
+import { TransactionsProvider } from "@/providers/TransactionsContext";
+import { UserProvider } from "@/providers/UserContext";
+import Login from "@/component/Login";
 
 const App = () => {
   const { isLoggedIn, loading } = useAuth();

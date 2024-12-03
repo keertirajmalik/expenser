@@ -1,3 +1,4 @@
+import { Transaction } from "@/types/transaction";
 import React, {
   createContext,
   useState,
@@ -5,7 +6,6 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { Transaction } from "../types/transaction";
 
 interface TransactionsContextProps {
   transactions: Transaction[];

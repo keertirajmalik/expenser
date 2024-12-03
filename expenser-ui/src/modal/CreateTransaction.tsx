@@ -3,10 +3,10 @@ import { Box, Button, FormGroup, Paper, TextField } from "@mui/material";
 import MenuItem from "@mui/material/MenuItem";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
-import { TransactionType } from "../types/transactionType";
-import CreateTransactionType from "../modal/CreateTransactionType";
-import { useTransactions } from "../providers/TransactionsContext";
-import { formatDate } from "../util/dateUtil";
+import { TransactionType } from "@/types/transactionType";
+import CreateTransactionType from "@/modal/CreateTransactionType";
+import { useTransactions } from "@/providers/TransactionsContext";
+import { formatDate } from "@/util/dateUtil";
 
 const style = {
   position: "absolute",

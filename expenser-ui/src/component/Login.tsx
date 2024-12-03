@@ -8,9 +8,9 @@ import {
   Typography,
   IconButton,
 } from "@mui/material";
-import { useAuth } from "../providers/AuthContext";
-import { useUser } from "../providers/UserContext";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useAuth } from "@/providers/AuthContext";
+import { useUser } from "@/providers/UserContext";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");

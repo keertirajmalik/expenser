@@ -6,12 +6,12 @@ import {
   GridColDef,
   GridCellParams,
 } from "@mui/x-data-grid";
-import { useTransactions } from "../providers/TransactionsContext";
 import DataGridTable from "./DataGridTable";
 import { Select, MenuItem, SelectChangeEvent } from "@mui/material";
-import { TransactionType } from "../types/transactionType";
-import { formatDate } from "../util/dateUtil";
-import { apiRequest } from "../util/apiRequest";
+import { useTransactions } from "@/providers/TransactionsContext";
+import { TransactionType } from "@/types/transactionType";
+import { apiRequest } from "@/util/apiRequest";
+import { formatDate } from "@/util/dateUtil";
 
 const deleteTransaction = (id: GridRowId): Promise<void> => {
   return apiRequest(`/cxf/transaction/${id}`, "DELETE");
