@@ -20,7 +20,6 @@ const deleteTransaction = (id: GridRowId): Promise<void> => {
 const updateTransaction = (updatedRow: GridRowModel): Promise<void> => {
   const transactionData = {
     ...updatedRow,
-    amount: parseInt(updatedRow.amount),
     date: formatDate(updatedRow.date),
   };
   return apiRequest(

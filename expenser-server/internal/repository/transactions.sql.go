@@ -20,13 +20,13 @@ RETURNING id, name, amount, type, date, note, user_id, created_at, updated_at
 `
 
 type CreateTransactionParams struct {
-	ID     uuid.UUID   `json:"id"`
-	Name   string      `json:"name"`
-	Amount int32       `json:"amount"`
-	Type   string      `json:"type"`
-	Date   pgtype.Date `json:"date"`
-	Note   *string     `json:"note"`
-	UserID uuid.UUID   `json:"user_id"`
+	ID     uuid.UUID      `json:"id"`
+	Name   string         `json:"name"`
+	Amount pgtype.Numeric `json:"amount"`
+	Type   string         `json:"type"`
+	Date   pgtype.Date    `json:"date"`
+	Note   *string        `json:"note"`
+	UserID uuid.UUID      `json:"user_id"`
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
@@ -113,13 +113,13 @@ RETURNING id, name, amount, type, date, note, user_id, created_at, updated_at
 `
 
 type UpdateTransactionParams struct {
-	ID     uuid.UUID   `json:"id"`
-	Name   string      `json:"name"`
-	Amount int32       `json:"amount"`
-	Type   string      `json:"type"`
-	Date   pgtype.Date `json:"date"`
-	Note   *string     `json:"note"`
-	UserID uuid.UUID   `json:"user_id"`
+	ID     uuid.UUID      `json:"id"`
+	Name   string         `json:"name"`
+	Amount pgtype.Numeric `json:"amount"`
+	Type   string         `json:"type"`
+	Date   pgtype.Date    `json:"date"`
+	Note   *string        `json:"note"`
+	UserID uuid.UUID      `json:"user_id"`
 }
 
 func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) (Transaction, error) {
