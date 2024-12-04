@@ -12,17 +12,20 @@ import { useTransactions } from "@/providers/TransactionsContext";
 import { TransactionType } from "@/types/transactionType";
 import { apiRequest } from "@/util/apiRequest";
 import { formatDate } from "@/util/dateUtil";
+import useSWR from "swr";
 
-const deleteTransaction = (id: GridRowId): Promise<void> => {
-  return apiRequest(`/cxf/transaction/${id}`, "DELETE");
+const deleteTransaction = async (id: GridRowId): Promise<Response> => {
+  return await apiRequest(`/cxf/transaction/${id}`, "DELETE");
 };
 
-const updateTransaction = (updatedRow: GridRowModel): Promise<void> => {
+const updateTransaction = async (
+  updatedRow: GridRowModel,
+): Promise<Response> => {
   const transactionData = {
     ...updatedRow,
     date: formatDate(updatedRow.date),
   };
-  return apiRequest(
+  return await apiRequest(
     `/cxf/transaction/${updatedRow.id}`,
     "PUT",
     transactionData,
@@ -76,35 +79,38 @@ const columns: GridColDef[] = [
   },
 ];
 
+const fetcher = async (url: string): Promise<TransactionType[]> => {
+  const res = await apiRequest(url, "GET");
+  if (!res.ok) {
+    throw new Error("Failed to fetch types: " + res.statusText);
+  }
+  const data = await res.json();
+  if (!Array.isArray(data.transaction_types)) {
+    throw new Error("Fetched types data is not an array");
+  }
+
+  return data.transaction_types;
+};
+
 const TypeSelectCell = (params: GridCellParams) => {
-  const [types, setTypes] = useState<TransactionType[]>([]);
+  const { data: types, error } = useSWR<TransactionType[]>(
+    "/cxf/type",
+    fetcher,
+  );
   const [selectedValue, setSelectedValue] = useState<string>("");
 
   useEffect(() => {
-    fetch("/cxf/type", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch typess: " + response.statusText);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (Array.isArray(data.transaction_types)) {
-          setTypes(data.transaction_types);
-          const validValue = data.transaction_types.find(
-            (type: TransactionType) => type.name === params.value,
-          );
-          setSelectedValue(validValue ? (params.value as string) : "");
-        } else {
-          console.error("Fetched types data is not an array:", data);
-        }
-      })
-      .catch((error) => console.error("Error fetching types:", error));
-  }, [params.value]);
+    if (types) {
+      const validValue = types.find(
+        (type: TransactionType) => type.name === params.value,
+      );
+      setSelectedValue(validValue ? (params.value as string) : "");
+    }
+  }, [types, params.value]);
+
+  if (error) {
+    console.error("Error fetching types:", error);
+  }
 
   const handleChange = (event: SelectChangeEvent<unknown>) => {
     const newValue = event.target.value as string;
@@ -118,7 +124,7 @@ const TypeSelectCell = (params: GridCellParams) => {
 
   return (
     <Select value={selectedValue} onChange={handleChange} fullWidth>
-      {types.map((type) => (
+      {types?.map((type) => (
         <MenuItem key={type.id} value={type.name}>
           {type.name}
         </MenuItem>

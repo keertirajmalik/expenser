@@ -2,7 +2,7 @@ const apiRequest = async (
   url: string,
   method: string,
   body?: Record<string, unknown>,
-): Promise<void> => {
+): Promise<Response> => {
   const response = await fetch(url, {
     method,
     headers: {
@@ -14,6 +14,8 @@ const apiRequest = async (
   if (!response.ok) {
     throw new Error(`Failed to ${method.toLowerCase()} transaction`);
   }
+
+  return response;
 };
 
 export { apiRequest };

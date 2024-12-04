@@ -7,6 +7,7 @@ import {
   Modal,
   Typography,
 } from "@mui/material";
+import { apiRequest } from "@/util/apiRequest";
 
 const style = {
   position: "absolute",
@@ -60,14 +61,7 @@ const CreateTransactionType = ({
         note: formState.note,
       };
 
-      fetch("/cxf/type", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(transactionTypeData),
-      })
+      apiRequest("/cxf/type", "POST", transactionTypeData)
         .then((response) => response.json())
         .then(() => {
           handleClose();

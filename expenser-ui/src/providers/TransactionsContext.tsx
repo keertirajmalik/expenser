@@ -1,4 +1,5 @@
 import { Transaction } from "@/types/transaction";
+import { apiRequest } from "@/util/apiRequest";
 import React, {
   createContext,
   useState,
@@ -20,11 +21,7 @@ const fetchTransactions = async (
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>,
 ) => {
   try {
-    const response = await fetch("/cxf/transaction", {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+    const response = await apiRequest("/cxf/transaction", "GET");
     const data = await response.json();
 
     if (Array.isArray(data.transactions)) {

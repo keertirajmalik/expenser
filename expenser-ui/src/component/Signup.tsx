@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Box, Paper, TextField, Button, Typography } from "@mui/material";
+import { apiRequest } from "@/util/apiRequest";
 
 const SignUp: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -40,13 +41,7 @@ const SignUp: React.FC = () => {
       setIsLoading(false);
       return;
     }
-    fetch("/cxf/user", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: fullname, username, password }),
-    })
+    apiRequest("/cxf/user", "POST", { name: fullname, username, password })
       .then(async (response) => {
         if (!response.ok) {
           const data = await response.json();

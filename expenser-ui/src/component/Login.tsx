@@ -11,6 +11,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useAuth } from "@/providers/AuthContext";
 import { useUser } from "@/providers/UserContext";
+import { apiRequest } from "@/util/apiRequest";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -26,13 +27,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    fetch("/cxf/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    })
+    apiRequest("/cxf/login", "POST", { username, password })
       .then(async (response) => {
         if (!response.ok) {
           const data = await response.json();
