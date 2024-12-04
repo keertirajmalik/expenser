@@ -14,7 +14,7 @@ import { useAuth, AuthProvider } from "@/providers/AuthContext";
 import { TransactionsProvider } from "@/providers/TransactionsContext";
 import { UserProvider } from "@/providers/UserContext";
 import Login from "@/component/Login";
-// import TransactionTypeTable from "@/component/TransactionTypeTable";
+import TransactionTypeTable from "@/component/TransactionTypeTable";
 
 const App = () => {
   const { isLoggedIn, loading } = useAuth();
@@ -30,7 +30,7 @@ const App = () => {
         <TransactionsProvider>
           <Appbar />
           <TransactionTable />
-          {/* <TransactionTypeTable /> */}
+          <TransactionTypeTable />
         </TransactionsProvider>
       ) : (
         <Navigate to="/auth/login" />

@@ -11,9 +11,6 @@ const apiRequest = async (
     },
     body: body ? JSON.stringify(body) : undefined,
   });
-  if (!response.ok) {
-    throw new Error(`Failed to ${method.toLowerCase()} transaction`);
-  }
 
   return response;
 };

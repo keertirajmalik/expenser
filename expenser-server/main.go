@@ -57,7 +57,7 @@ func main() {
 	mux.HandleFunc("GET /cxf/type", handler.HandleTransactionTypeGet(config))
 	mux.HandleFunc("POST /cxf/type", handler.HandleTransactionTypeCreate(config))
 	mux.HandleFunc("DELETE /cxf/type/{id}", handler.HandleTransactionTypeDelete(config))
-	mux.HandleFunc("PUT /cxf/type/{id}", handler.HandleTransactionTypeUpdate(config))
+	//mux.HandleFunc("PUT /cxf/type/{id}", handler.HandleTransactionTypeUpdate(config))
 
 	stack := middleware.CreateStack(
 		middleware.AllowCors,

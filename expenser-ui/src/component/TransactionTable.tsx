@@ -7,7 +7,7 @@ import {
   GridCellParams,
 } from "@mui/x-data-grid";
 import DataGridTable from "./DataGridTable";
-import { Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import { Select, MenuItem, SelectChangeEvent, Alert } from "@mui/material";
 import { useTransactions } from "@/providers/TransactionsContext";
 import { TransactionType } from "@/types/transactionType";
 import { apiRequest } from "@/util/apiRequest";
@@ -110,6 +110,7 @@ const TypeSelectCell = (params: GridCellParams) => {
 
   if (error) {
     console.error("Error fetching types:", error);
+    return <Alert severity="error">Failed to load transaction types</Alert>;
   }
 
   const handleChange = (event: SelectChangeEvent<unknown>) => {

@@ -10,11 +10,11 @@ import { apiRequest } from "@/util/apiRequest";
 import { TransactionType } from "@/types/transactionType";
 import useSWR from "swr";
 
-const deleteTransactionType = (id: GridRowId): Promise<void> => {
+const deleteTransactionType = async (id: GridRowId): Promise<Response> => {
   return apiRequest(`/cxf/type/${id}`, "DELETE");
 };
 
-const updateTransactionType = (updatedRow: GridRowModel): Promise<void> => {
+const updateTransactionType = (updatedRow: GridRowModel): Promise<Response> => {
   const transactionData = {
     ...updatedRow,
   };
@@ -78,8 +78,6 @@ export default function TransactionTypeTable(): JSX.Element {
       prevRows.map((row) => (row.id === newRow.id ? updatedRow : row)),
     );
     await updateTransactionType(newRow);
-    const updatedData = await fetchTransactionTypes("/cxf/type");
-    setRows(updatedData.transaction_types);
     return newRow;
   };
 
