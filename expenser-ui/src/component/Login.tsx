@@ -7,6 +7,7 @@ import {
   Button,
   Typography,
   IconButton,
+  Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useAuth } from "@/providers/AuthContext";
@@ -80,15 +81,9 @@ const Login: React.FC = () => {
         </Typography>
         <form onSubmit={handleSubmit}>
           {error && (
-            <Typography
-              variant="body2"
-              color="error"
-              align="center"
-              role="alert"
-              aria-live="polite"
-            >
+            <Alert severity="error" role="alert" aria-live="polite">
               {error}
-            </Typography>
+            </Alert>
           )}
           <TextField
             required

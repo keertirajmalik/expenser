@@ -11,9 +11,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/keertirajmalik/expenser/expenser-server/database"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/handler"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 	"github.com/keertirajmalik/expenser/expenser-server/middleware"
-	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 )
 
 func main() {
@@ -69,7 +69,13 @@ func main() {
 		Addr:    ":" + port,
 		Handler: stack(mux),
 	}
-
+	log.Println(`
+ _____
+| ____| __  __  _ __     ___   _ __    ___    ___   _ __
+|  _|   \ \/ / | '_ \   / _ \ | '_ \  / __|  / _ \ | '__|
+| |___   >  <  | |_) | |  __/ | | | | \__ \ |  __/ | |
+|_____| /_/\_\ | .__/   \___| |_| |_| |___/  \___| |_|
+               |_|                                       `)
 	log.Printf("Server is running on port %s\n", port)
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
