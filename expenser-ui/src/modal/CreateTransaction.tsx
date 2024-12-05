@@ -7,6 +7,7 @@ import { TransactionType } from "@/types/transactionType";
 import CreateTransactionType from "@/modal/CreateTransactionType";
 import { useTransactions } from "@/providers/TransactionsContext";
 import { formatDate } from "@/util/dateUtil";
+import { apiRequest } from "@/util/apiRequest";
 
 const style = {
   position: "absolute",
@@ -57,11 +58,7 @@ const CreateTransaction = ({
     if (open && !nestedModalOpen) {
       const fetchTransactionTypes = async () => {
         try {
-          const response = await fetch("/cxf/type", {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          });
+          const response = await apiRequest("/cxf/type", "GET");
           const data = await response.json();
           setTransactionTypes(data.transaction_types ?? []);
         } catch (error) {
@@ -101,14 +98,7 @@ const CreateTransaction = ({
       date: formatDate(formData.date),
     };
 
-    fetch("/cxf/transaction", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify(transactionData),
-    }).then(() => {
+    apiRequest("/cxf/transaction", "POST", transactionData).then(() => {
       handleClose();
       fetchTransactions();
     });

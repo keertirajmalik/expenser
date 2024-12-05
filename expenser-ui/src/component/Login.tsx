@@ -7,10 +7,12 @@ import {
   Button,
   Typography,
   IconButton,
+  Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useAuth } from "@/providers/AuthContext";
 import { useUser } from "@/providers/UserContext";
+import { apiRequest } from "@/util/apiRequest";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -26,13 +28,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    fetch("/cxf/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    })
+    apiRequest("/cxf/login", "POST", { username, password })
       .then(async (response) => {
         if (!response.ok) {
           const data = await response.json();
@@ -85,15 +81,9 @@ const Login: React.FC = () => {
         </Typography>
         <form onSubmit={handleSubmit}>
           {error && (
-            <Typography
-              variant="body2"
-              color="error"
-              align="center"
-              role="alert"
-              aria-live="polite"
-            >
+            <Alert severity="error" role="alert" aria-live="polite">
               {error}
-            </Typography>
+            </Alert>
           )}
           <TextField
             required
