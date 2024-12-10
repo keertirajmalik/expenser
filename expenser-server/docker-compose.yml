@@ -1,0 +1,26 @@
+services:
+  db:
+      image: postgres:latest
+      container_name: expenser-db
+      restart: unless-stopped
+      environment:
+        POSTGRES_DB: ${DB_DATABASE}
+        POSTGRES_USER: ${DB_USERNAME}
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+      ports:
+        - "${DB_PORT}:5432"
+      volumes:
+        - psql_volume:/var/lib/postgresql/data
+      healthcheck:
+        test: ["CMD-SHELL", "sh -c 'pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}'"]
+        interval: 5s
+        timeout: 5s
+        retries: 3
+        start_period: 15s
+      networks:
+        - expenser-network
+
+volumes:
+  psql_volume:
+networks:
+  expenser-network:
