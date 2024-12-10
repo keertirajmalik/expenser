@@ -2,93 +2,52 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
-	"github.com/joho/godotenv"
-	"github.com/keertirajmalik/expenser/expenser-server/database"
-	"github.com/keertirajmalik/expenser/expenser-server/internal/handler"
-	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
-	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
-	"github.com/keertirajmalik/expenser/expenser-server/middleware"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/server"
 )
 
-func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
+func gracefulShutdown(apiServer *http.Server, done chan bool) {
+	// Create context that listens for the interrupt signal from the OS.
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		log.Fatal("PORT is not found in the environment")
-	}
-
-	jwtSecret := os.Getenv("JWT_SECRET")
-	if jwtSecret == "" {
-		log.Fatal("JWT_SECRET environment variable is not set")
-	}
-
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer cancel()
-
-	db, err := database.Connect(ctx)
-	if err != nil {
-		log.Fatal("failed to connect to database: ", err)
-	}
-	mux := http.NewServeMux()
-
-	config := model.Config{
-		Queries:   repository.New(db),
-		JWTSecret: []byte(jwtSecret),
-	}
-
-	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(config))
-
-	mux.HandleFunc("POST /cxf/user", handler.HandleUserCreate(config))
-
-	mux.HandleFunc("GET /cxf/transaction", handler.HandleTransactionGet(config))
-	mux.HandleFunc("POST /cxf/transaction", handler.HandleTransactionCreate(config))
-	mux.HandleFunc("DELETE /cxf/transaction/{id}", handler.HandleTransactionDelete(config))
-	mux.HandleFunc("PUT /cxf/transaction/{id}", handler.HandleTransactionUpdate(config))
-
-	mux.HandleFunc("GET /cxf/type", handler.HandleTransactionTypeGet(config))
-	mux.HandleFunc("POST /cxf/type", handler.HandleTransactionTypeCreate(config))
-	mux.HandleFunc("DELETE /cxf/type/{id}", handler.HandleTransactionTypeDelete(config))
-	//mux.HandleFunc("PUT /cxf/type/{id}", handler.HandleTransactionTypeUpdate(config))
-
-	stack := middleware.CreateStack(
-		middleware.AllowCors,
-		middleware.Logging,
-		middleware.AuthMiddleware,
-	)
-
-	server := &http.Server{
-		Addr:    ":" + port,
-		Handler: stack(mux),
-	}
-	log.Println(`
- _____
-| ____| __  __  _ __     ___   _ __    ___    ___   _ __
-|  _|   \ \/ / | '_ \   / _ \ | '_ \  / __|  / _ \ | '__|
-| |___   >  <  | |_) | |  __/ | | | | \__ \ |  __/ | |
-|_____| /_/\_\ | .__/   \___| |_| |_| |___/  \___| |_|
-               |_|                                       `)
-	log.Printf("Server is running on port %s\n", port)
-	go func() {
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Server failed: %v", err)
-		}
-	}()
-
+	// Listen for the interrupt signal.
 	<-ctx.Done()
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
 
-	if err := server.Shutdown(shutdownCtx); err != nil {
-		log.Printf("Server shutdown failed: %v", err)
+	log.Println("shutting down gracefully, press Ctrl+C again to force")
+
+	// The context is used to inform the server it has 5 seconds to finish
+	// the request it is currently handling
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := apiServer.Shutdown(ctx); err != nil {
+		log.Printf("Server forced to shutdown with error: %v", err)
 	}
-	db.Close()
+
+	log.Println("Server exiting")
+
+	// Notify the main goroutine that the shutdown is complete
+	done <- true
+}
+
+func main() {
+	server := server.NewServer()
+
+	done := make(chan bool, 1)
+
+	go gracefulShutdown(server, done)
+
+	err := server.ListenAndServe()
+	if err != nil && err != http.ErrServerClosed {
+		panic(fmt.Sprintf("http server error: %s", err))
+	}
+
+	<-done
+	log.Println("Graceful shutdown complete.")
 }
