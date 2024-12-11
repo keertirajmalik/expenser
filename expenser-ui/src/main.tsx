@@ -1,10 +1,10 @@
+import Home from "@/app/home";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter, Route, Routes } from "react-router";
+import { LoginPage } from "./app/login";
+import { SignupPage } from "./app/signup";
 import "./index.css";
-import { BrowserRouter } from "react-router";
-import { Routes, Route } from "react-router";
-import { SignupPage, LoginPage } from "@/app/auth";
-import Home from "@/app/home";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
