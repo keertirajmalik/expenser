@@ -34,14 +34,14 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 const FormSchema = z.object({
-  name: z.string({
-    required_error: "Expense name is required.",
+  name: z.string().nonempty({
+    message: "Expense name is required.",
   }),
-  type: z.string({
-    required_error: "Expense type is required.",
+  type: z.string().nonempty({
+    message: "Expense type is required.",
   }),
-  amount: z.string({
-    required_error: "Expense amount is required.",
+  amount: z.string().nonempty({
+    message: "Expense amount is required.",
   }),
   date: z.date({
     required_error: "Expense date is required.",
@@ -74,7 +74,7 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: "",
-      type: undefined,
+      type: "",
       amount: "",
       date: undefined,
       note: "",
