@@ -13,7 +13,7 @@ type Transaction struct {
 	ID        uuid.UUID          `json:"id"`
 	Name      string             `json:"name"`
 	Amount    pgtype.Numeric     `json:"amount"`
-	Type      string             `json:"type"`
+	Type      uuid.UUID          `json:"type"`
 	Date      pgtype.Date        `json:"date"`
 	Note      *string            `json:"note"`
 	UserID    uuid.UUID          `json:"user_id"`

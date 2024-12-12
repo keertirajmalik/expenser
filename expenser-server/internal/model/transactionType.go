@@ -34,6 +34,16 @@ func (d Config) GetTransactionTypesFromDB(ctx context.Context) ([]TransactionTyp
 	return convertDBTransactionTypesToTransactionTypes(dbTransactionTypes), nil
 }
 
+func (d Config) GetTransactionTypeByIdFromDB(ctx context.Context, id uuid.UUID) (TransactionType, error) {
+	dbTransactionType, err := d.Queries.GetTransactionTypeById(ctx, id)
+	if err != nil {
+		log.Println("Couldn't get transaction type from in DB", err)
+		return TransactionType{}, err
+	}
+
+	return convertDBTransactionTypesToTransactionTypes([]repository.TransactionType{dbTransactionType})[0], nil
+}
+
 func convertDBTransactionTypesToTransactionTypes(dbTransactions []repository.TransactionType) []TransactionType {
 	transactionTypes := []TransactionType{}
 
