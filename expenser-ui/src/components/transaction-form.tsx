@@ -19,7 +19,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Command,
   CommandEmpty,
@@ -30,8 +29,9 @@ import {
 } from "@/components/ui/command";
 import { apiRequest } from "@/util/apiRequest";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { Calendar } from "./ui/calendar";
 
 const FormSchema = z.object({
   name: z.string().nonempty({
@@ -49,18 +49,6 @@ const FormSchema = z.object({
   note: z.string(),
 });
 
-const languages = [
-  { label: "English", value: "en" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Spanish", value: "es" },
-  { label: "Portuguese", value: "pt" },
-  { label: "Russian", value: "ru" },
-  { label: "Japanese", value: "ja" },
-  { label: "Korean", value: "ko" },
-  { label: "Chinese", value: "zh" },
-] as const;
-
 interface TransactionFormProps {
   handleClose: () => void;
 }
@@ -69,6 +57,7 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
   const toast = useToast();
   const [openType, setOpenType] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
+  const [expenseTypes, setExpenseTypes] = useState<string[]>([]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -89,20 +78,41 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
     };
 
     apiRequest("/cxf/transaction", "POST", transactionData).then((res) => {
-      if (res.status !== 201) {
+      if (!res.ok) {
         toast.toast({
-          description: "Failed to create transaction.",
+          description: "Failed to save expense.",
           variant: "destructive",
         });
         return;
       }
       handleClose();
       toast.toast({
-        description: "Transaction created successfully.",
+        description: "Expense saved successfully.",
       });
-      return;
     });
   }
+
+  useEffect(() => {
+    if (openType) {
+      apiRequest("/cxf/type", "GET").then(async (res) => {
+        if (!res.ok) {
+          toast.toast({
+            description: "Failed to fetch expense types.",
+            variant: "destructive",
+          });
+          return;
+        }
+        const data = await res.json();
+        const transformedData = data.transaction_types.map(
+          (type: { id: string; name: string }) => ({
+            label: type.name,
+            value: type.id,
+          }),
+        );
+        setExpenseTypes(transformedData);
+      });
+    }
+  }, [openType]);
 
   return (
     <Form {...form}>
@@ -114,11 +124,7 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
             <FormItem>
               <FormLabel>Expense Name</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Name of your expense"
-                  {...field}
-                  id="name"
-                />
+                <Input placeholder="Name of your expense" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -142,8 +148,8 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
                       )}
                     >
                       {field.value
-                        ? languages.find(
-                            (language) => language.value === field.value,
+                        ? expenseTypes.find(
+                            (type) => type.value === field.value,
                           )?.label
                         : "Select Expense Type"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -156,20 +162,20 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
                     <CommandList>
                       <CommandEmpty>No expense type found.</CommandEmpty>
                       <CommandGroup>
-                        {languages.map((language) => (
+                        {expenseTypes.map((type) => (
                           <CommandItem
-                            value={language.label}
-                            key={language.value}
+                            value={type.label}
+                            key={type.value}
                             onSelect={() => {
-                              form.setValue("type", language.value);
+                              form.setValue("type", type.value);
                               setOpenType(false);
                             }}
                           >
-                            {language.label}
+                            {type.label}
                             <Check
                               className={cn(
                                 "ml-auto",
-                                language.value === field.value
+                                type.value === field.value
                                   ? "opacity-100"
                                   : "opacity-0",
                               )}
@@ -192,7 +198,7 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
             <FormItem>
               <FormLabel>Expense Amount</FormLabel>
               <FormControl>
-                <Input placeholder="Expense amount" {...field} id="amount" />
+                <Input placeholder="Expense amount" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

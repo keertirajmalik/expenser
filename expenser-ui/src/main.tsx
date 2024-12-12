@@ -1,25 +1,23 @@
-import Home from "@/app/home";
+import { AuthProvider } from "@/providers/AuthContext";
+import { UserProvider } from "@/providers/UserContext";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router";
-import { LoginPage } from "./app/login";
-import { SignupPage } from "./app/signup";
-import "./index.css";
-import { ThemeProvider } from "./providers/ThemeProvider";
-import { Toaster } from "./components/ui/toaster";
+import { BrowserRouter } from "react-router";
+import "@/index.css";
+import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "next-themes";
+import { App } from "@/App";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <Toaster />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="auth">
-            <Route path="login" element={<LoginPage />} />
-            <Route path="signup" element={<SignupPage />} />
-          </Route>
-        </Routes>
+        <AuthProvider>
+          <UserProvider>
+            <App />
+          </UserProvider>
+        </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>
   </StrictMode>,

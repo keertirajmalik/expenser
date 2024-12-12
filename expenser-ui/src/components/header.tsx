@@ -1,10 +1,10 @@
+import { TransactionDialog } from "@/components/transaction-dialog";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/ui/container";
 import ProfileButton from "@/components/ui/profile-button";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { NavLink } from "react-router";
-import { TransactionDialog } from "@/components/transaction-dialog";
 
 export function Header() {
   const { theme, setTheme } = useTheme();

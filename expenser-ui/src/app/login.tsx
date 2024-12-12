@@ -13,9 +13,14 @@ import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useAuth } from "@/providers/AuthContext";
+import { useUser } from "@/providers/UserContext";
 
 function LoginForm() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
+  const { handleLogin } = useAuth();
+  const { setName } = useUser();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,7 +29,7 @@ function LoginForm() {
 
   const [error, setError] = useState("");
 
-  const handleLogin = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!username || !password) {
       setError("Username and password are required");
@@ -39,9 +44,9 @@ function LoginForm() {
         }
         return response.json();
       })
-      .then(() => {
-        // handleLogin(data.token, data.name);
-        // setContextName(data.name);
+      .then((res) => {
+        handleLogin(res.token, res.name);
+        setName(res.name);
         navigate("/");
       })
       .catch((error) => {
@@ -109,7 +114,7 @@ function LoginForm() {
               </Button>
             </div>
           </div>
-          <Button type="submit" className="w-full" onClick={handleLogin}>
+          <Button type="submit" className="w-full" onClick={handleSubmit}>
             Login
           </Button>
         </div>
