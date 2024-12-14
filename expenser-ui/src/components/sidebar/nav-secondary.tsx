@@ -34,8 +34,9 @@ export function NavSecondary({
             <SidebarMenuButton asChild size="sm">
               <div className="flex items-center space-x-2">
                 <Sun />
-                <Label htmlFor="airplane-mode">Light Mode</Label>
+                <Label htmlFor="toggel-theme">Light Mode</Label>
                 <Switch
+                  id="toggel-theme"
                   checked={theme === "light"}
                   onCheckedChange={() =>
                     setTheme(theme === "dark" ? "light" : "dark")

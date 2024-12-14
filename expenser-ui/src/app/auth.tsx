@@ -1,19 +1,25 @@
 import { LoginForm } from "@/components/login-form";
 import { SignupForm } from "@/components/signup-form";
 
+const AuthLayout = ({ children }: { children: React.ReactNode }) => (
+  <div className="flex h-screen w-full items-center justify-center px-4">
+    {children}
+  </div>
+);
+
 function LoginPage() {
   return (
-    <div className="flex h-screen w-full items-center justify-center px-4">
+    <AuthLayout>
       <LoginForm />
-    </div>
+    </AuthLayout>
   );
 }
 
 function SignupPage() {
   return (
-    <div className="flex h-screen w-full items-center justify-center px-4">
+    <AuthLayout>
       <SignupForm />
-    </div>
+    </AuthLayout>
   );
 }
 

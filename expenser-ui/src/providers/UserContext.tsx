@@ -29,7 +29,7 @@ export const UserProvider = ({
   useEffect(() => {
     localStorage.setItem("name", name);
     localStorage.setItem("username", username);
-  }, [name]);
+  }, [name, username]);
 
   return (
     <UserContext.Provider value={{ name, setName, username, setUsername }}>

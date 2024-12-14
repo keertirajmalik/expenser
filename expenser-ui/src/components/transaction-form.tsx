@@ -27,11 +27,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { apiRequest } from "@/util/apiRequest";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar } from "./ui/calendar";
+import { apiRequest } from "@/lib/util/apiRequest";
 
 const FormSchema = z.object({
   name: z.string().nonempty({
@@ -53,11 +53,16 @@ interface TransactionFormProps {
   handleClose: () => void;
 }
 
+interface SelectionOption {
+  label: string;
+  value: string;
+}
+
 export function TransactionForm({ handleClose }: TransactionFormProps) {
   const toast = useToast();
   const [openType, setOpenType] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
-  const [expenseTypes, setExpenseTypes] = useState<string[]>([]);
+  const [expenseTypes, setExpenseTypes] = useState<SelectionOption[]>([]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -71,30 +76,41 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
+    const handleError = (error: unknown) => {
+      const message =
+        error instanceof Error ? error.message : "An unexpected error occurred";
+      toast.toast({
+        title: "Transaction Failed",
+        description: message,
+        variant: "destructive",
+        action: (
+          <Button onClick={() => form.handleSubmit(onSubmit)()}>Retry</Button>
+        ),
+      });
+    };
+
     const transactionData = {
       ...data,
       amount: parseFloat(data.amount),
       date: format(data.date, "dd/MM/yyyy"),
     };
 
-    apiRequest("/cxf/transaction", "POST", transactionData).then((res) => {
-      if (!res.ok) {
+    apiRequest("/cxf/transaction", "POST", transactionData)
+      .then((res: Response) => {
+        if (!res.ok) {
+          throw new Error(`Failed to save expense: ${res.statusText}`);
+        }
+        handleClose();
         toast.toast({
-          description: "Failed to save expense.",
-          variant: "destructive",
+          description: "Expense saved successfully.",
         });
-        return;
-      }
-      handleClose();
-      toast.toast({
-        description: "Expense saved successfully.",
-      });
-    });
+      })
+      .catch(handleError);
   }
 
   useEffect(() => {
     if (openType) {
-      apiRequest("/cxf/type", "GET").then(async (res) => {
+      apiRequest("/cxf/type", "GET").then(async (res: Response) => {
         if (!res.ok) {
           toast.toast({
             description: "Failed to fetch expense types.",
