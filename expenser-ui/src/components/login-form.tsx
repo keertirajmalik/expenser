@@ -8,17 +8,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { apiRequest } from "@/lib/apiRequest";
+import { apiRequest } from "@/util/apiRequest";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useAuth } from "@/providers/auth-provider";
-import { useUser } from "@/providers/user-provider";
 
-function LoginForm() {
-  const { handleLogin } = useAuth();
-
+export function LoginForm() {
+  let navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -27,12 +24,8 @@ function LoginForm() {
 
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleLogin = (e: FormEvent) => {
     e.preventDefault();
-    if (!username || !password) {
-      setError("Username and password are required");
-      return;
-    }
 
     apiRequest("/cxf/login", "POST", { username, password })
       .then(async (response) => {
@@ -42,8 +35,10 @@ function LoginForm() {
         }
         return response.json();
       })
-      .then((res) => {
-        handleLogin(res.token, res.name, res.username);
+      .then(() => {
+        // handleLogin(data.token, data.name);
+        // setContextName(data.name);
+        navigate("/");
       })
       .catch((error) => {
         setError(error.message);
@@ -110,7 +105,7 @@ function LoginForm() {
               </Button>
             </div>
           </div>
-          <Button type="submit" className="w-full" onClick={handleSubmit}>
+          <Button type="submit" className="w-full" onClick={handleLogin}>
             Login
           </Button>
         </div>
@@ -122,13 +117,5 @@ function LoginForm() {
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-export function LoginPage() {
-  return (
-    <div className="flex h-screen w-full items-center justify-center px-4">
-      <LoginForm />
-    </div>
   );
 }

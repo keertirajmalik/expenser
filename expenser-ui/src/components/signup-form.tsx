@@ -8,33 +8,46 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { apiRequest } from "@/lib/apiRequest";
+import { apiRequest } from "@/util/apiRequest";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
-import { FormEvent, useState } from "react";
-import { Link } from "react-router";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useAuth } from "@/providers/auth-provider";
-import { useUser } from "@/providers/user-provider";
 
-function LoginForm() {
-  const { handleLogin } = useAuth();
+const validatePassword = (pass: string) => {
+  if (pass.length < 8) {
+    return "Password must be at least 8 characters long";
+  }
+  if (!/[A-Z]/.test(pass)) {
+    return "Password must contain at least one uppercase letter";
+  }
+  if (!/[0-9]/.test(pass)) {
+    return "Password must contain at least one number";
+  }
+  return "";
+};
 
+export function SignupForm() {
+  let navigate = useNavigate();
   const [username, setUsername] = useState("");
+  const [fullname, setFullname] = useState("");
   const [password, setPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
-
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username || !password) {
-      setError("Username and password are required");
+    if (!fullname) {
+      setError("Full name is required");
       return;
     }
-
-    apiRequest("/cxf/login", "POST", { username, password })
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+    apiRequest("/cxf/user", "POST", { name: fullname, username, password })
       .then(async (response) => {
         if (!response.ok) {
           const data = await response.json();
@@ -42,8 +55,8 @@ function LoginForm() {
         }
         return response.json();
       })
-      .then((res) => {
-        handleLogin(res.token, res.name, res.username);
+      .then(() => {
+        navigate("/auth/login");
       })
       .catch((error) => {
         setError(error.message);
@@ -53,9 +66,9 @@ function LoginForm() {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Login</CardTitle>
+        <CardTitle className="text-2xl">Sign up</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Provide your details below to create an account
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -67,6 +80,16 @@ function LoginForm() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
+          <div className="grid gap-2">
+            <Label htmlFor="fullname">Full name</Label>
+            <Input
+              id="fullname"
+              type="fullname"
+              required
+              autoComplete="fullname"
+              onChange={(e) => setFullname(e.target.value)}
+            />
+          </div>
           <div className="grid gap-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -111,24 +134,16 @@ function LoginForm() {
             </div>
           </div>
           <Button type="submit" className="w-full" onClick={handleSubmit}>
-            Login
+            Sign up
           </Button>
         </div>
         <div className="mt-4 text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link to="/auth/signup" className="underline">
-            Sign up
+          Already have an account?
+          <Link to="/auth/login" className="underline">
+            Login
           </Link>
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-export function LoginPage() {
-  return (
-    <div className="flex h-screen w-full items-center justify-center px-4">
-      <LoginForm />
-    </div>
   );
 }
