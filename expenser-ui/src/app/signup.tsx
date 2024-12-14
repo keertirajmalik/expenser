@@ -84,9 +84,9 @@ function SignupForm() {
             <Label htmlFor="fullname">Full name</Label>
             <Input
               id="fullname"
-              type="fullname"
+              type="text"
               required
-              autoComplete="fullname"
+              autoComplete="name"
               onChange={(e) => setFullname(e.target.value)}
             />
           </div>
