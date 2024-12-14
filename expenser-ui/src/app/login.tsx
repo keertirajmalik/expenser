@@ -8,13 +8,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { apiRequest } from "@/util/apiRequest";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useAuth } from "@/providers/AuthContext";
 import { useUser } from "@/providers/UserContext";
+import { apiRequest } from "@/lib/util/apiRequest";
 
 function LoginForm() {
   const navigate = useNavigate();

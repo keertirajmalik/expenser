@@ -1,5 +1,5 @@
-import { Transaction } from "@/types/transaction";
-import { apiRequest } from "@/util/apiRequest";
+import { Transaction } from "@/lib/types/transaction";
+import { apiRequest } from "@/lib/util/apiRequest";
 import React, {
   createContext,
   useState,

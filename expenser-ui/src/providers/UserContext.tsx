@@ -9,6 +9,8 @@ import {
 interface UserContextType {
   name: string;
   setName: (name: string) => void;
+  username: string;
+  setUsername: (username: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -21,13 +23,16 @@ export const UserProvider = ({
   const [name, setName] = useState<string>(() => {
     return localStorage.getItem("name") || "";
   });
-
+  const [username, setUsername] = useState<string>(() => {
+    return localStorage.getItem("username") || "";
+  });
   useEffect(() => {
     localStorage.setItem("name", name);
+    localStorage.setItem("username", username);
   }, [name]);
 
   return (
-    <UserContext.Provider value={{ name, setName }}>
+    <UserContext.Provider value={{ name, setName, username, setUsername }}>
       {children}
     </UserContext.Provider>
   );
