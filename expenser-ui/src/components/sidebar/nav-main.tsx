@@ -7,6 +7,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useState } from "react";
+import { Link } from "react-router";
 
 export function NavMain({
   items,
@@ -17,17 +19,29 @@ export function NavMain({
     icon: LucideIcon;
   }[];
 }) {
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Projects</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton asChild>
-              <a href={item.url}>
+            <SidebarMenuButton
+              asChild
+              isActive={selectedItem === item.name}
+              onClick={() => setSelectedItem(item.name)}
+              className={`
+                data-[active=true]:font-semibold
+                border-l-[3px] border-transparent
+                data-[active=true]:border-[hsl(var(--primary))]
+                dark:data-[active=true]:border-[hsl(var(--primary))]
+              `}
+            >
+              <Link to={item.url}>
                 <item.icon />
                 <span>{item.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
