@@ -9,7 +9,6 @@ import { useNavigate } from "react-router";
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  loading: boolean;
   handleLogin: (token: string, name: string) => void;
   handleLogout: () => void;
 }
@@ -22,7 +21,6 @@ export const AuthProvider = ({
   children: ReactNode;
 }): JSX.Element => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
 
   const navigate = useNavigate();
 
@@ -38,7 +36,6 @@ export const AuthProvider = ({
         navigate("/auth/login");
       }
     }
-    setLoading(false);
   }, [navigate]);
 
   const handleLogin = (token: string, name: string) => {
@@ -55,9 +52,7 @@ export const AuthProvider = ({
   };
 
   return (
-    <AuthContext.Provider
-      value={{ isLoggedIn, loading, handleLogin, handleLogout }}
-    >
+    <AuthContext.Provider value={{ isLoggedIn, handleLogin, handleLogout }}>
       {children}
     </AuthContext.Provider>
   );
