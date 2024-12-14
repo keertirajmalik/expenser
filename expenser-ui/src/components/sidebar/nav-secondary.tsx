@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Sun } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -33,7 +33,7 @@ export function NavSecondary({
           <SidebarMenuItem key="Toggle theme">
             <SidebarMenuButton asChild size="sm">
               <div className="flex items-center space-x-2">
-                <Sun />
+                {theme === "light" ? <Sun /> : <Moon />}
                 <Label htmlFor="toggel-theme">Light Mode</Label>
                 <Switch
                   id="toggel-theme"

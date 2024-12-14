@@ -16,17 +16,16 @@ import { NavMain } from "@/components/sidebar/nav-main";
 import { NavSecondary } from "@/components/sidebar/nav-secondary";
 import { NavUser } from "@/components/sidebar/nav-user";
 
-// This is sample data.
 const data = {
   navMain: [
     {
       name: "Dashboard",
-      url: "/dashboard",
+      url: "/",
       icon: LayoutDashboard,
     },
     {
       name: "Expense",
-      url: "/transactions",
+      url: "/expense",
       icon: ArrowLeftRight,
     },
   ],
