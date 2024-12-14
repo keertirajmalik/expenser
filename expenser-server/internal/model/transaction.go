@@ -12,52 +12,37 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type Transaction struct {
+type InputTransaction struct {
+	ID              uuid.UUID       `json:"id"`
+	Name            string          `json:"name"`
+	Amount          decimal.Decimal `json:"amount"`
+	TransactionType uuid.UUID       `json:"type"`
+	Date            string          `json:"date"`
+	Note            string          `json:"note"`
+	UserID          uuid.UUID       `json:"user_id"`
+}
+
+type ResponseTransaction struct {
 	ID              uuid.UUID       `json:"id"`
 	Name            string          `json:"name"`
 	Amount          decimal.Decimal `json:"amount"`
 	TransactionType string          `json:"type"`
 	Date            string          `json:"date"`
 	Note            string          `json:"note"`
-	UserID          uuid.UUID       `json:"user_id"`
+	User            string          `json:"user"`
 }
 
-func NewTransaction(transaction, transactionType, note string, amount decimal.Decimal, date string, userID uuid.UUID) Transaction {
-	return Transaction{
-		ID:              uuid.New(),
-		Name:            transaction,
-		Amount:          amount,
-		TransactionType: transactionType,
-		Date:            date,
-		Note:            note,
-		UserID:          userID,
-	}
-}
-
-func ConvertTransaction(id uuid.UUID, transaction, transactionType, note string, amount decimal.Decimal, date string, userID uuid.UUID) Transaction {
-	return Transaction{
-		ID:              id,
-		Name:            transaction,
-		Amount:          amount,
-		TransactionType: transactionType,
-		Date:            date,
-		Note:            note,
-		UserID:          userID,
-	}
-}
-
-func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]Transaction, error) {
+func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]ResponseTransaction, error) {
 	dbTransactions, err := d.Queries.GetTransaction(ctx, userID)
 	if err != nil {
 		log.Printf("Couldn't get transaction from DB: %v", err)
-		return []Transaction{}, err
+		return []ResponseTransaction{}, err
 	}
-	return convertDBTransactionToTransaction(dbTransactions), nil
+	return convertDBTransactionToTransaction(d, ctx, dbTransactions), nil
 }
 
-func convertDBTransactionToTransaction(dbTransactions []repository.Transaction) []Transaction {
-	transactions := []Transaction{}
-
+func convertDBTransactionToTransaction(config Config, ctx context.Context, dbTransactions []repository.Transaction) []ResponseTransaction {
+	transactions := []ResponseTransaction{}
 	for _, transaction := range dbTransactions {
 		noteValue := ""
 		if transaction.Note != nil {
@@ -82,25 +67,37 @@ func convertDBTransactionToTransaction(dbTransactions []repository.Transaction) 
 				log.Printf("Failed to convert Amount: %v", err)
 			}
 		}
-		transactions = append(transactions, Transaction{
+
+		transactionType, err := config.GetTransactionTypeByIdFromDB(ctx, transaction.Type)
+		if err != nil {
+			log.Printf("Couldn't get transaction type from DB: %v", err)
+			return []ResponseTransaction{}
+		}
+
+		user, err := config.Queries.GetUserById(ctx, transaction.UserID)
+		if err != nil {
+			log.Printf("Couldn't get user from DB: %v", err)
+			return []ResponseTransaction{}
+		}
+		transactions = append(transactions, ResponseTransaction{
 			ID:              transaction.ID,
 			Name:            transaction.Name,
 			Amount:          money,
-			TransactionType: transaction.Type,
+			TransactionType: transactionType.Name,
 			Date:            date,
 			Note:            noteValue,
-			UserID:          transaction.UserID,
+			User:            user.Username,
 		})
 	}
 
 	return transactions
 }
 
-func (d *Config) AddTransactionToDB(ctx context.Context, transaction Transaction) error {
+func (d Config) AddTransactionToDB(ctx context.Context, transaction InputTransaction) (ResponseTransaction, error) {
 	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
 	if err != nil {
 		log.Printf("Invalid date format: %v", err)
-		return fmt.Errorf("invalid date format: %w", err)
+		return ResponseTransaction{}, fmt.Errorf("invalid date format: %w", err)
 
 	}
 
@@ -108,10 +105,10 @@ func (d *Config) AddTransactionToDB(ctx context.Context, transaction Transaction
 	err = money.Scan(transaction.Amount.String())
 	if err != nil {
 		log.Printf("Invalid amount format: %v", err)
-		return fmt.Errorf("Failed to convert amount type: %w", err)
+		return ResponseTransaction{}, fmt.Errorf("Failed to convert amount type: %w", err)
 	}
 
-	_, err = d.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
+	dbTransaction, err := d.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
 		ID:     uuid.New(),
 		Name:   transaction.Name,
 		Type:   transaction.TransactionType,
@@ -126,13 +123,13 @@ func (d *Config) AddTransactionToDB(ctx context.Context, transaction Transaction
 
 	if err != nil {
 		log.Printf("Couldn't create transaction in DB: %v", err)
-		return fmt.Errorf("failed to create transaction: %w", err)
+		return ResponseTransaction{}, fmt.Errorf("failed to create transaction: %w", err)
 	}
 
-	return nil
+	return convertDBTransactionToTransaction(d, ctx, []repository.Transaction{dbTransaction})[0], nil
 }
 
-func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction Transaction) error {
+func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTransaction) error {
 	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
 	if err != nil {
 		log.Printf("Invalid date format: %v", err)

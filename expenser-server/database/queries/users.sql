@@ -4,8 +4,10 @@ VALUES ($1, $2, $3, $4)
 RETURNING *;
 
 -- name: GetUsers :many
-SELECT * from users;
+SELECT * FROM users;
 
 -- name: GetUserByUsername :one
-SELECT * from users where username=$1;
+SELECT * FROM users WHERE username=$1;
 
+-- name: GetUserById :one
+SELECT * FROM users WHERE id=$1;

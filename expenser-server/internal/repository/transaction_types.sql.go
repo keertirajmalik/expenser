@@ -46,7 +46,7 @@ func (q *Queries) DeleteTransactionType(ctx context.Context, id uuid.UUID) error
 }
 
 const getTransactionType = `-- name: GetTransactionType :many
-SELECT id, name, description, created_at, updated_at from transaction_types
+SELECT id, name, description, created_at, updated_at FROM transaction_types
 `
 
 func (q *Queries) GetTransactionType(ctx context.Context) ([]TransactionType, error) {
@@ -73,4 +73,21 @@ func (q *Queries) GetTransactionType(ctx context.Context) ([]TransactionType, er
 		return nil, err
 	}
 	return items, nil
+}
+
+const getTransactionTypeById = `-- name: GetTransactionTypeById :one
+SELECT id, name, description, created_at, updated_at FROM transaction_types where id=$1
+`
+
+func (q *Queries) GetTransactionTypeById(ctx context.Context, id uuid.UUID) (TransactionType, error) {
+	row := q.db.QueryRow(ctx, getTransactionTypeById, id)
+	var i TransactionType
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }
