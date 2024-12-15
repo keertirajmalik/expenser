@@ -21,7 +21,7 @@ export function NavMain({
     icon: LucideIcon;
   }[];
 }) {
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+  const [selectedItem, setSelectedItem] = useState<string>("Dashboard");
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">

@@ -15,6 +15,13 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function clearLocalStorage() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("expireAt");
+  localStorage.removeItem("name");
+  localStorage.removeItem("username");
+}
+
 export const AuthProvider = ({
   children,
 }: {
@@ -28,18 +35,15 @@ export const AuthProvider = ({
     const token = localStorage.getItem("token");
     const expireAt = localStorage.getItem("expireAt");
 
-    if (token && expireAt) {
-      if (new Date(expireAt) > new Date()) {
-        setIsLoggedIn(true);
-      } else {
-        localStorage.clear();
-        navigate("/auth/login");
-      }
+    if (token && expireAt && new Date(expireAt) > new Date()) {
+      setIsLoggedIn(true);
+      return;
     }
+    handleLogout();
   }, [navigate]);
 
   const handleLogin = (token: string, name: string, username: string) => {
-    const expireAt = new Date(Date.now() + 1000 * 60).toISOString();
+    const expireAt = new Date(Date.now() + 1000 * 60).toString();
     localStorage.setItem("token", token);
     localStorage.setItem("expireAt", expireAt);
     localStorage.setItem("name", name);
@@ -49,7 +53,7 @@ export const AuthProvider = ({
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    clearLocalStorage();
     navigate("/auth/login");
   };
 

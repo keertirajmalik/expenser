@@ -7,9 +7,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useTheme } from "next-themes";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { useTheme } from "@/providers/theme-provider";
 
 export function NavSecondary({
   ...props
@@ -34,9 +34,9 @@ export function NavSecondary({
             <SidebarMenuButton asChild size="sm">
               <div className="flex items-center space-x-2">
                 {theme === "light" ? <Sun /> : <Moon />}
-                <Label htmlFor="toggel-theme">Light Mode</Label>
+                <Label htmlFor="toggle-theme">Light Mode</Label>
                 <Switch
-                  id="toggel-theme"
+                  id="toggle-theme"
                   checked={theme === "light"}
                   onCheckedChange={() =>
                     setTheme(theme === "dark" ? "light" : "dark")
