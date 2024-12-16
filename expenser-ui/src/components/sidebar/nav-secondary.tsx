@@ -31,8 +31,8 @@ export function NavSecondary({
             </SidebarMenuItem>
           ))} */}
           <SidebarMenuItem key="Toggle theme">
-            <SidebarMenuButton asChild size="sm">
-              <div className="flex items-center space-x-2">
+            <SidebarMenuButton asChild>
+              <div className="flex items-center space-x-1">
                 {theme === "light" ? <Sun /> : <Moon />}
                 <Label htmlFor="toggle-theme">Light Mode</Label>
                 <Switch

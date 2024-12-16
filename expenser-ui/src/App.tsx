@@ -1,11 +1,10 @@
+import { LoginPage, SignupPage } from "@/app/auth";
 import Expense from "@/app/expense";
 import Home from "@/app/home";
-import { LoginPage } from "@/app/login";
-import { SignupPage } from "@/app/signup";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { useAuth } from "@/providers/AuthContext";
+import { useAuth } from "@/providers/auth-provider";
 import { Routes, Route, Navigate } from "react-router";
 
 export function App() {

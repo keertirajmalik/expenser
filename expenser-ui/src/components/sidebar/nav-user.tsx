@@ -16,9 +16,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useUser } from "@/providers/UserContext";
 import avatar from "@/assets/shadcn.jpg";
-import { useAuth } from "@/providers/AuthContext";
+import { useAuth } from "@/providers/auth-provider";
+import { useUser } from "@/providers/user-provider";
 
 function stringAvatar(name: string) {
   if (!name?.trim()) {

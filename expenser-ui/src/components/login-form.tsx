@@ -8,14 +8,16 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { apiRequest } from "@/util/apiRequest";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { apiRequest } from "@/lib/util/apiRequest";
+import { useAuth } from "@/providers/auth-provider";
 
 export function LoginForm() {
-  let navigate = useNavigate();
+  const { handleLogin } = useAuth();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,8 +26,12 @@ export function LoginForm() {
 
   const [error, setError] = useState("");
 
-  const handleLogin = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
+    if (!username || !password) {
+      setError("Username and password are required");
+      return;
+    }
 
     apiRequest("/cxf/login", "POST", { username, password })
       .then(async (response) => {
@@ -35,10 +41,8 @@ export function LoginForm() {
         }
         return response.json();
       })
-      .then(() => {
-        // handleLogin(data.token, data.name);
-        // setContextName(data.name);
-        navigate("/");
+      .then((res) => {
+        handleLogin(res.token, res.name, res.username);
       })
       .catch((error) => {
         setError(error.message);
@@ -105,7 +109,7 @@ export function LoginForm() {
               </Button>
             </div>
           </div>
-          <Button type="submit" className="w-full" onClick={handleLogin}>
+          <Button type="submit" className="w-full" onClick={handleSubmit}>
             Login
           </Button>
         </div>
