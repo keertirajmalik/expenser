@@ -1,6 +1,12 @@
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import {
   Form,
   FormControl,
@@ -10,27 +16,21 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { format } from "date-fns";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { apiRequest } from "@/util/apiRequest";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { apiRequest } from "@/util/apiRequest";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Calendar } from "./ui/calendar";
 
 const FormSchema = z.object({
@@ -57,7 +57,9 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
   const toast = useToast();
   const [openType, setOpenType] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
-  const [expenseTypes, setExpenseTypes] = useState<string[]>([]);
+  const [expenseTypes, setExpenseTypes] = useState<
+    { label: string; value: string }[]
+  >([]);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),

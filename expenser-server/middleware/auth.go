@@ -36,7 +36,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		userID, err := auth.ValidateJWT(token, []byte(jwtSecret))
 		if err != nil {
-            log.Print("I am here")
 			respondWithJson(w, err)
 			return
 		}
