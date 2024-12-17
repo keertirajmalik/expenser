@@ -1,5 +1,5 @@
-import { AuthProvider } from "@/providers/AuthContext";
-import { UserProvider } from "@/providers/UserContext";
+import { AuthProvider } from "@/providers/auth-provider";
+import { UserProvider } from "@/providers/user-provider";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";

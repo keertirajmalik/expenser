@@ -24,7 +24,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { apiRequest } from "@/util/apiRequest";
+import { apiRequest } from "@/lib/apiRequest";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
@@ -109,7 +109,7 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
           (type: { id: string; name: string }) => ({
             label: type.name,
             value: type.id,
-          }),
+          })
         );
         setExpenseTypes(transformedData);
       });
@@ -146,12 +146,12 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
                       role="combobox"
                       className={cn(
                         "justify-between",
-                        !field.value && "text-muted-foreground",
+                        !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value
                         ? expenseTypes.find(
-                            (type) => type.value === field.value,
+                            (type) => type.value === field.value
                           )?.label
                         : "Select Expense Type"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -179,7 +179,7 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
                                 "ml-auto",
                                 type.value === field.value
                                   ? "opacity-100"
-                                  : "opacity-0",
+                                  : "opacity-0"
                               )}
                             />
                           </CommandItem>
@@ -219,7 +219,7 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
                       variant={"outline"}
                       className={cn(
                         "pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground",
+                        !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value ? (
