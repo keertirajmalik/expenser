@@ -38,9 +38,9 @@ export function NavSecondary({
                 <Switch
                   id="toggle-theme"
                   checked={theme === "light"}
-                  onCheckedChange={() =>
-                    setTheme(theme === "dark" ? "light" : "dark")
-                  }
+                  onCheckedChange={() => {
+                    setTheme(theme === "dark" ? "light" : "dark");
+                  }}
                 />
               </div>
             </SidebarMenuButton>
