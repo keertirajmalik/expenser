@@ -1,5 +1,5 @@
 import Expense from "@/app/expense";
-import Home from "@/app/home";
+import Dashboard from "@/app/dashboard";
 import { LoginPage } from "@/app/login";
 import { SignupPage } from "@/app/signup";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
@@ -36,7 +36,10 @@ function MainRoutes({ isLoggedIn }: { isLoggedIn: boolean }) {
       <SidebarInset>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <Routes>
-            <Route path="/" element={isLoggedIn ? <Home /> : <LoginPage />} />
+            <Route
+              path="/"
+              element={isLoggedIn ? <Dashboard /> : <LoginPage />}
+            />
             <Route
               path="/expense"
               element={isLoggedIn ? <Expense /> : <LoginPage />}
