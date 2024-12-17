@@ -1,5 +1,5 @@
 import { Transaction } from "@/types/transaction";
-import { apiRequest } from "@/util/apiRequest";
+import { apiRequest } from "@/lib/apiRequest";
 import React, {
   createContext,
   useState,
@@ -14,11 +14,11 @@ interface TransactionsContextProps {
 }
 
 const TransactionsContext = createContext<TransactionsContextProps | undefined>(
-  undefined,
+  undefined
 );
 
 const fetchTransactions = async (
-  setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>,
+  setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>
 ) => {
   try {
     const response = await apiRequest("/cxf/transaction", "GET");
@@ -74,7 +74,7 @@ export const useTransactions = (): TransactionsContextProps => {
   const context = useContext(TransactionsContext);
   if (!context) {
     throw new Error(
-      "useTransactions must be used within a TransactionsProvider",
+      "useTransactions must be used within a TransactionsProvider"
     );
   }
   return context;
