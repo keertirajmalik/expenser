@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { TransactionForm } from "./transaction-form";
 import { useState } from "react";
+import { Plus } from "lucide-react";
 
 export function TransactionDialog() {
   const [open, setOpen] = useState(false);
@@ -20,7 +21,10 @@ export function TransactionDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Create Expense</Button>
+        <Button variant="default">
+          <Plus />
+          Create Expense
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

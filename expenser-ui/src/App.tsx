@@ -40,6 +40,10 @@ function MainRoutes({ isLoggedIn }: { isLoggedIn: boolean }) {
               path="/expense"
               element={isLoggedIn ? <Expense /> : <LoginPage />}
             />
+            <Route
+              path="/type"
+              element={isLoggedIn ? <Expense /> : <LoginPage />}
+            />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

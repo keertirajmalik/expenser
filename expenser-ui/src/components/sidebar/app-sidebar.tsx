@@ -11,7 +11,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { Command } from "@/components/ui/command";
-import { LayoutDashboard, ArrowLeftRight } from "lucide-react";
+import { LayoutDashboard, ArrowLeftRight, ListTree } from "lucide-react";
 import { NavMain } from "@/components/sidebar/nav-main";
 import { NavSecondary } from "@/components/sidebar/nav-secondary";
 import { NavUser } from "@/components/sidebar/nav-user";
@@ -27,6 +27,11 @@ const data = {
       name: "Expense",
       url: "/expense",
       icon: ArrowLeftRight,
+    },
+    {
+      name: "Type",
+      url: "/type",
+      icon: ListTree,
     },
   ],
 };
