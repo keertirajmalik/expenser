@@ -12,7 +12,7 @@ import { UserProvider } from "@/providers/user-provider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="system" storageKey="ui-theme">
       <Toaster />
       <BrowserRouter>
         <AuthProvider>
