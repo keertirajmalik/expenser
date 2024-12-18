@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Routes, Route, Navigate } from "react-router";
 import { ROUTES } from "@/types/routes";
+import ExpenseType from "@/app/type";
 
 export function App() {
   return (
@@ -35,7 +36,7 @@ function MainRoutes() {
           <Routes>
             <Route path={ROUTES.MAIN.DASHBOARD} element={<Dashboard />} />
             <Route path={ROUTES.MAIN.EXPENSE} element={<Expense />} />
-            <Route path={ROUTES.MAIN.TYPE} element={<Expense />} />
+            <Route path={ROUTES.MAIN.TYPE} element={<ExpenseType />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

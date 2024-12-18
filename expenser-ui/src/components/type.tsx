@@ -1,46 +1,25 @@
-import { columns } from "@/components/expense-columns";
-import { DataTable } from "@/components/data-table/data-table";
 import { ExpensesDialog } from "@/components/expense-dialog";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
 import { useEffect, useState } from "react";
-import { Expense as expense } from "@/types/expense";
 import { apiRequest } from "@/lib/apiRequest";
-
-const fetchExpenses = (
-  setExpenses: React.Dispatch<React.SetStateAction<expense[]>>,
-) => {
-  apiRequest("/cxf/transaction", "GET")
-    .then((response) => {
-      response.json().then((data) => {
-        if (Array.isArray(data.transactions)) {
-          const formattedData = data.transactions.map((item: expense) => {
-            return {
-              id: item.id,
-              name: item.name,
-              type: item.type,
-              amount: item.amount,
-              date: item.date,
-              note: item.note,
-            };
-          });
-          setExpenses(formattedData);
-        } else {
-          console.error("Expected an array but got:", data.transactions);
-        }
-      });
-    })
-    .catch((error) => {
-      console.error("Error fetching data:", error);
-      setExpenses([]);
-    });
-};
+import { ExpenseType } from "@/types/expenseType";
+import { DataTable } from "@/components/data-table/data-table";
 
 export default function Expense() {
-  const [expenses, setExpenses] = useState<expense[]>([]);
+  const [expenseTypes, setExpenseTypes] = useState<ExpenseType[]>([]);
 
   useEffect(() => {
-    fetchExpenses(setExpenses);
+    apiRequest("/cxf/type", "GET").then(async (res: Response) => {
+      const data = await res.json();
+      const transformedData = data.transaction_types.map(
+        (type: { id: string; name: string }) => ({
+          label: type.name,
+          value: type.id,
+        }),
+      );
+      setExpenseTypes(transformedData);
+    });
   }, []);
 
   return (
@@ -67,7 +46,7 @@ export default function Expense() {
         className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4"
         role="main"
       >
-        <DataTable columns={columns} data={expenses} />
+        <DataTable columns={columns} data={expenseTypes} />
       </main>
     </div>
   );
