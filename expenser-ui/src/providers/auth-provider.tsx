@@ -9,12 +9,18 @@ import { useNavigate } from "react-router";
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  loading: boolean;
-  handleLogin: (token: string, name: string) => void;
+  handleLogin: (token: string, name: string, username: string) => void;
   handleLogout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function clearLocalStorage() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("expireAt");
+  localStorage.removeItem("name");
+  localStorage.removeItem("username");
+}
 
 export const AuthProvider = ({
   children,
@@ -22,7 +28,6 @@ export const AuthProvider = ({
   children: ReactNode;
 }): JSX.Element => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
 
   const navigate = useNavigate();
 
@@ -30,34 +35,30 @@ export const AuthProvider = ({
     const token = localStorage.getItem("token");
     const expireAt = localStorage.getItem("expireAt");
 
-    if (token && expireAt) {
-      if (new Date(expireAt) > new Date()) {
-        setIsLoggedIn(true);
-      } else {
-        localStorage.clear();
-        navigate("/auth/login");
-      }
+    if (token && expireAt && new Date(expireAt) > new Date()) {
+      setIsLoggedIn(true);
+      return;
     }
-    setLoading(false);
+    handleLogout();
   }, [navigate]);
 
-  const handleLogin = (token: string, name: string) => {
-    const expireAt = new Date(Date.now() + 1000 * 60).toISOString();
+  const handleLogin = (token: string, name: string, username: string) => {
+    const expireAt = new Date(Date.now() + 1000 * 60).toString();
     localStorage.setItem("token", token);
     localStorage.setItem("expireAt", expireAt);
     localStorage.setItem("name", name);
+    localStorage.setItem("username", username);
     setIsLoggedIn(true);
+    navigate("/");
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    clearLocalStorage();
     navigate("/auth/login");
   };
 
   return (
-    <AuthContext.Provider
-      value={{ isLoggedIn, loading, handleLogin, handleLogout }}
-    >
+    <AuthContext.Provider value={{ isLoggedIn, handleLogin, handleLogout }}>
       {children}
     </AuthContext.Provider>
   );

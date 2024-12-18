@@ -1,19 +1,45 @@
-import Home from "@/app/home";
+import Expense from "@/app/expense";
+import Dashboard from "@/app/dashboard";
 import { LoginPage } from "@/app/login";
 import { SignupPage } from "@/app/signup";
-import { useAuth } from "@/providers/AuthContext";
-import { Routes, Route } from "react-router";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Routes, Route, Navigate } from "react-router";
+import { ROUTES } from "@/types/routes";
 
 export function App() {
-  const { isLoggedIn } = useAuth();
-
   return (
     <Routes>
-      <Route path="/" element={isLoggedIn ? <Home /> : <LoginPage />} />
-      <Route path="auth">
-        <Route path="login" element={<LoginPage />} />
-        <Route path="signup" element={<SignupPage />} />
-      </Route>
+      <Route path="/auth/*" element={<AuthRoutes />} />
+      <Route path="*" element={<MainRoutes />} />
     </Routes>
+  );
+}
+
+function AuthRoutes() {
+  return (
+    <Routes>
+      <Route path={ROUTES.AUTH.LOGIN} element={<LoginPage />} />
+      <Route path={ROUTES.AUTH.SIGNUP} element={<SignupPage />} />
+      <Route path="*" element={<Navigate to="/auth/login" />} />
+    </Routes>
+  );
+}
+
+function MainRoutes() {
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <Routes>
+            <Route path={ROUTES.MAIN.DASHBOARD} element={<Dashboard />} />
+            <Route path={ROUTES.MAIN.EXPENSE} element={<Expense />} />
+            <Route path={ROUTES.MAIN.TYPE} element={<Expense />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

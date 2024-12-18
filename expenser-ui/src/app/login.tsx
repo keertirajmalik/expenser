@@ -8,18 +8,15 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { apiRequest } from "@/util/apiRequest";
+import { apiRequest } from "@/lib/apiRequest";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useAuth } from "@/providers/AuthContext";
-import { useUser } from "@/providers/UserContext";
+import { useAuth } from "@/providers/auth-provider";
 
 function LoginForm() {
-  const navigate = useNavigate();
   const { handleLogin } = useAuth();
-  const { setName } = useUser();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -45,9 +42,7 @@ function LoginForm() {
         return response.json();
       })
       .then((res) => {
-        handleLogin(res.token, res.name);
-        setName(res.name);
-        navigate("/");
+        handleLogin(res.token, res.name, res.username);
       })
       .catch((error) => {
         setError(error.message);
