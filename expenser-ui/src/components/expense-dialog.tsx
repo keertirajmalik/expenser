@@ -7,11 +7,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { TransactionForm } from "./transaction-form";
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { ExpenseForm } from "@/components/expense-form";
 
-export function TransactionDialog() {
+export function ExpensesDialog() {
   const [open, setOpen] = useState(false);
 
   const handleClose = () => {
@@ -33,7 +33,7 @@ export function TransactionDialog() {
             Provide information regarding expense.
           </DialogDescription>
         </DialogHeader>
-        <TransactionForm handleClose={handleClose} />
+        <ExpenseForm handleClose={handleClose} />
       </DialogContent>
     </Dialog>
   );

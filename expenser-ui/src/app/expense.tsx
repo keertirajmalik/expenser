@@ -1,4 +1,4 @@
-import { TransactionDialog } from "@/components/transaction-dialog";
+import { ExpensesDialog } from "@/components/expense-dialog";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
 
@@ -21,7 +21,7 @@ export default function Expense() {
             <p className="text-sm text-gray-500">List of Your Expenses</p>
           </div>
         </div>
-        <TransactionDialog />
+        <ExpensesDialog />
       </header>
       <main
         className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center px-4"

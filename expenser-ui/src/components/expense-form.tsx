@@ -49,7 +49,7 @@ const FormSchema = z.object({
   note: z.string(),
 });
 
-interface TransactionFormProps {
+interface ExpenseFormProps {
   handleClose: () => void;
 }
 
@@ -58,7 +58,7 @@ interface SelectionOption {
   value: string;
 }
 
-export function TransactionForm({ handleClose }: TransactionFormProps) {
+export function ExpenseForm({ handleClose }: ExpenseFormProps) {
   const toast = useToast();
   const [openType, setOpenType] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
@@ -80,7 +80,7 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
       const message =
         error instanceof Error ? error.message : "An unexpected error occurred";
       toast.toast({
-        title: "Transaction Failed",
+        title: "Expense creation Failed",
         description: message,
         variant: "destructive",
         action: (
@@ -89,13 +89,13 @@ export function TransactionForm({ handleClose }: TransactionFormProps) {
       });
     };
 
-    const transactionData = {
+    const expenseData = {
       ...data,
       amount: parseFloat(data.amount),
       date: format(data.date, "dd/MM/yyyy"),
     };
 
-    apiRequest("/cxf/transaction", "POST", transactionData)
+    apiRequest("/cxf/transaction", "POST", expenseData)
       .then((res: Response) => {
         if (!res.ok) {
           throw new Error(`Failed to save expense: ${res.statusText}`);
