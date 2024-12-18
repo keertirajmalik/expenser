@@ -83,9 +83,6 @@ export function ExpenseForm({ handleClose }: ExpenseFormProps) {
         title: "Expense creation Failed",
         description: message,
         variant: "destructive",
-        action: (
-          <Button onClick={() => form.handleSubmit(onSubmit)()}>Retry</Button>
-        ),
       });
     };
 

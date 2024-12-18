@@ -9,9 +9,16 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { ExpenseForm } from "@/components/expense-form";
+import { ExpenseForm } from "@/components/create-dialog/expense-form";
+import { TypeForm } from "@/components/create-dialog/type-form";
 
-export function ExpensesDialog() {
+interface CreateDialogProps {
+  type: "Expense" | "Type";
+  title: string;
+  description: string;
+}
+
+export function CreateDialog({ type, title, description }: CreateDialogProps) {
   const [open, setOpen] = useState(false);
 
   const handleClose = () => {
@@ -23,17 +30,19 @@ export function ExpensesDialog() {
       <DialogTrigger asChild>
         <Button variant="default">
           <Plus />
-          Create Expense
+          Create {type}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create Expense</DialogTitle>
-          <DialogDescription>
-            Provide information regarding expense.
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <ExpenseForm handleClose={handleClose} />
+        {type === "Expense" ? (
+          <ExpenseForm handleClose={handleClose} />
+        ) : (
+          <TypeForm handleClose={handleClose} />
+        )}
       </DialogContent>
     </Dialog>
   );

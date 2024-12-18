@@ -1,4 +1,4 @@
-const apiRequest = async (
+export const apiRequest = async (
   url: string,
   method: string,
   body?: Record<string, unknown>,
@@ -14,5 +14,3 @@ const apiRequest = async (
 
   return response;
 };
-
-export { apiRequest };
