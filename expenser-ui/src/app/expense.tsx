@@ -4,13 +4,17 @@ import { Separator } from "@radix-ui/react-separator";
 
 export default function Expense() {
   return (
-    <>
-      <header className="flex h-16 shrink-0 justify-between items-center gap-2 border-b px-4">
+    <div className="flex h-96 w-full flex-col">
+      <header
+        className="flex h-16 shrink-0 justify-between items-center gap-2 border-b px-4"
+        role="banner"
+      >
         <div className="flex items-center gap-2">
-          <SidebarTrigger className="-ml-1" />
+          <SidebarTrigger className="-ml-1" aria-label="Toggle sidebar" />
           <Separator
             orientation="vertical"
             className="bg-border w-px mr-2 h-4"
+            decorative={true}
           />
           <div className="flex flex-col">
             <h1 className="text-lg font-semibold">Expense</h1>
@@ -19,9 +23,15 @@ export default function Expense() {
         </div>
         <TransactionDialog />
       </header>
-      <div className="flex h-screen w-full items-center justify-center px-4">
-        <h1 className="text-4xl font-bold">Expense Page</h1>
-      </div>
-    </>
+      <main
+        className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center px-4"
+        role="main"
+      >
+        {" "}
+        <h1 className="text-4xl font-bold" id="expense-title">
+          Expense Page
+        </h1>
+      </main>
+    </div>
   );
 }

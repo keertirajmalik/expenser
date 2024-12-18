@@ -3,8 +3,11 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export default function Dashboard() {
   return (
-    <>
-      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+    <div className="flex h-96 w-full flex-col">
+      <header
+        className="flex h-16 shrink-0 items-center gap-2 border-b px-4"
+        role="banner"
+      >
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-4" />
         <div className="flex flex-col">
@@ -14,9 +17,12 @@ export default function Dashboard() {
           </p>
         </div>
       </header>
-      <div className="flex h-screen w-full items-center justify-center px-4">
+      <main
+        className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center px-4"
+        role="main"
+      >
         <h1 className="text-4xl font-bold">Welcome to Expenser</h1>
-      </div>
-    </>
+      </main>
+    </div>
   );
 }

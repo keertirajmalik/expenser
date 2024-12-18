@@ -7,8 +7,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useState } from "react";
-import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router";
 
 export function NavMain({
   items,
@@ -19,7 +19,18 @@ export function NavMain({
     icon: LucideIcon;
   }[];
 }) {
-  const [selectedItem, setSelectedItem] = useState<string>("Dashboard");
+  const location = useLocation();
+  const [selectedItem, setSelectedItem] = useState<string>(() => {
+    const matchingItem = items.find((item) => item.url === location.pathname);
+    return matchingItem?.name ?? "Dashboard";
+  });
+
+  useEffect(() => {
+    const matchingItem = items.find((item) => item.url === location.pathname);
+    if (matchingItem) {
+      setSelectedItem(matchingItem.name);
+    }
+  }, [location.pathname, items]);
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -31,6 +42,8 @@ export function NavMain({
               asChild
               isActive={selectedItem === item.name}
               onClick={() => setSelectedItem(item.name)}
+              role="menuitem"
+              aria-current={selectedItem === item.name ? "page" : undefined}
               className={`
                           data-[active=true]:font-semibold
                           border-l-[3px] border-transparent

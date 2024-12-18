@@ -43,7 +43,7 @@ export const AuthProvider = ({
   }, [navigate]);
 
   const handleLogin = (token: string, name: string, username: string) => {
-    const expireAt = new Date(Date.now() + 1000 * 60 * 5).toString();
+    const expireAt = new Date(Date.now() + 1000 * 60).toString();
     localStorage.setItem("token", token);
     localStorage.setItem("expireAt", expireAt);
     localStorage.setItem("name", name);

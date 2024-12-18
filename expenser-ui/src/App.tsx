@@ -3,18 +3,15 @@ import Dashboard from "@/app/dashboard";
 import { LoginPage } from "@/app/login";
 import { SignupPage } from "@/app/signup";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
-
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { useAuth } from "@/providers/auth-provider";
 import { Routes, Route, Navigate } from "react-router";
+import { ROUTES } from "@/types/routes";
 
 export function App() {
-  const { isLoggedIn } = useAuth();
-
   return (
     <Routes>
       <Route path="/auth/*" element={<AuthRoutes />} />
-      <Route path="*" element={<MainRoutes isLoggedIn={isLoggedIn} />} />
+      <Route path="*" element={<MainRoutes />} />
     </Routes>
   );
 }
@@ -22,32 +19,23 @@ export function App() {
 function AuthRoutes() {
   return (
     <Routes>
-      <Route path="login" element={<LoginPage />} />
-      <Route path="signup" element={<SignupPage />} />
+      <Route path={ROUTES.AUTH.LOGIN} element={<LoginPage />} />
+      <Route path={ROUTES.AUTH.SIGNUP} element={<SignupPage />} />
       <Route path="*" element={<Navigate to="/auth/login" />} />
     </Routes>
   );
 }
 
-function MainRoutes({ isLoggedIn }: { isLoggedIn: boolean }) {
+function MainRoutes() {
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <Routes>
-            <Route
-              path="/"
-              element={isLoggedIn ? <Dashboard /> : <LoginPage />}
-            />
-            <Route
-              path="/expense"
-              element={isLoggedIn ? <Expense /> : <LoginPage />}
-            />
-            <Route
-              path="/type"
-              element={isLoggedIn ? <Expense /> : <LoginPage />}
-            />
+            <Route path={ROUTES.MAIN.DASHBOARD} element={<Dashboard />} />
+            <Route path={ROUTES.MAIN.EXPENSE} element={<Expense />} />
+            <Route path={ROUTES.MAIN.TYPE} element={<Expense />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

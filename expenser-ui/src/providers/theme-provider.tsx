@@ -41,9 +41,16 @@ export function ThemeProvider({
         ? "dark"
         : "light";
 
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const handleChange = (e: MediaQueryListEvent) => {
+        root.classList.remove("light", "dark");
+        root.classList.add(e.matches ? "dark" : "light");
+      };
+      mediaQuery.addEventListener("change", handleChange);
+
       root.classList.add(systemTheme);
       localStorage.setItem(storageKey, systemTheme);
-      return;
+      return () => mediaQuery.removeEventListener("change", handleChange);
     }
 
     root.classList.add(theme);

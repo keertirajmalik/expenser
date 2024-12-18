@@ -19,6 +19,7 @@ import {
 import avatar from "@/assets/shadcn.jpg";
 import { useAuth } from "@/providers/auth-provider";
 import { useUser } from "@/providers/user-provider";
+import { useMemo } from "react";
 
 function stringAvatar(name: string) {
   if (!name?.trim()) {
@@ -41,6 +42,7 @@ export function NavUser() {
   const { isMobile } = useSidebar();
   const { name, username } = useUser();
   const { handleLogout } = useAuth();
+  const avatarFallback = useMemo(() => stringAvatar(name), [name]);
 
   return (
     <SidebarMenu>
@@ -54,7 +56,7 @@ export function NavUser() {
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={avatar} alt={name} />
                 <AvatarFallback className="rounded-lg">
-                  {stringAvatar(name)}
+                  {avatarFallback}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -75,7 +77,7 @@ export function NavUser() {
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={avatar} alt={name} />
                   <AvatarFallback className="rounded-lg">
-                    {stringAvatar(name)}
+                    {avatarFallback}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">

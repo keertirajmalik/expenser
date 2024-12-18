@@ -20,23 +20,20 @@ export function NavSecondary({
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
-          {/* {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild size="sm">
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))} */}
           <SidebarMenuItem key="Toggle theme">
             <SidebarMenuButton asChild>
-              <div className="flex items-center space-x-1">
+              <div
+                className="flex items-center space-x-1"
+                role="group"
+                aria-label="Theme toggle"
+              >
                 {theme === "light" ? <Sun /> : <Moon />}
-                <Label htmlFor="toggle-theme">Light Mode</Label>
+                <Label htmlFor="toggle-theme">
+                  {theme === "light" ? "Light Mode" : "Dark Mode"}
+                </Label>
                 <Switch
                   id="toggle-theme"
+                  aria-label={`Toggle ${theme === "light" ? "dark" : "light"} mode`}
                   checked={theme === "light"}
                   onCheckedChange={() => {
                     setTheme(theme === "dark" ? "light" : "dark");
