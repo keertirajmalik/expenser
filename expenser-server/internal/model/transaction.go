@@ -68,7 +68,7 @@ func convertDBTransactionToTransaction(config Config, ctx context.Context, dbTra
 			}
 		}
 
-		transactionType, err := config.GetTransactionTypeByIdFromDB(ctx, transaction.Type)
+		transactionType, err := config.GetTransactionTypeByIdFromDB(ctx, transaction.Type, transaction.UserID)
 		if err != nil {
 			log.Printf("Couldn't get transaction type from DB: %v", err)
 			return []ResponseTransaction{}

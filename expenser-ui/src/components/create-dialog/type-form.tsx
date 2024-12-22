@@ -9,13 +9,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/apiRequest";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const FormSchema = z.object({
+export const TypeFormSchema = z.object({
   name: z.string().nonempty({
     message: "Expense  type name is required.",
   }),
@@ -23,47 +21,21 @@ const FormSchema = z.object({
 });
 
 interface TypeFormProps {
-  handleClose: () => void;
+  onSubmit: (data: z.infer<typeof TypeFormSchema>) => void;
+  initialData?: {
+    name: string;
+    description: string;
+  };
 }
 
-export function TypeForm({ handleClose }: TypeFormProps) {
-  const toast = useToast();
-
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
+export function TypeForm({ onSubmit, initialData }: TypeFormProps) {
+  const form = useForm<z.infer<typeof TypeFormSchema>>({
+    resolver: zodResolver(TypeFormSchema),
+    defaultValues: initialData || {
       name: "",
       description: "",
     },
   });
-
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    const handleError = (error: unknown) => {
-      const message =
-        error instanceof Error ? error.message : "An unexpected error occurred";
-      toast.toast({
-        title: "Expense type creation Failed",
-        description: message,
-        variant: "destructive",
-      });
-    };
-
-    const typeData = {
-      ...data,
-    };
-
-    apiRequest("/cxf/type", "POST", typeData)
-      .then((res: Response) => {
-        if (!res.ok) {
-          throw new Error(`Failed to save expense: ${res.statusText}`);
-        }
-        handleClose();
-        toast.toast({
-          description: "Expense type create successfully.",
-        });
-      })
-      .catch(handleError);
-  }
 
   return (
     <Form {...form}>
@@ -75,7 +47,7 @@ export function TypeForm({ handleClose }: TypeFormProps) {
             <FormItem>
               <FormLabel>Expense Name</FormLabel>
               <FormControl>
-                <Input placeholder="Name of your expense" {...field} />
+                <Input placeholder="Name of your expense type" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -89,7 +61,7 @@ export function TypeForm({ handleClose }: TypeFormProps) {
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Tell us a little bit about expense"
+                  placeholder="Tell us a little bit about expense type"
                   className="resize-none"
                   {...field}
                 />

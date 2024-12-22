@@ -33,7 +33,23 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const FormSchema = z.object({
+interface SelectionOption {
+  label: string;
+  value: string;
+}
+
+interface ExpenseFormProps {
+  onSubmit: (data: z.infer<typeof ExpenseFormSchema>) => void;
+  initialData?: {
+    name: string;
+    type: string;
+    amount: string;
+    date: Date;
+    note: string;
+  };
+}
+
+export const ExpenseFormSchema = z.object({
   name: z.string().nonempty({
     message: "Expense name is required.",
   }),
@@ -49,24 +65,15 @@ const FormSchema = z.object({
   note: z.string(),
 });
 
-interface ExpenseFormProps {
-  handleClose: () => void;
-}
-
-interface SelectionOption {
-  label: string;
-  value: string;
-}
-
-export function ExpenseForm({ handleClose }: ExpenseFormProps) {
+export function ExpenseForm({ onSubmit, initialData }: ExpenseFormProps) {
   const toast = useToast();
   const [openType, setOpenType] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [expenseTypes, setExpenseTypes] = useState<SelectionOption[]>([]);
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
+  const form = useForm<z.infer<typeof ExpenseFormSchema>>({
+    resolver: zodResolver(ExpenseFormSchema),
+    defaultValues: initialData || {
       name: "",
       type: "",
       amount: "",
@@ -75,57 +82,39 @@ export function ExpenseForm({ handleClose }: ExpenseFormProps) {
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    const handleError = (error: unknown) => {
-      const message =
-        error instanceof Error ? error.message : "An unexpected error occurred";
-      toast.toast({
-        title: "Expense creation Failed",
-        description: message,
-        variant: "destructive",
-      });
-    };
-
-    const expenseData = {
-      ...data,
-      amount: parseFloat(data.amount),
-      date: format(data.date, "dd/MM/yyyy"),
-    };
-
-    apiRequest("/cxf/transaction", "POST", expenseData)
-      .then((res: Response) => {
-        if (!res.ok) {
-          throw new Error(`Failed to save expense: ${res.statusText}`);
-        }
-        handleClose();
+  useEffect(() => {
+    apiRequest("/cxf/type", "GET").then(async (res: Response) => {
+      if (!res.ok) {
         toast.toast({
-          description: "Expense saved successfully.",
+          description: "Failed to fetch expense types.",
+          variant: "destructive",
         });
-      })
-      .catch(handleError);
-  }
+        return;
+      }
+      const data = await res.json();
+      const transformedData = data.transaction_types.map(
+        (type: { id: string; name: string }) => ({
+          label: type.name,
+          value: type.id,
+        }),
+      );
+      setExpenseTypes(transformedData);
+    });
+  }, []);
 
   useEffect(() => {
-    if (openType) {
-      apiRequest("/cxf/type", "GET").then(async (res: Response) => {
-        if (!res.ok) {
-          toast.toast({
-            description: "Failed to fetch expense types.",
-            variant: "destructive",
-          });
-          return;
-        }
-        const data = await res.json();
-        const transformedData = data.transaction_types.map(
-          (type: { id: string; name: string }) => ({
-            label: type.name,
-            value: type.id,
-          }),
+    if (initialData) {
+      form.reset(initialData);
+      if (initialData.type) {
+        const typeOption = expenseTypes.find(
+          (type) => type.label === initialData.type,
         );
-        setExpenseTypes(transformedData);
-      });
+        if (typeOption) {
+          form.setValue("type", typeOption.value);
+        }
+      }
     }
-  }, [openType]);
+  }, [initialData, expenseTypes]);
 
   return (
     <Form {...form}>

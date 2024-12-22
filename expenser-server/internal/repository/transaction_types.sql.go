@@ -9,48 +9,60 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 const createTransactionType = `-- name: CreateTransactionType :one
-INSERT INTO transaction_types(id, name, description)
-VALUES ($1, $2, $3)
-RETURNING id, name, description, created_at, updated_at
+INSERT INTO transaction_types(id, name, description, user_id)
+VALUES ($1, $2, $3, $4)
+RETURNING id, name, description, user_id, created_at, updated_at
 `
 
 type CreateTransactionTypeParams struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
 	Description *string   `json:"description"`
+	UserID      uuid.UUID `json:"user_id"`
 }
 
 func (q *Queries) CreateTransactionType(ctx context.Context, arg CreateTransactionTypeParams) (TransactionType, error) {
-	row := q.db.QueryRow(ctx, createTransactionType, arg.ID, arg.Name, arg.Description)
+	row := q.db.QueryRow(ctx, createTransactionType,
+		arg.ID,
+		arg.Name,
+		arg.Description,
+		arg.UserID,
+	)
 	var i TransactionType
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Description,
+		&i.UserID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
 	return i, err
 }
 
-const deleteTransactionType = `-- name: DeleteTransactionType :exec
-DELETE FROM transaction_types where id=$1
+const deleteTransactionType = `-- name: DeleteTransactionType :execresult
+DELETE FROM transaction_types where id=$1 AND user_id=$2
 `
 
-func (q *Queries) DeleteTransactionType(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.Exec(ctx, deleteTransactionType, id)
-	return err
+type DeleteTransactionTypeParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) DeleteTransactionType(ctx context.Context, arg DeleteTransactionTypeParams) (pgconn.CommandTag, error) {
+	return q.db.Exec(ctx, deleteTransactionType, arg.ID, arg.UserID)
 }
 
 const getTransactionType = `-- name: GetTransactionType :many
-SELECT id, name, description, created_at, updated_at FROM transaction_types
+SELECT id, name, description, user_id, created_at, updated_at FROM transaction_types WHERE user_id=$1
 `
 
-func (q *Queries) GetTransactionType(ctx context.Context) ([]TransactionType, error) {
-	rows, err := q.db.Query(ctx, getTransactionType)
+func (q *Queries) GetTransactionType(ctx context.Context, userID uuid.UUID) ([]TransactionType, error) {
+	rows, err := q.db.Query(ctx, getTransactionType, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -62,6 +74,7 @@ func (q *Queries) GetTransactionType(ctx context.Context) ([]TransactionType, er
 			&i.ID,
 			&i.Name,
 			&i.Description,
+			&i.UserID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -76,16 +89,56 @@ func (q *Queries) GetTransactionType(ctx context.Context) ([]TransactionType, er
 }
 
 const getTransactionTypeById = `-- name: GetTransactionTypeById :one
-SELECT id, name, description, created_at, updated_at FROM transaction_types where id=$1
+SELECT id, name, description, user_id, created_at, updated_at FROM transaction_types where id=$1 AND user_id=$2
 `
 
-func (q *Queries) GetTransactionTypeById(ctx context.Context, id uuid.UUID) (TransactionType, error) {
-	row := q.db.QueryRow(ctx, getTransactionTypeById, id)
+type GetTransactionTypeByIdParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) GetTransactionTypeById(ctx context.Context, arg GetTransactionTypeByIdParams) (TransactionType, error) {
+	row := q.db.QueryRow(ctx, getTransactionTypeById, arg.ID, arg.UserID)
 	var i TransactionType
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Description,
+		&i.UserID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateTransactionType = `-- name: UpdateTransactionType :one
+UPDATE transaction_types
+SET name = $2,
+    description = $3
+WHERE id = $1 And user_id=$4
+RETURNING id, name, description, user_id, created_at, updated_at
+`
+
+type UpdateTransactionTypeParams struct {
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description *string   `json:"description"`
+	UserID      uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) UpdateTransactionType(ctx context.Context, arg UpdateTransactionTypeParams) (TransactionType, error) {
+	row := q.db.QueryRow(ctx, updateTransactionType,
+		arg.ID,
+		arg.Name,
+		arg.Description,
+		arg.UserID,
+	)
+	var i TransactionType
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.UserID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

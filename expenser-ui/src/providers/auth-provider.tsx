@@ -32,6 +32,9 @@ export const AuthProvider = ({
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      return;
+    }
     const token = localStorage.getItem("token");
     const expireAt = localStorage.getItem("expireAt");
 
