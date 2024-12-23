@@ -43,6 +43,21 @@ func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]
 	return convertDBTransactionToTransaction(d, ctx, dbTransactions), nil
 }
 
+// convertDBTransactionToTransaction converts database transaction records to response-ready transaction objects.
+// It processes a slice of repository transactions, handling nullable fields and performing necessary type
+// conversions. For each transaction, it fetches associated transaction type and user information.
+// The function formats dates as DD/MM/YYYY and handles decimal amount conversions.
+//
+// Parameters:
+//   - config: Config object containing database queries and transaction type lookup functionality
+//   - ctx: Context for database operations
+//   - dbTransactions: Slice of repository.Transaction objects to be converted
+//
+// Returns:
+//   - []ResponseTransaction: Slice of formatted transactions ready for response
+//
+// The function returns an empty slice if any database operation fails (transaction type or user lookup).
+// Logs errors for amount conversion failures but continues processing.
 func convertDBTransactionToTransaction(config Config, ctx context.Context, dbTransactions []repository.Transaction) []ResponseTransaction {
 	transactions := []ResponseTransaction{}
 	for _, transaction := range dbTransactions {

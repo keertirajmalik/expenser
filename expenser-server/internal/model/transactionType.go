@@ -46,6 +46,18 @@ func (d Config) GetTransactionTypeByIdFromDB(ctx context.Context, id, userId uui
 	return convertDBTransactionTypesToTransactionTypes(d, ctx, []repository.TransactionType{dbTransactionType})[0], nil
 }
 
+// convertDBTransactionTypesToTransactionTypes converts a slice of database transaction types to response transaction types.
+// It fetches associated user information for each transaction type and handles nil description fields.
+// If a user lookup fails, it logs the error and returns an empty slice.
+//
+// Parameters:
+//   - config: Config object containing database queries
+//   - ctx: Context for database operations
+//   - dbTransactions: Slice of repository.TransactionType to convert
+//
+// Returns:
+//   - []ResponseTransactionType: Slice of converted transaction types with user information.
+//     Returns empty slice if any user lookup fails.
 func convertDBTransactionTypesToTransactionTypes(config Config, ctx context.Context, dbTransactions []repository.TransactionType) []ResponseTransactionType {
 	transactionTypes := []ResponseTransactionType{}
 
