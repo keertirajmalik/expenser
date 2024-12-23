@@ -29,7 +29,7 @@ const validatePassword = (pass: string) => {
 };
 
 function SignupForm() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const toast = useToast();
   const [username, setUsername] = useState("");
   const [fullname, setFullname] = useState("");

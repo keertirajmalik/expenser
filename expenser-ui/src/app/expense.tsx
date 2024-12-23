@@ -26,12 +26,11 @@ const fetchExpenses = (
           });
           setExpenses(formattedData);
         } else {
-          console.error("Expected an array but got:", data.transactions);
+          setExpenses([]);
         }
       });
     })
-    .catch((error) => {
-      console.error("Error fetching data:", error);
+    .catch(() => {
       setExpenses([]);
     });
 };

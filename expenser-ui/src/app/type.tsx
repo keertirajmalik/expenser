@@ -10,27 +10,20 @@ import { useEffect, useState } from "react";
 function fetchExpenseTypes(
   setExpenseTypes: React.Dispatch<React.SetStateAction<type[]>>,
 ) {
-  apiRequest("/cxf/type", "GET")
-    .then((response) => {
-      response.json().then((data) => {
-        if (Array.isArray(data.transaction_types)) {
-          const transformedData = data.transaction_types.map((item: type) => {
-            return {
-              id: item.id,
-              name: item.name,
-              description: item.description,
-            };
-          });
-          setExpenseTypes(transformedData);
-        } else {
-          console.error("Expected an array but got:", data.transactions);
-        }
-      });
-    })
-    .catch((error) => {
-      console.error("Error fetching data:", error);
-      setExpenseTypes([]);
+  apiRequest("/cxf/type", "GET").then((response) => {
+    response.json().then((data) => {
+      if (Array.isArray(data.transaction_types)) {
+        const transformedData = data.transaction_types.map((item: type) => {
+          return {
+            id: item.id,
+            name: item.name,
+            description: item.description,
+          };
+        });
+        setExpenseTypes(transformedData);
+      }
     });
+  });
 }
 export default function ExpenseType() {
   const [expenseTypes, setExpenseTypes] = useState<type[]>([]);

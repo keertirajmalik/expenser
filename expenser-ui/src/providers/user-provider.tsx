@@ -1,9 +1,9 @@
 import {
   createContext,
-  useState,
+  ReactNode,
   useContext,
   useEffect,
-  ReactNode,
+  useState,
 } from "react";
 
 interface UserContextType {
@@ -26,6 +26,7 @@ export const UserProvider = ({
   const [username, setUsername] = useState<string>(() => {
     return localStorage.getItem("username") || "";
   });
+
   useEffect(() => {
     localStorage.setItem("name", name);
     localStorage.setItem("username", username);
