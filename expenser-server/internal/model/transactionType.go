@@ -90,8 +90,9 @@ func (d Config) AddTransactionTypeData(ctx context.Context, transactionType Tran
 func (d Config) DeleteTransactionTypeFromDB(ctx context.Context, id, userID uuid.UUID) error {
 	result, err := d.Queries.DeleteTransactionType(ctx, repository.DeleteTransactionTypeParams{ID: id, UserID: userID})
 	if err != nil {
+		log.Printf("Failed to delete transaction type %s for user %s: %v", id, userID, err)
 		if errors.Is(err, pgx.ErrNoRows) {
-			return errors.New("Transaction type not found: " + id.String())
+			return errors.New("Transaction type not found")
 		}
 		log.Println("Couldn't delete transaction type from DB", err)
 		return err
@@ -99,6 +100,7 @@ func (d Config) DeleteTransactionTypeFromDB(ctx context.Context, id, userID uuid
 
 	rowAffected := result.RowsAffected()
 	if rowAffected == 0 {
+		log.Printf("Failed to delete transaction type %s for user %s: %v", id, userID, err)
 		return fmt.Errorf("transaction type %s not found for user %s", id, userID)
 	}
 
@@ -114,7 +116,10 @@ func (d Config) UpdateTransactionTypeInDB(ctx context.Context, transactionType T
 	})
 
 	if err != nil {
-		log.Printf("Couldn't update transaction in DB: %v", err)
+		log.Printf("Failed to update transaction type %s for user %s: %v", transactionType.ID, transactionType.UserID, err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ResponseTransactionType{}, errors.New("Transaction type not found")
+		}
 		return ResponseTransactionType{}, err
 	}
 

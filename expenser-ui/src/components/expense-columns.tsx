@@ -3,6 +3,7 @@ import {
   ExpenseFormSchema,
 } from "@/components/create-dialog/expense-form";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
+import { DeleteDialog } from "@/components/data-table/row-action";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,7 +22,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/apiRequest";
 import { Expense } from "@/types/expense";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, Row } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
@@ -71,22 +72,24 @@ export const columns: ColumnDef<Expense>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const [editSheetOpen, setEditSheetOpen] = useState(false);
       const toast = useToast();
 
-      function onSubmit(data: z.infer<typeof ExpenseFormSchema>) {
-        const handleError = (error: unknown) => {
-          const message =
-            error instanceof Error
-              ? error.message
-              : "An unexpected error occurred";
-          toast.toast({
-            title: "Expense update Failed",
-            description: message,
-            variant: "destructive",
-          });
-        };
+      const [editSheetOpen, setEditSheetOpen] = useState(false);
+      const [alertDialogOpen, setAlertDialogOpen] = useState(false);
 
+      const handleToast = (
+        title: string,
+        description: string,
+        variant?: "default" | "destructive" | null | undefined,
+      ) => {
+        toast.toast({
+          title: title,
+          description: description,
+          variant: variant,
+        });
+      };
+
+      function onSubmit(data: z.infer<typeof ExpenseFormSchema>): void {
         const expenseData = {
           ...data,
           amount: parseFloat(data.amount),
@@ -94,17 +97,34 @@ export const columns: ColumnDef<Expense>[] = [
         };
 
         apiRequest(`/cxf/transaction/${row.original.id}`, "PUT", expenseData)
-          .then((res: Response) => {
+          .then(async (res: Response) => {
             if (!res.ok) {
-              throw new Error(`Failed to update expense: ${res.statusText}`);
+              const errorData = await res.json();
+              throw new Error(errorData.error);
             }
             setEditSheetOpen(false);
-            toast.toast({
-              description: "Expense updated successfully.",
-            });
+            handleToast("Expense Updated", "Expense updated successfully.");
           })
-          .catch(handleError);
+          .catch((error: Error) =>
+            handleToast("Expense Update Failed", error.message, "destructive"),
+          );
       }
+
+      function deleteExpense() {
+        apiRequest(`/cxf/transaction/${row.original.id}`, "DELETE")
+          .then(async (res: Response) => {
+            if (!res.ok) {
+              const errorData = await res.json();
+              throw new Error(errorData.error);
+            }
+            setAlertDialogOpen(false);
+            handleToast("Expense Deleted", "Expense deleted successfully.");
+          })
+          .catch((error: Error) =>
+            handleToast("Expense Delete Failed", error.message, "destructive"),
+          );
+      }
+
       return (
         <>
           <DropdownMenu>
@@ -123,33 +143,62 @@ export const columns: ColumnDef<Expense>[] = [
               >
                 Edit expense
               </DropdownMenuItem>
-              <DropdownMenuItem>Delete expense</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setAlertDialogOpen(true);
+                }}
+              >
+                Delete expense
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle>Edit Expese Details</SheetTitle>
-                <SheetDescription>
-                  Make changes to your expense here. Click submit when you're
-                  done.
-                </SheetDescription>
-              </SheetHeader>
-
-              <ExpenseForm
-                onSubmit={onSubmit}
-                initialData={{
-                  name: row.original.name,
-                  type: row.original.type,
-                  amount: row.original.amount.toString(),
-                  date: new Date(row.original.date),
-                  note: row.original.note,
-                }}
-              />
-            </SheetContent>
-          </Sheet>
+          {EditExpenseSheet(editSheetOpen, setEditSheetOpen, onSubmit, row)}
+          <DeleteDialog
+            setAlertDialogOpen={setAlertDialogOpen}
+            alertDialogOpen={alertDialogOpen}
+            deleteExpense={deleteExpense}
+          />
         </>
       );
     },
   },
 ];
+
+function EditExpenseSheet(
+  editSheetOpen: boolean,
+  setEditSheetOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  onSubmit: (data: z.infer<typeof ExpenseFormSchema>) => void,
+  row: Row<Expense>,
+) {
+  return (
+    <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Edit Expese Details</SheetTitle>
+          <SheetDescription>
+            Make changes to your expense here. Click submit when you're done.
+          </SheetDescription>
+        </SheetHeader>
+
+        <ExpenseForm
+          onSubmit={onSubmit}
+          initialData={{
+            name: row.original.name,
+            type: row.original.type,
+            amount: row.original.amount.toString(),
+            date: new Date(row.original.date),
+            note: row.original.note,
+          }}
+        />
+        <Button
+          type="reset"
+          variant="secondary"
+          className="w-full my-4"
+          onClick={() => setEditSheetOpen(false)}
+        >
+          Cancel
+        </Button>
+      </SheetContent>
+    </Sheet>
+  );
+}
