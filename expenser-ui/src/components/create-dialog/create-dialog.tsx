@@ -29,17 +29,17 @@ export function CreateDialog({ type, title, description }: CreateDialogProps) {
   const toast = useToast();
   const [open, setOpen] = useState(false);
 
-  function onExpenesFormSubmit(data: z.infer<typeof ExpenseFormSchema>) {
-    const handleError = (error: Error) => {
-      const message =
-        error instanceof Error ? error.message : "An unexpected error occurred";
-      toast.toast({
-        title: "Expense creation Failed",
-        description: message,
-        variant: "destructive",
-      });
-    };
+  const handleError = (error: Error) => {
+    const message =
+      error instanceof Error ? error.message : "An unexpected error occurred";
+    toast.toast({
+      title: "Expense type creation Failed",
+      description: message,
+      variant: "destructive",
+    });
+  };
 
+  function onExpenesFormSubmit(data: z.infer<typeof ExpenseFormSchema>) {
     const expenseData = {
       ...data,
       amount: parseFloat(data.amount),
@@ -60,20 +60,11 @@ export function CreateDialog({ type, title, description }: CreateDialogProps) {
   }
 
   function onTypeFormSubmit(data: z.infer<typeof TypeFormSchema>) {
-    const handleError = (error: Error) => {
-      const message =
-        error instanceof Error ? error.message : "An unexpected error occurred";
-      toast.toast({
-        title: "Expense type creation Failed",
-        description: message,
-        variant: "destructive",
-      });
-    };
-
     apiRequest("/cxf/type", "POST", data)
-      .then((res: Response) => {
+      .then(async (res: Response) => {
         if (!res.ok) {
-          throw new Error(`Failed to save expense type: ${res.statusText}`);
+          const errorData = await res.json();
+          throw new Error(errorData.error);
         }
         setOpen(false);
         toast.toast({

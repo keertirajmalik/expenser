@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 )
 
@@ -78,7 +79,12 @@ func (d Config) AddTransactionTypeData(ctx context.Context, transactionType Tran
 	})
 
 	if err != nil {
-		log.Println("Couldn't create transaction type in DB", err)
+		log.Printf("Failed to create transaction type %s for user %s: %v", transactionType.ID, transactionType.UserID, err)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return ResponseTransactionType{}, fmt.Errorf("Transaction type already exist")
+		}
+
 		return ResponseTransactionType{}, err
 	}
 

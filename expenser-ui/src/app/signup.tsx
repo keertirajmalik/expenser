@@ -13,6 +13,7 @@ import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useToast } from "@/hooks/use-toast";
 
 const validatePassword = (pass: string) => {
   if (pass.length < 8) {
@@ -29,6 +30,7 @@ const validatePassword = (pass: string) => {
 
 function SignupForm() {
   let navigate = useNavigate();
+  const toast = useToast();
   const [username, setUsername] = useState("");
   const [fullname, setFullname] = useState("");
   const [password, setPassword] = useState("");
@@ -59,7 +61,11 @@ function SignupForm() {
         navigate("/auth/login");
       })
       .catch((error) => {
-        setError(error.message);
+        toast.toast({
+          title: "User creation failed",
+          description: error.message,
+          variant: "destructive",
+        });
       });
   };
 

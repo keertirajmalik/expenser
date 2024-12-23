@@ -2,9 +2,12 @@ package model
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 )
 
@@ -44,6 +47,10 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 
 	if err != nil {
 		log.Printf("Failed to create user in DB - username: %s, error: %v", user.Username, err)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return User{}, fmt.Errorf("User already exist")
+		}
 		return User{}, err
 	}
 
