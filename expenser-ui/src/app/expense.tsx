@@ -5,7 +5,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { apiRequest } from "@/lib/apiRequest";
 import { Expense as expense } from "@/types/expense";
 import { Separator } from "@radix-ui/react-separator";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const fetchExpenses = (
   setExpenses: React.Dispatch<React.SetStateAction<expense[]>>,
@@ -38,9 +38,13 @@ const fetchExpenses = (
 export default function Expense() {
   const [expenses, setExpenses] = useState<expense[]>([]);
 
-  useEffect(() => {
+  const refreshExpenses = useCallback(() => {
     fetchExpenses(setExpenses);
   }, []);
+
+  useEffect(() => {
+    refreshExpenses();
+  }, [refreshExpenses]);
 
   return (
     <div className="flex h-96 w-full flex-col">
@@ -64,6 +68,7 @@ export default function Expense() {
           type="Expense"
           title="Create Expense"
           description=" Provide information regarding expense."
+          onSuccess={refreshExpenses}
         />
       </header>
       <main

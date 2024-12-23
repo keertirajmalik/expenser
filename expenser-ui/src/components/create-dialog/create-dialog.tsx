@@ -23,9 +23,15 @@ interface CreateDialogProps {
   type: "Expense" | "Type";
   title: string;
   description: string;
+  onSuccess: () => void;
 }
 
-export function CreateDialog({ type, title, description }: CreateDialogProps) {
+export function CreateDialog({
+  type,
+  title,
+  description,
+  onSuccess,
+}: CreateDialogProps) {
   const toast = useToast();
   const [open, setOpen] = useState(false);
 
@@ -55,6 +61,7 @@ export function CreateDialog({ type, title, description }: CreateDialogProps) {
         toast.toast({
           description: "Expense saved successfully.",
         });
+        onSuccess();
       })
       .catch(handleError);
   }
@@ -70,6 +77,7 @@ export function CreateDialog({ type, title, description }: CreateDialogProps) {
         toast.toast({
           description: "Expense type create successfully.",
         });
+        onSuccess();
       })
       .catch(handleError);
   }

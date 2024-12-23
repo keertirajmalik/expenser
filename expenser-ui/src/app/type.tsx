@@ -5,7 +5,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { apiRequest } from "@/lib/apiRequest";
 import { ExpenseType as type } from "@/types/expenseType";
 import { Separator } from "@radix-ui/react-separator";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 function fetchExpenseTypes(
   setExpenseTypes: React.Dispatch<React.SetStateAction<type[]>>,
@@ -28,9 +28,13 @@ function fetchExpenseTypes(
 export default function ExpenseType() {
   const [expenseTypes, setExpenseTypes] = useState<type[]>([]);
 
-  useEffect(() => {
+  const refreshExpenseTypes = useCallback(() => {
     fetchExpenseTypes(setExpenseTypes);
   }, []);
+
+  useEffect(() => {
+    refreshExpenseTypes();
+  }, [refreshExpenseTypes]);
 
   return (
     <div className="flex h-96 w-full flex-col">
@@ -54,6 +58,7 @@ export default function ExpenseType() {
           type="Type"
           title="Create Expense Type"
           description=" Provide information regarding expense type."
+          onSuccess={refreshExpenseTypes}
         />
       </header>
       <main
