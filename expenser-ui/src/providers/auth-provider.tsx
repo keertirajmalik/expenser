@@ -37,7 +37,7 @@ export const AuthProvider = ({
   useEffect(() => {
     if (location.pathname.startsWith("/auth")) {
       clearLocalStorage();
-      setIsLoggedIn(true);
+      setIsLoggedIn(false);
       return;
     }
     const token = localStorage.getItem("token");

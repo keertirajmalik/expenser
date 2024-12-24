@@ -20,14 +20,14 @@ import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 
 interface CreateDialogProps {
-  type: "Expense" | "Type";
+  creationType: "Expense" | "Type";
   title: string;
   description: string;
   onSuccess: () => void;
 }
 
 export function CreateDialog({
-  type,
+  creationType,
   title,
   description,
   onSuccess,
@@ -39,13 +39,13 @@ export function CreateDialog({
     const message =
       error instanceof Error ? error.message : "An unexpected error occurred";
     toast.toast({
-      title: "Expense type creation Failed",
+      title: `${creationType} creation Failed`,
       description: message,
       variant: "destructive",
     });
   };
 
-  function onExpenesFormSubmit(data: z.infer<typeof ExpenseFormSchema>) {
+  function onExpenseFormSubmit(data: z.infer<typeof ExpenseFormSchema>) {
     const expenseData = {
       ...data,
       amount: parseFloat(data.amount),
@@ -59,7 +59,7 @@ export function CreateDialog({
         }
         setOpen(false);
         toast.toast({
-          description: "Expense saved successfully.",
+          description: "Expense created successfully.",
         });
         onSuccess();
       })
@@ -75,7 +75,7 @@ export function CreateDialog({
         }
         setOpen(false);
         toast.toast({
-          description: "Expense type create successfully.",
+          description: "Expense type created successfully.",
         });
         onSuccess();
       })
@@ -87,7 +87,7 @@ export function CreateDialog({
       <DialogTrigger asChild>
         <Button variant="default">
           <Plus />
-          Create {type}
+          Create {creationType}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -95,8 +95,8 @@ export function CreateDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        {type === "Expense" ? (
-          <ExpenseForm onSubmit={onExpenesFormSubmit} />
+        {creationType === "Expense" ? (
+          <ExpenseForm onSubmit={onExpenseFormSubmit} />
         ) : (
           <TypeForm onSubmit={onTypeFormSubmit} />
         )}

@@ -77,7 +77,7 @@ export const columns: ColumnDef<Expense>[] = [
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [alertDialogOpen, setAlertDialogOpen] = useState(false);
 
-      const handleToast = (
+      const showToast = (
         title: string,
         description: string,
         variant?: "default" | "destructive" | null | undefined,
@@ -103,10 +103,10 @@ export const columns: ColumnDef<Expense>[] = [
               throw new Error(errorData.error);
             }
             setEditSheetOpen(false);
-            handleToast("Expense Updated", "Expense updated successfully.");
+            showToast("Expense Updated", "Expense updated successfully.");
           })
           .catch((error: Error) =>
-            handleToast("Expense Update Failed", error.message, "destructive"),
+            showToast("Expense Update Failed", error.message, "destructive"),
           );
       }
 
@@ -118,10 +118,10 @@ export const columns: ColumnDef<Expense>[] = [
               throw new Error(errorData.error);
             }
             setAlertDialogOpen(false);
-            handleToast("Expense Deleted", "Expense deleted successfully.");
+            showToast("Expense Deleted", "Expense deleted successfully.");
           })
           .catch((error: Error) =>
-            handleToast("Expense Delete Failed", error.message, "destructive"),
+            showToast("Expense Delete Failed", error.message, "destructive"),
           );
       }
 
@@ -156,7 +156,7 @@ export const columns: ColumnDef<Expense>[] = [
           <DeleteDialog
             setAlertDialogOpen={setAlertDialogOpen}
             alertDialogOpen={alertDialogOpen}
-            deleteExpense={deleteExpense}
+            deleteFunction={deleteExpense}
           />
         </>
       );

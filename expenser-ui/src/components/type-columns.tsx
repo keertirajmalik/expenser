@@ -132,7 +132,7 @@ export const columns: ColumnDef<ExpenseType>[] = [
           <DeleteDialog
             setAlertDialogOpen={setAlertDialogOpen}
             alertDialogOpen={alertDialogOpen}
-            deleteExpense={deleteExpenseType}
+            deleteFunction={deleteExpenseType}
           />
         </>
       );
