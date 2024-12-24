@@ -13,11 +13,11 @@ createRoot(document.getElementById("root")!).render(
     <ThemeProvider defaultTheme="system" storageKey="ui-theme">
       <Toaster />
       <BrowserRouter>
-        <AuthProvider>
-          <UserProvider>
+        <UserProvider>
+          <AuthProvider>
             <App />
-          </UserProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </UserProvider>
       </BrowserRouter>
     </ThemeProvider>
   </StrictMode>,

@@ -3,10 +3,12 @@ package model
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 )
 
@@ -14,80 +16,120 @@ type TransactionType struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
+	UserID      uuid.UUID `json:"user_id"`
 }
 
-func NewTransactionType(name, description string) TransactionType {
-	return TransactionType{
-		ID:          uuid.New(),
-		Name:        name,
-		Description: description,
-	}
+type ResponseTransactionType struct {
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	User        string    `json:"user"`
 }
 
-func (d Config) GetTransactionTypesFromDB(ctx context.Context) ([]TransactionType, error) {
-	dbTransactionTypes, err := d.Queries.GetTransactionType(ctx)
+func (d Config) GetTransactionTypesFromDB(ctx context.Context, userId uuid.UUID) ([]ResponseTransactionType, error) {
+	dbTransactionTypes, err := d.Queries.GetTransactionType(ctx, userId)
 	if err != nil {
 		log.Println("Couldn't get transaction type from in DB", err)
-		return []TransactionType{}, err
+		return []ResponseTransactionType{}, err
 	}
 
-	return convertDBTransactionTypesToTransactionTypes(dbTransactionTypes), nil
+	return convertDBTransactionTypesToTransactionTypes(d, ctx, dbTransactionTypes), nil
 }
 
-func (d Config) GetTransactionTypeByIdFromDB(ctx context.Context, id uuid.UUID) (TransactionType, error) {
-	dbTransactionType, err := d.Queries.GetTransactionTypeById(ctx, id)
+func (d Config) GetTransactionTypeByIdFromDB(ctx context.Context, id, userId uuid.UUID) (ResponseTransactionType, error) {
+	dbTransactionType, err := d.Queries.GetTransactionTypeById(ctx, repository.GetTransactionTypeByIdParams{ID: id, UserID: userId})
 	if err != nil {
 		log.Println("Couldn't get transaction type from in DB", err)
-		return TransactionType{}, err
+		return ResponseTransactionType{}, err
 	}
 
-	return convertDBTransactionTypesToTransactionTypes([]repository.TransactionType{dbTransactionType})[0], nil
+	return convertDBTransactionTypesToTransactionTypes(d, ctx, []repository.TransactionType{dbTransactionType})[0], nil
 }
 
-func convertDBTransactionTypesToTransactionTypes(dbTransactions []repository.TransactionType) []TransactionType {
-	transactionTypes := []TransactionType{}
+func convertDBTransactionTypesToTransactionTypes(config Config, ctx context.Context, dbTransactions []repository.TransactionType) []ResponseTransactionType {
+	transactionTypes := []ResponseTransactionType{}
 
 	for _, transactionType := range dbTransactions {
 		descriptionValue := ""
 		if transactionType.Description != nil {
 			descriptionValue = *transactionType.Description
 		}
-		transactionTypes = append(transactionTypes, TransactionType{
+		user, err := config.Queries.GetUserById(ctx, transactionType.UserID)
+		if err != nil {
+			log.Printf("Couldn't get user from DB: %v", err)
+			return []ResponseTransactionType{}
+		}
+		transactionTypes = append(transactionTypes, ResponseTransactionType{
 			ID:          transactionType.ID,
 			Name:        transactionType.Name,
 			Description: descriptionValue,
+			User:        user.Username,
 		})
 	}
 
 	return transactionTypes
 }
 
-func (d Config) AddTransactionTypeData(ctx context.Context, transactionType TransactionType) (TransactionType, error) {
+func (d Config) AddTransactionTypeData(ctx context.Context, transactionType TransactionType) (ResponseTransactionType, error) {
 	dbTransactionType, err := d.Queries.CreateTransactionType(ctx, repository.CreateTransactionTypeParams{
 		ID:          uuid.New(),
 		Name:        transactionType.Name,
 		Description: &transactionType.Description,
+		UserID:      transactionType.UserID,
 	})
 
 	if err != nil {
-		log.Println("Couldn't create transaction type in DB", err)
-		return TransactionType{}, err
+		log.Printf("Failed to create transaction type %s for user %s: %v", transactionType.ID, transactionType.UserID, err)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return ResponseTransactionType{}, fmt.Errorf("Transaction type already exist")
+		}
+
+		return ResponseTransactionType{}, err
 	}
 
-	transactionTypes := convertDBTransactionTypesToTransactionTypes([]repository.TransactionType{dbTransactionType})
+	transactionTypes := convertDBTransactionTypesToTransactionTypes(d, ctx, []repository.TransactionType{dbTransactionType})
 
 	return transactionTypes[0], nil
 }
 
-func (d Config) DeleteTransactionTypeFromDB(ctx context.Context, id uuid.UUID) error {
-	err := d.Queries.DeleteTransactionType(ctx, id)
+func (d Config) DeleteTransactionTypeFromDB(ctx context.Context, id, userID uuid.UUID) error {
+	result, err := d.Queries.DeleteTransactionType(ctx, repository.DeleteTransactionTypeParams{ID: id, UserID: userID})
 	if err != nil {
+		log.Printf("Failed to delete transaction type %s for user %s: %v", id, userID, err)
 		if errors.Is(err, pgx.ErrNoRows) {
-			return errors.New("Transaction type not found: " + id.String())
+			return errors.New("Transaction type not found")
 		}
 		log.Println("Couldn't delete transaction type from DB", err)
 		return err
 	}
 
+	rowAffected := result.RowsAffected()
+	if rowAffected == 0 {
+		log.Printf("Failed to delete transaction type %s for user %s: %v", id, userID, err)
+		return fmt.Errorf("transaction type %s not found for user %s", id, userID)
+	}
+
 	return nil
+}
+
+func (d Config) UpdateTransactionTypeInDB(ctx context.Context, transactionType TransactionType) (ResponseTransactionType, error) {
+	dbTransactionType, err := d.Queries.UpdateTransactionType(ctx, repository.UpdateTransactionTypeParams{
+		ID:          transactionType.ID,
+		Name:        transactionType.Name,
+		Description: &transactionType.Description,
+		UserID:      transactionType.UserID,
+	})
+
+	if err != nil {
+		log.Printf("Failed to update transaction type %s for user %s: %v", transactionType.ID, transactionType.UserID, err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ResponseTransactionType{}, errors.New("Transaction type not found")
+		}
+		return ResponseTransactionType{}, err
+	}
+
+	transactionTypes := convertDBTransactionTypesToTransactionTypes(d, ctx, []repository.TransactionType{dbTransactionType})
+
+	return transactionTypes[0], nil
 }

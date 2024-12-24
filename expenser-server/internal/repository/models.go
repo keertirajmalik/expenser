@@ -25,6 +25,7 @@ type TransactionType struct {
 	ID          uuid.UUID          `json:"id"`
 	Name        string             `json:"name"`
 	Description *string            `json:"description"`
+	UserID      uuid.UUID          `json:"user_id"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
 }

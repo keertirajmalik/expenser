@@ -1,11 +1,12 @@
+import { useUser } from "@/providers/user-provider";
 import {
   createContext,
-  useState,
+  ReactNode,
   useContext,
   useEffect,
-  ReactNode,
+  useState,
 } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 interface AuthContextType {
   isLoggedIn: boolean;
@@ -30,8 +31,15 @@ export const AuthProvider = ({
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { setName, setUsername } = useUser();
 
   useEffect(() => {
+    if (location.pathname.startsWith("/auth")) {
+      clearLocalStorage();
+      setIsLoggedIn(false);
+      return;
+    }
     const token = localStorage.getItem("token");
     const expireAt = localStorage.getItem("expireAt");
 
@@ -48,12 +56,15 @@ export const AuthProvider = ({
     localStorage.setItem("expireAt", expireAt);
     localStorage.setItem("name", name);
     localStorage.setItem("username", username);
+    setName(name);
+    setUsername(username);
     setIsLoggedIn(true);
     navigate("/");
   };
 
   const handleLogout = () => {
     clearLocalStorage();
+    setIsLoggedIn(false);
     navigate("/auth/login");
   };
 

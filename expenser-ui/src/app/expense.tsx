@@ -1,8 +1,51 @@
-import { ExpensesDialog } from "@/components/expense-dialog";
+import { CreateDialog } from "@/components/create-dialog/create-dialog";
+import { DataTable } from "@/components/data-table/data-table";
+import { columns } from "@/components/expense-columns";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { apiRequest } from "@/lib/apiRequest";
+import { Expense as expense } from "@/types/expense";
 import { Separator } from "@radix-ui/react-separator";
+import { useCallback, useEffect, useState } from "react";
+
+const fetchExpenses = (
+  setExpenses: React.Dispatch<React.SetStateAction<expense[]>>,
+) => {
+  apiRequest("/cxf/transaction", "GET")
+    .then((response) => {
+      response.json().then((data) => {
+        if (Array.isArray(data.transactions)) {
+          const formattedData = data.transactions.map((item: expense) => {
+            return {
+              id: item.id,
+              name: item.name,
+              type: item.type,
+              amount: item.amount,
+              date: item.date,
+              note: item.note,
+            };
+          });
+          setExpenses(formattedData);
+        } else {
+          setExpenses([]);
+        }
+      });
+    })
+    .catch(() => {
+      setExpenses([]);
+    });
+};
 
 export default function Expense() {
+  const [expenses, setExpenses] = useState<expense[]>([]);
+
+  const refreshExpenses = useCallback(() => {
+    fetchExpenses(setExpenses);
+  }, []);
+
+  useEffect(() => {
+    refreshExpenses();
+  }, [refreshExpenses]);
+
   return (
     <div className="flex h-96 w-full flex-col">
       <header
@@ -21,16 +64,18 @@ export default function Expense() {
             <p className="text-sm text-gray-500">List of Your Expenses</p>
           </div>
         </div>
-        <ExpensesDialog />
+        <CreateDialog
+          type="Expense"
+          title="Create Expense"
+          description=" Provide information regarding expense."
+          onSuccess={refreshExpenses}
+        />
       </header>
       <main
-        className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center px-4"
+        className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4"
         role="main"
       >
-        {" "}
-        <h1 className="text-4xl font-bold" id="expense-title">
-          Expense Page
-        </h1>
+        <DataTable columns={columns} data={expenses} />
       </main>
     </div>
   );

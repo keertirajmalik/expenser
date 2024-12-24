@@ -2,11 +2,13 @@ package model
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 	"github.com/shopspring/decimal"
@@ -68,7 +70,7 @@ func convertDBTransactionToTransaction(config Config, ctx context.Context, dbTra
 			}
 		}
 
-		transactionType, err := config.GetTransactionTypeByIdFromDB(ctx, transaction.Type)
+		transactionType, err := config.GetTransactionTypeByIdFromDB(ctx, transaction.Type, transaction.UserID)
 		if err != nil {
 			log.Printf("Couldn't get transaction type from DB: %v", err)
 			return []ResponseTransaction{}
@@ -157,7 +159,10 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTra
 	})
 
 	if err != nil {
-		log.Printf("Couldn't update transaction in DB: %v", err)
+		log.Printf("Failed to update transaction %s for user %s: %v", transaction.ID, transaction.UserID, err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return errors.New("Transaction not found")
+		}
 		return err
 	}
 
@@ -171,12 +176,16 @@ func (d Config) DeleteTransactionFromDB(ctx context.Context, id, userID uuid.UUI
 	})
 	if err != nil {
 		log.Printf("Failed to delete transaction %s for user %s: %v", id, userID, err)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return errors.New("Transaction not found: " + id.String())
+		}
 		return err
 	}
 
 	rowAffected := result.RowsAffected()
 	if rowAffected == 0 {
-		return fmt.Errorf("transaction %s not found for user %s", id, userID)
+		log.Printf("Transaction not found: %v", id.String())
+		return errors.New("Transaction not found")
 	}
 
 	return nil

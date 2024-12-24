@@ -2,9 +2,12 @@ package model
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 )
 
@@ -15,13 +18,16 @@ type User struct {
 	HashedPassword string    `json:"-"`
 }
 
-func NewUser(name, username, password string) User {
-	return User{
-		ID:             uuid.New(),
-		Name:           name,
-		Username:       username,
-		HashedPassword: password,
-	}
+const (
+	errCodeUniqueViolation = "23505"
+)
+
+type ErrDuplicateUser struct {
+	Username string
+}
+
+func (e *ErrDuplicateUser) Error() string {
+	return fmt.Sprintf("User already exist")
 }
 
 func (d Config) GetUsersFromDB(ctx context.Context) ([]User, error) {
@@ -43,7 +49,11 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 	})
 
 	if err != nil {
-		log.Printf("Failed to create user in DB - username: %s, error: %v", user.Username, err)
+		log.Printf("Failed to create user in DB: %v", err)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == errCodeUniqueViolation {
+			return User{}, &ErrDuplicateUser{Username: user.Username}
+		}
 		return User{}, err
 	}
 
