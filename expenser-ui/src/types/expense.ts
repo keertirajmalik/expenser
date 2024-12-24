@@ -2,7 +2,7 @@ export interface Expense {
   id: number;
   name: string;
   type: string;
-  amount: number;
+  amount: string;
   date: Date;
   note: string;
 }

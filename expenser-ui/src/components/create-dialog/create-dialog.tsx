@@ -51,7 +51,6 @@ export function CreateDialog({
       amount: parseFloat(data.amount),
       date: format(data.date, "dd/MM/yyyy"),
     };
-
     apiRequest("/cxf/transaction", "POST", expenseData)
       .then((res: Response) => {
         if (!res.ok) {

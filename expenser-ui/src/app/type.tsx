@@ -55,7 +55,7 @@ export default function ExpenseType() {
           </div>
         </div>
         <CreateDialog
-          type="Type"
+          creationType="Type"
           title="Create Expense Type"
           description=" Provide information regarding expense type."
           onSuccess={refreshExpenseTypes}

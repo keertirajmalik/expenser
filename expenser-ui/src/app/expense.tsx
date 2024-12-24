@@ -65,7 +65,7 @@ export default function Expense() {
           </div>
         </div>
         <CreateDialog
-          type="Expense"
+          creationType="Expense"
           title="Create Expense"
           description=" Provide information regarding expense."
           onSuccess={refreshExpenses}

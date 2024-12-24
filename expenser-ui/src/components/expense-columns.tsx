@@ -23,7 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/apiRequest";
 import { Expense } from "@/types/expense";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
@@ -186,7 +186,7 @@ function EditExpenseSheet(
             name: row.original.name,
             type: row.original.type,
             amount: row.original.amount.toString(),
-            date: new Date(row.original.date),
+            date: parse(row.original.date.toString(), "dd/MM/yyyy", new Date()),
             note: row.original.note,
           }}
         />
