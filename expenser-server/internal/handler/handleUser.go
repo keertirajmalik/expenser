@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/keertirajmalik/expenser/expenser-server/auth"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 )
@@ -35,8 +36,8 @@ func HandleUserCreate(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		user := model.NewUser(params.Name, params.Username, hashedPassword)
-		user, err = data.AddUserToDB(r.Context(), user)
+		user, err := data.AddUserToDB(r.Context(), model.User{ID: uuid.New(), Name: params.Name, Username: params.Username, HashedPassword: hashedPassword})
+
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return

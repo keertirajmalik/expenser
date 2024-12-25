@@ -9,6 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/keertirajmalik/expenser/expenser-server/database"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 )
 
@@ -24,6 +25,18 @@ type ResponseTransactionType struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	User        string    `json:"user"`
+}
+
+const (
+	errCodeNotNullViolation = "23502"
+)
+
+type ErrNotNullConstraint struct {
+	column string
+}
+
+func (e *ErrNotNullConstraint) Error() string {
+	return fmt.Sprintf("%s can't be null", e.column)
 }
 
 func (d Config) GetTransactionTypesFromDB(ctx context.Context, userId uuid.UUID) ([]ResponseTransactionType, error) {
@@ -81,10 +94,9 @@ func (d Config) AddTransactionTypeData(ctx context.Context, transactionType Tran
 	if err != nil {
 		log.Printf("Failed to create transaction type %s for user %s: %v", transactionType.ID, transactionType.UserID, err)
 		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
-			return ResponseTransactionType{}, fmt.Errorf("Transaction type already exist")
+		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
+			return ResponseTransactionType{}, &database.ErrDuplicateData{Column: transactionType.Name}
 		}
-
 		return ResponseTransactionType{}, err
 	}
 
