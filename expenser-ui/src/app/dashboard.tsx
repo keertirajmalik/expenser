@@ -1,3 +1,5 @@
+import { BarChartComponent } from "@/components/chart/bar-chart";
+import { PieChartComponent } from "@/components/chart/pie-chart";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -18,10 +20,11 @@ export default function Dashboard() {
         </div>
       </header>
       <main
-        className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center px-4"
+        className="flex min-h-[calc(100vh-4rem)] w-full items-center justify-center px-4 gap-2"
         role="main"
       >
-        <h1 className="text-4xl font-bold">Welcome to Expenser</h1>
+        <BarChartComponent />
+        <PieChartComponent />
       </main>
     </div>
   );
