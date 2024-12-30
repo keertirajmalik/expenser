@@ -2,11 +2,12 @@
 
 CREATE TABLE transaction_types(
     id UUID PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
     description TEXT,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(name, user_id)
 );
 
 CREATE INDEX idx_transaction_types_name ON transaction_types(name);
