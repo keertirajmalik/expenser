@@ -35,31 +35,32 @@ const getUniqueTypes = (expenses: Expense[]): string[] => {
   return Array.from(new Set(expenses.map((item: Expense) => item.type)));
 };
 
-const createChartConfig = (types: string[], colors: string[]): ChartConfig => {
-  return types.reduce<ChartConfig>((acc, type, index) => {
+const createChartConfig = (data: Expense[]): ChartConfig => {
+  const uniqueTypes = getUniqueTypes(data);
+  const colors = generateColors(uniqueTypes.length);
+  return uniqueTypes.reduce<ChartConfig>((acc, type, index) => {
     acc[type] = { label: type, color: colors[index] };
     return acc;
   }, {});
 };
 
 const generateChartData = (expenses: Expense[]): ChartData[] => {
-  const colors = generateColors(expenses.length);
-  return expenses.reduce((acc: ChartData[], item, index) => {
+  const typeMap = expenses.reduce((acc: Record<string, number>, item) => {
     const amount = parseFloat(item.amount);
-    const existingItem = acc.find((accItem) => accItem.type === item.type);
-    if (existingItem) {
-      existingItem.amount += amount;
-    } else {
-      acc.push({ type: item.type, amount, fill: colors[index] });
-    }
+    acc[item.type] = (acc[item.type] || 0) + amount;
     return acc;
-  }, []);
+  }, {});
+  const uniqueTypes = Object.keys(typeMap);
+  const colors = generateColors(uniqueTypes.length);
+  return uniqueTypes.map((type, index) => ({
+    type,
+    amount: typeMap[type],
+    fill: colors[index],
+  }));
 };
 
 export function PieChartComponent({ data }: PieChartProps) {
-  const uniqueTypes = getUniqueTypes(data);
-  const colors = generateColors(uniqueTypes.length);
-  const chartConfig = createChartConfig(uniqueTypes, colors);
+  const chartConfig = createChartConfig(data);
   const chartData = generateChartData(data);
 
   return (
