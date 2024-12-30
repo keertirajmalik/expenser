@@ -83,8 +83,7 @@ export function BarChartComponent() {
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Bar dataKey="amount" fill="var(--color-expense)" radius={8}>
               <LabelList
-                position="top"
-                offset={12}
+                position="center"
                 className="fill-foreground"
                 fontSize={12}
               />
