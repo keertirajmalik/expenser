@@ -10,13 +10,15 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Expense } from "@/types/expense";
-import { apiRequest } from "@/lib/apiRequest";
-import { useEffect, useState } from "react";
 
 interface ChartData {
   type: string;
   amount: number;
   fill: string;
+}
+
+interface PieChartProps {
+  data: Expense[];
 }
 
 const generateColors = (count: number): string[] => {
@@ -54,31 +56,11 @@ const generateChartData = (expenses: Expense[]): ChartData[] => {
   }, []);
 };
 
-const fetchExpenses = (
-  setChartConfig: React.Dispatch<React.SetStateAction<ChartConfig>>,
-  setChartData: React.Dispatch<React.SetStateAction<ChartData[]>>,
-) => {
-  apiRequest("/cxf/transaction", "GET")
-    .then((response) => response.json())
-    .then((data) => {
-      if (Array.isArray(data.transactions)) {
-        const uniqueTypes = getUniqueTypes(data.transactions);
-        const colors = generateColors(uniqueTypes.length);
-        const newChartConfig = createChartConfig(uniqueTypes, colors);
-        setChartConfig(newChartConfig);
-        const chartData = generateChartData(data.transactions);
-        setChartData(chartData);
-      }
-    });
-};
-
-export function PieChartComponent() {
-  const [chartConfig, setChartConfig] = useState<ChartConfig>({});
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-
-  useEffect(() => {
-    fetchExpenses(setChartConfig, setChartData);
-  }, []);
+export function PieChartComponent({ data }: PieChartProps) {
+  const uniqueTypes = getUniqueTypes(data);
+  const colors = generateColors(uniqueTypes.length);
+  const chartConfig = createChartConfig(uniqueTypes, colors);
+  const chartData = generateChartData(data);
 
   return (
     <Card className="flex flex-col">

@@ -6,32 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { apiRequest } from "@/lib/apiRequest";
 import { Expense } from "@/types/expense";
-import { useEffect, useState } from "react";
 
-const fetchExpenses = (
-  setExpenses: React.Dispatch<React.SetStateAction<Expense[]>>,
-) => {
-  apiRequest("/cxf/transaction", "GET").then((response) => {
-    response.json().then((data) => {
-      if (Array.isArray(data.transactions)) {
-        //sort basedon the date
+interface RecentSalesProps {
+  data: Expense[];
+}
 
-        setExpenses(data.transactions);
-      }
-    });
-  });
-};
-
-export function RecentSales() {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  useEffect(() => {
-    fetchExpenses(setExpenses);
-  }, []);
-
-  const total = expenses
-    .reduce((acc, expense) => acc + parseFloat(expense.amount), 0)
+export function RecentSales({ data }: RecentSalesProps) {
+  const total = data
+    .reduce((acc, data) => acc + parseFloat(data.amount), 0)
     .toFixed(2);
 
   return (
@@ -42,7 +25,7 @@ export function RecentSales() {
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          {expenses
+          {data
             .sort((a: Expense, b: Expense) => {
               return new Date(b.date).getTime() - new Date(a.date).getTime();
             })

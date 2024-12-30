@@ -1,4 +1,3 @@
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -6,29 +5,18 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { apiRequest } from "@/lib/apiRequest";
 import { Expense } from "@/types/expense";
 import { compareAsc, format, parse } from "date-fns";
-import { useEffect, useState } from "react";
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 
 interface ChartData {
   month: string;
   amount: number;
 }
 
-const fetchExpenses = (
-  setChartData: React.Dispatch<React.SetStateAction<ChartData[]>>,
-) => {
-  apiRequest("/cxf/transaction", "GET").then((response) => {
-    response.json().then((data) => {
-      if (Array.isArray(data.transactions)) {
-        const chartData = generateChartData(data.transactions);
-        console.log(chartData);
-        setChartData(chartData);
-      }
-    });
-  });
-};
+interface LineChartProps {
+  data: Expense[];
+}
 
 const formatDate = (date: string) =>
   format(parse(date, "dd/MM/yyyy", new Date()), "MMM/yy");
@@ -67,11 +55,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function LineChartComponent() {
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  useEffect(() => {
-    fetchExpenses(setChartData);
-  }, []);
+export function LineChartComponent({ data }: LineChartProps) {
+  const chartData = generateChartData(data);
 
   return (
     <Card>

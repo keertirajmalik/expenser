@@ -1,4 +1,3 @@
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -6,23 +5,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { apiRequest } from "@/lib/apiRequest";
 import { Expense } from "@/types/expense";
-import { useEffect, useState } from "react";
-import { parse, compareAsc, format } from "date-fns";
+import { compareAsc, format, parse } from "date-fns";
+import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
 
-const fetchExpenses = (
-  setChartData: React.Dispatch<React.SetStateAction<ChartData[]>>,
-) => {
-  apiRequest("/cxf/transaction", "GET").then((response) => {
-    response.json().then((data) => {
-      if (Array.isArray(data.transactions)) {
-        const chartData = generateChartData(data.transactions);
-        setChartData(chartData);
-      }
-    });
-  });
-};
+interface BarChartProps {
+  data: Expense[];
+}
 
 const generateChartData = (expenses: Expense[]): ChartData[] => {
   return expenses
@@ -58,11 +47,8 @@ interface ChartData {
 const parseDate = (dateStr: Date) =>
   parse(dateStr.toString(), "dd/MM/yyyy", new Date());
 
-export function BarChartComponent() {
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  useEffect(() => {
-    fetchExpenses(setChartData);
-  }, []);
+export function BarChartComponent({ data }: BarChartProps) {
+  const chartData = generateChartData(data);
 
   return (
     <Card>
