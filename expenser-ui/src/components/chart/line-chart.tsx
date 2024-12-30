@@ -1,4 +1,4 @@
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts";
+import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -8,8 +8,13 @@ import {
 } from "@/components/ui/chart";
 import { apiRequest } from "@/lib/apiRequest";
 import { Expense } from "@/types/expense";
+import { compareAsc, format, parse } from "date-fns";
 import { useEffect, useState } from "react";
-import { parse, compareAsc, format } from "date-fns";
+
+interface ChartData {
+  month: string;
+  amount: number;
+}
 
 const fetchExpenses = (
   setChartData: React.Dispatch<React.SetStateAction<ChartData[]>>,
@@ -18,25 +23,37 @@ const fetchExpenses = (
     response.json().then((data) => {
       if (Array.isArray(data.transactions)) {
         const chartData = generateChartData(data.transactions);
+        console.log(chartData);
         setChartData(chartData);
       }
     });
   });
 };
 
+const formatDate = (date: string) =>
+  format(parse(date, "dd/MM/yyyy", new Date()), "MMM/yy");
+
 const generateChartData = (expenses: Expense[]): ChartData[] => {
   return expenses
     .reduce((acc: ChartData[], item) => {
-      const existingItem = acc.find((accItem) => accItem.date === item.date);
+      const formattedDate = formatDate(item.date.toString());
+      const existingItem = acc.find(
+        (accItem) => accItem.month === formattedDate,
+      );
       const amount = parseFloat(item.amount);
       if (existingItem) {
         existingItem.amount += amount;
       } else {
-        acc.push({ date: item.date, amount });
+        acc.push({ month: formattedDate, amount });
       }
       return acc;
     }, [])
-    .sort((a, b) => compareAsc(parseDate(a.date), parseDate(b.date)))
+    .sort((a, b) =>
+      compareAsc(
+        parse(a.month, "MMM/yyyy", new Date()),
+        parse(b.month, "MMM/yyyy", new Date()),
+      ),
+    )
     .map((item) => ({
       ...item,
       amount: parseFloat(item.amount.toFixed(2)),
@@ -44,21 +61,13 @@ const generateChartData = (expenses: Expense[]): ChartData[] => {
 };
 
 const chartConfig = {
-  expense: {
+  desktop: {
     label: "Expenses",
     color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig;
 
-interface ChartData {
-  date: Date;
-  amount: number;
-}
-
-const parseDate = (dateStr: Date) =>
-  parse(dateStr.toString(), "dd/MM/yyyy", new Date());
-
-export function BarChartComponent() {
+export function LineChartComponent() {
   const [chartData, setChartData] = useState<ChartData[]>([]);
   useEffect(() => {
     fetchExpenses(setChartData);
@@ -67,31 +76,37 @@ export function BarChartComponent() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Daily Expense Chart</CardTitle>
+        <CardTitle>Monthly Expense Chart</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-          <BarChart accessibilityLayer data={chartData}>
+          <LineChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="date"
+              dataKey="month"
               tickLine={false}
-              tickMargin={10}
               axisLine={false}
-              tickFormatter={(date) => format(parseDate(date), "d/MMM")}
+              tickMargin={8}
+              interval={0}
+              tickFormatter={(value) => value}
+              padding={{ left: 15, right: 15 }}
             />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <Bar dataKey="amount" fill="var(--color-expense)" radius={8}>
-              <LabelList
-                position="top"
-                offset={12}
-                className="fill-foreground"
-                fontSize={12}
-              />
-            </Bar>
-          </BarChart>
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Line
+              dataKey="amount"
+              type="monotone"
+              stroke="var(--color-desktop)"
+              strokeWidth={2}
+              dot={false}
+            />
+          </LineChart>
         </ChartContainer>
       </CardContent>
     </Card>
   );
 }
+
+//TODO: Add a line for each type to display monthly expenses

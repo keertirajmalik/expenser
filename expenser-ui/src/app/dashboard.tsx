@@ -1,4 +1,5 @@
 import { BarChartComponent } from "@/components/chart/bar-chart";
+import { LineChartComponent } from "@/components/chart/line-chart";
 import { PieChartComponent } from "@/components/chart/pie-chart";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -25,6 +26,7 @@ export default function Dashboard() {
       >
         <BarChartComponent />
         <PieChartComponent />
+        <LineChartComponent />
       </main>
     </div>
   );
