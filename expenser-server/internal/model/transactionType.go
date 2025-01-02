@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -25,6 +26,7 @@ type ResponseTransactionType struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	User        string    `json:"user"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 const (
@@ -46,7 +48,23 @@ func (d Config) GetTransactionTypesFromDB(ctx context.Context, userId uuid.UUID)
 		return []ResponseTransactionType{}, err
 	}
 
-	return convertDBTransactionTypesToTransactionTypes(d, ctx, dbTransactionTypes), nil
+	transactionTypes := []ResponseTransactionType{}
+
+	for _, transactionType := range dbTransactionTypes {
+		descriptionValue := ""
+		if transactionType.Description != nil {
+			descriptionValue = *transactionType.Description
+		}
+		transactionTypes = append(transactionTypes, ResponseTransactionType{
+			ID:          transactionType.ID,
+			Name:        transactionType.Name,
+			Description: descriptionValue,
+			User:        transactionType.User,
+			CreatedAt:   transactionType.CreatedAt.Time,
+		})
+	}
+
+	return transactionTypes, nil
 }
 
 func (d Config) GetTransactionTypeByIdFromDB(ctx context.Context, id, userId uuid.UUID) (ResponseTransactionType, error) {
@@ -56,31 +74,18 @@ func (d Config) GetTransactionTypeByIdFromDB(ctx context.Context, id, userId uui
 		return ResponseTransactionType{}, err
 	}
 
-	return convertDBTransactionTypesToTransactionTypes(d, ctx, []repository.TransactionType{dbTransactionType})[0], nil
-}
-
-func convertDBTransactionTypesToTransactionTypes(config Config, ctx context.Context, dbTransactions []repository.TransactionType) []ResponseTransactionType {
-	transactionTypes := []ResponseTransactionType{}
-
-	for _, transactionType := range dbTransactions {
-		descriptionValue := ""
-		if transactionType.Description != nil {
-			descriptionValue = *transactionType.Description
-		}
-		user, err := config.Queries.GetUserById(ctx, transactionType.UserID)
-		if err != nil {
-			log.Printf("Couldn't get user from DB: %v", err)
-			return []ResponseTransactionType{}
-		}
-		transactionTypes = append(transactionTypes, ResponseTransactionType{
-			ID:          transactionType.ID,
-			Name:        transactionType.Name,
-			Description: descriptionValue,
-			User:        user.Username,
-		})
+	descriptionValue := ""
+	if dbTransactionType.Description != nil {
+		descriptionValue = *dbTransactionType.Description
 	}
-
-	return transactionTypes
+	transactionType := ResponseTransactionType{
+		ID:          dbTransactionType.ID,
+		Name:        dbTransactionType.Name,
+		Description: descriptionValue,
+		User:        dbTransactionType.User,
+		CreatedAt:   dbTransactionType.CreatedAt.Time,
+	}
+	return transactionType, nil
 }
 
 func (d Config) AddTransactionTypeData(ctx context.Context, transactionType TransactionType) (ResponseTransactionType, error) {
@@ -100,9 +105,19 @@ func (d Config) AddTransactionTypeData(ctx context.Context, transactionType Tran
 		return ResponseTransactionType{}, err
 	}
 
-	transactionTypes := convertDBTransactionTypesToTransactionTypes(d, ctx, []repository.TransactionType{dbTransactionType})
+	descriptionValue := ""
+	if dbTransactionType.Description != nil {
+		descriptionValue = *dbTransactionType.Description
+	}
 
-	return transactionTypes[0], nil
+	transactionTypeResponse := ResponseTransactionType{
+		ID:          dbTransactionType.ID,
+		Name:        dbTransactionType.Name,
+		Description: descriptionValue,
+		User:        dbTransactionType.User,
+		CreatedAt:   dbTransactionType.CreatedAt.Time,
+	}
+	return transactionTypeResponse, nil
 }
 
 func (d Config) DeleteTransactionTypeFromDB(ctx context.Context, id, userID uuid.UUID) error {
@@ -141,7 +156,17 @@ func (d Config) UpdateTransactionTypeInDB(ctx context.Context, transactionType T
 		return ResponseTransactionType{}, err
 	}
 
-	transactionTypes := convertDBTransactionTypesToTransactionTypes(d, ctx, []repository.TransactionType{dbTransactionType})
+	descriptionValue := ""
+	if dbTransactionType.Description != nil {
+		descriptionValue = *dbTransactionType.Description
+	}
 
-	return transactionTypes[0], nil
+	transactionTypeResponse := ResponseTransactionType{
+		ID:          dbTransactionType.ID,
+		Name:        dbTransactionType.Name,
+		Description: descriptionValue,
+		User:        dbTransactionType.User,
+		CreatedAt:   dbTransactionType.CreatedAt.Time,
+	}
+	return transactionTypeResponse, nil
 }
