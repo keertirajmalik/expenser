@@ -84,7 +84,7 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 	}
 
 	type response struct {
-		Transaction model.InputTransaction `json:"transaction"`
+		Transaction model.ResponseTransaction `json:"transaction"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -117,13 +117,13 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 			Date:            params.Date,
 			UserID:          userID,
 		}
-		err = data.UpdateTransactionInDB(r.Context(), transaction)
+		dbTransaction, err := data.UpdateTransactionInDB(r.Context(), transaction)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		respondWithJson(w, http.StatusOK, response{
-			Transaction: transaction,
+			Transaction: dbTransaction,
 		})
 	}
 }

@@ -14,9 +14,23 @@ import (
 )
 
 const createTransaction = `-- name: CreateTransaction :one
-INSERT INTO transactions(id, name, amount, type, date, note, user_id)
-VALUES ($1, $2, $3, $4,$5, $6, $7)
-RETURNING id, name, amount, type, date, note, user_id, created_at, updated_at
+WITH inserted AS (
+    INSERT INTO transactions(id, name, amount, type, date, note, user_id)
+    VALUES ($1, $2, $3, $4,$5, $6, $7)
+    RETURNING id, name, amount, type, date, note, user_id, created_at, updated_at
+)
+SELECT inserted.id,
+    inserted."name",
+    inserted.amount,
+    transaction_types."name" AS type,
+    inserted."date",
+    inserted.note,
+    users."name" AS user,
+    inserted.created_at,
+    inserted.updated_at
+FROM inserted
+INNER JOIN users ON inserted.user_id = users.id
+INNER JOIN transaction_types ON inserted."type" = transaction_types.id
 `
 
 type CreateTransactionParams struct {
@@ -29,7 +43,19 @@ type CreateTransactionParams struct {
 	UserID uuid.UUID      `json:"user_id"`
 }
 
-func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
+type CreateTransactionRow struct {
+	ID        uuid.UUID          `json:"id"`
+	Name      string             `json:"name"`
+	Amount    pgtype.Numeric     `json:"amount"`
+	Type      string             `json:"type"`
+	Date      pgtype.Date        `json:"date"`
+	Note      *string            `json:"note"`
+	User      string             `json:"user"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (CreateTransactionRow, error) {
 	row := q.db.QueryRow(ctx, createTransaction,
 		arg.ID,
 		arg.Name,
@@ -39,7 +65,7 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 		arg.Note,
 		arg.UserID,
 	)
-	var i Transaction
+	var i CreateTransactionRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -47,7 +73,7 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 		&i.Type,
 		&i.Date,
 		&i.Note,
-		&i.UserID,
+		&i.User,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -68,18 +94,43 @@ func (q *Queries) DeleteTransaction(ctx context.Context, arg DeleteTransactionPa
 }
 
 const getTransaction = `-- name: GetTransaction :many
-SELECT id, name, amount, type, date, note, user_id, created_at, updated_at from transactions where user_id=$1
+SELECT transactions.id,
+transactions."name",
+    transactions.amount,
+    transaction_types."name" AS type,
+    transactions."date",
+    transactions.note,
+    users."name" AS user,
+    transactions.created_at,
+    transactions.updated_at
+FROM transactions
+INNER JOIN users ON transactions.user_id = users.id
+INNER JOIN transaction_types ON transactions."type"  = transaction_types.id
+WHERE transactions.user_id=$1
+ORDER BY transactions.created_at DESC
 `
 
-func (q *Queries) GetTransaction(ctx context.Context, userID uuid.UUID) ([]Transaction, error) {
+type GetTransactionRow struct {
+	ID        uuid.UUID          `json:"id"`
+	Name      string             `json:"name"`
+	Amount    pgtype.Numeric     `json:"amount"`
+	Type      string             `json:"type"`
+	Date      pgtype.Date        `json:"date"`
+	Note      *string            `json:"note"`
+	User      string             `json:"user"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+func (q *Queries) GetTransaction(ctx context.Context, userID uuid.UUID) ([]GetTransactionRow, error) {
 	rows, err := q.db.Query(ctx, getTransaction, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Transaction
+	var items []GetTransactionRow
 	for rows.Next() {
-		var i Transaction
+		var i GetTransactionRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -87,7 +138,7 @@ func (q *Queries) GetTransaction(ctx context.Context, userID uuid.UUID) ([]Trans
 			&i.Type,
 			&i.Date,
 			&i.Note,
-			&i.UserID,
+			&i.User,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -102,14 +153,28 @@ func (q *Queries) GetTransaction(ctx context.Context, userID uuid.UUID) ([]Trans
 }
 
 const updateTransaction = `-- name: UpdateTransaction :one
-UPDATE transactions
-SET name = $2,
-    amount = $3,
-    type =  $4,
-    date = $5,
-    note = $6
-WHERE id = $1 AND user_id=$7
-RETURNING id, name, amount, type, date, note, user_id, created_at, updated_at
+WITH updated AS (
+    UPDATE transactions
+    SET name = $2,
+        amount = $3,
+        type =  $4,
+        date = $5,
+        note = $6
+    WHERE transactions.id = $1 AND transactions.user_id=$7
+    RETURNING id, name, amount, type, date, note, user_id, created_at, updated_at
+)
+SELECT updated.id,
+    updated."name",
+    updated.amount,
+    transaction_types."name" AS type,
+    updated."date",
+    updated.note,
+    users."name" AS user,
+    updated.created_at,
+    updated.updated_at
+FROM updated
+INNER JOIN users ON updated.user_id = users.id
+INNER JOIN transaction_types ON updated."type" = transaction_types.id
 `
 
 type UpdateTransactionParams struct {
@@ -122,7 +187,19 @@ type UpdateTransactionParams struct {
 	UserID uuid.UUID      `json:"user_id"`
 }
 
-func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) (Transaction, error) {
+type UpdateTransactionRow struct {
+	ID        uuid.UUID          `json:"id"`
+	Name      string             `json:"name"`
+	Amount    pgtype.Numeric     `json:"amount"`
+	Type      string             `json:"type"`
+	Date      pgtype.Date        `json:"date"`
+	Note      *string            `json:"note"`
+	User      string             `json:"user"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionParams) (UpdateTransactionRow, error) {
 	row := q.db.QueryRow(ctx, updateTransaction,
 		arg.ID,
 		arg.Name,
@@ -132,7 +209,7 @@ func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionPa
 		arg.Note,
 		arg.UserID,
 	)
-	var i Transaction
+	var i UpdateTransactionRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
@@ -140,7 +217,7 @@ func (q *Queries) UpdateTransaction(ctx context.Context, arg UpdateTransactionPa
 		&i.Type,
 		&i.Date,
 		&i.Note,
-		&i.UserID,
+		&i.User,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
