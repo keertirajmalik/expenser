@@ -4,12 +4,11 @@ Expenser is an expense tracking application designed to help users manage their 
 
 ## Features
 
+- **Easy Expense Tracking:** Quickly add, edit, or remove expenses with just a few clicks.
+- **Categorized Expenses:** Group expenses into categories (like Food, Transportation, Shopping) for better organization.
+- **Analytics & Reports:** View summaries, charts, and expense patterns to analyze your spending habits.
+- **Secure Storage:** Data is securely stored so you can track your expenses over time.
 - **User Authentication**: Secure login and registration using JWT tokens.
-- **Transaction Management**: Create, read, update, and delete transactions.
-- **Transaction Types**: Categorize transactions with custom types.
-- **Responsive UI**: A modern and responsive interface using Material-UI components.
-- **RESTful API**: Structured API endpoints for seamless frontend-backend communication.
-- **Database Integration**: Persistent data storage with PostgreSQL.
 
 ## Technologies Used
 
@@ -29,7 +28,7 @@ Expenser is an expense tracking application designed to help users manage their 
 - React 18
 - TypeScript
 - Vite
-- Material-UI
+- Shadcn/ui
 - React Router
 - ESLint and Prettier for code styling
 - Context API for state management
@@ -38,9 +37,9 @@ Expenser is an expense tracking application designed to help users manage their 
 
 ### Prerequisites
 
-- Go 1.22 or higher installed
-- Node.js and npm installed
-- PostgreSQL database setup
+- [Go](https://golang.org/dl/)
+- [Node.js](https://nodejs.org/en/download/)
+- [Docker](https://www.docker.com/products/docker-desktop)
 
 ### Backend Setup
 
@@ -48,10 +47,15 @@ Expenser is an expense tracking application designed to help users manage their 
 
    ```bash
    git clone https://github.com/keertirajmalik/expenser.git
-   cd expenser/expenser-server
    ```
 
-2. **Set Up Environment Variables**
+2. **Navigate to the Backend Directory**
+
+   ```bash
+   cd expenser-server
+   ```
+
+3. **Set Up Environment Variables**
 
    Create a `.env` file in the `expenser-server` directory:
 
@@ -61,31 +65,34 @@ Expenser is an expense tracking application designed to help users manage their 
 
    Add the following variables to `.env`:
 
-   ```
+   ```env
    PORT=8080
    DB_URL=postgresql://<username>:<password>@localhost:5432/<database_name>?sslmode=disable
    JWT_SECRET=<your_jwt_secret_key>
+   DB_USERNAME=<username>
+   DB_PASSWORD=<password>
+   DB_DATABASE=<database_name>
    ```
 
-3. **Install Dependencies**
+4. **Install Dependencies**
 
    ```bash
    go mod tidy
    ```
 
-4. **Run Database Migrations**
+5. **Run Database Migrations**
 
    ```bash
    # Using psql
    psql -U <username> -d <database_name> -f db/schema/001_init.sql
 
-   # Or using a migration tool like golang-migrate
-   migrate -database "${DB_URL}" -path db/schema up
+   # Or using a migration tool like goose
+   goose postgres "user=${DB_USERNAME} dbname=${DB_DATABASE} sslmode=disable host=localhost password=${DB_PASSWORD}" -dir database/schema up
    ```
 
   Note: Ensure your database user has sufficient privileges to create tables and indexes.
 
-5. **Start the Server**
+6. **Start the Server**
 
    ```bash
    go run main.go
@@ -98,7 +105,7 @@ Expenser is an expense tracking application designed to help users manage their 
 1. **Navigate to the Frontend Directory**
 
    ```bash
-   cd ../expenser-ui
+   cd expenser-ui
    ```
 
 2. **Install Dependencies**
@@ -117,7 +124,7 @@ Expenser is an expense tracking application designed to help users manage their 
 
    Add the following variable to `.env`:
 
-   ```
+   ```env
    VITE_APP_DEV_BACKEND_URL=http://localhost:8080
    ```
 
@@ -132,8 +139,7 @@ Expenser is an expense tracking application designed to help users manage their 
 ## Usage
 
 1. **Access the Application**
-
-   Open your web browser and navigate to `http://localhost:3000`.
+   Once the development server is running, open `http://localhost:3000` in your browser to view the application.
 
 2. **Register a New Account**
 
@@ -145,29 +151,42 @@ Expenser is an expense tracking application designed to help users manage their 
 
 4. **Manage Transactions**
 
-   - Add new transactions.
+   - Click on "Add Expense" and fill in details like amount, description, and category.
    - View your transaction history.
    - Update or delete existing transactions.
-   - Create and manage transaction types.
+
+5. **Manage Categories**
+
+   - Create expense categories according to your needs.
+   - View your expense categories.
+   - Update or delete existing expense categories.
+
+6. **View Reports**
+
+   Navigate to the "Dashboard" section to get an overview of your expenses by category or date range
 
 ## Project Structure
 
-```
+```doc
 expenser/
 ├── expenser-server/       # Backend server code
-│   ├── db/                # Database configurations and queries
-│   ├── handler/           # HTTP handler functions
+│   ├── auth/              # Authentication logic
+│   ├── database/          # Database configurations and queries
 │   ├── internal/          # Internal packages (auth, database models)
+│   │   ├── handler/       # routes handlers
+│   │   ├── model/         # Data models
+│   │   ├── repository/    # DB related code
+│   │   └── server/        # server configuration
 │   ├── middleware/        # Middleware functions
-│   ├── model/             # Data models and configurations
 │   └── main.go            # Entry point of the backend server
 └── expenser-ui/           # Frontend client code
     ├── src/
-    │   ├── component/     # React components
-    │   ├── modal/         # Modal components
+    │   ├── app/           # Application pages
+    │   ├── components/    # React components
+    │   ├── hooks/         # Hooks
+    │   ├── lib/           # utils
     │   ├── providers/     # Context providers
     │   └── types/         # Type definitions
-    ├── public/            # Static assets
     ├── tsconfig.json      # TypeScript configuration
     └── vite.config.ts     # Vite configuration
 ```
@@ -188,5 +207,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Keertiraj Malik - [@keertiraj_malik](https://x.com/keertiraj_malik) - keertirajmalik@icloud.com
+Keertiraj Malik - [@keertiraj_malik](https://x.com/keertiraj_malik) - <keertirajmalik@icloud.com>
 Project Link: [https://github.com/keertirajmalik/expenser](https://github.com/keertirajmalik/expenser)
+
+Thank you for using Expenser! If you have any questions or suggestions, feel free to open an issue or contact the maintainers of the project.
