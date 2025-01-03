@@ -50,3 +50,34 @@ func HandleUserCreate(data model.Config) http.HandlerFunc {
 	}
 
 }
+
+func HandleUserUpdate(data model.Config) http.HandlerFunc {
+	type parameters struct {
+		Name string `json:"name"`
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value("userID").(uuid.UUID)
+
+		decoder := json.NewDecoder(r.Body)
+		decoder.DisallowUnknownFields()
+		params := parameters{}
+		err := decoder.Decode(&params)
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
+			return
+		}
+
+		user, err := data.UpdateUserInDB(r.Context(), model.User{ID: userID, Name: params.Name})
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		respondWithJson(w, http.StatusOK, model.User{
+			ID:       user.ID,
+			Username: user.Username,
+			Name:     user.Name,
+		})
+	}
+
+}

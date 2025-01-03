@@ -23,7 +23,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.Contains(r.URL.Path, "login") || strings.Contains(r.URL.Path, "user") {
+		if strings.Contains(r.URL.Path, "login") || (strings.Contains(r.URL.Path, "user") && r.Method == "POST") {
 			next.ServeHTTP(w, r)
 			return
 		}

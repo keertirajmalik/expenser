@@ -61,15 +61,6 @@ func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (U
 	return user[0], nil
 }
 
-func userExist(users []repository.User, newUser User) bool {
-	for _, user := range users {
-		if user.Username == newUser.Username {
-			return true
-		}
-	}
-	return false
-}
-
 func convertDBUserToUser(dbUsers []repository.User) []User {
 	users := []User{}
 
@@ -83,4 +74,24 @@ func convertDBUserToUser(dbUsers []repository.User) []User {
 	}
 
 	return users
+}
+
+func (d Config) UpdateUserInDB(ctx context.Context, user User) (User, error) {
+	dbUser, err := d.Queries.UpdateUser(ctx, repository.UpdateUserParams{
+		ID:             user.ID,
+		Name:           user.Name,
+	})
+
+	if err != nil {
+		log.Printf("Failed to update user in DB: %v", err)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
+			return User{}, &database.ErrDuplicateData{Column: user.Username}
+		}
+		return User{}, err
+	}
+
+	users := convertDBUserToUser([]repository.User{dbUser})
+
+	return users[0], nil
 }

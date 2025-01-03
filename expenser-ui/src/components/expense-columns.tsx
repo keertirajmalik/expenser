@@ -19,8 +19,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/apiRequest";
+import { showToast } from "@/lib/showToast";
 import { Expense } from "@/types/expense";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { format, parse } from "date-fns";
@@ -72,22 +72,8 @@ export const columns: ColumnDef<Expense>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const toast = useToast();
-
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [alertDialogOpen, setAlertDialogOpen] = useState(false);
-
-      const showToast = (
-        title: string,
-        description: string,
-        variant?: "default" | "destructive" | null | undefined,
-      ) => {
-        toast.toast({
-          title: title,
-          description: description,
-          variant: variant,
-        });
-      };
 
       function onSubmit(data: z.infer<typeof ExpenseFormSchema>): void {
         const expenseData = {

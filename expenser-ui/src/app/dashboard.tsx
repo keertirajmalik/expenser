@@ -14,8 +14,6 @@ const fetchExpenses = (
   apiRequest("/cxf/transaction", "GET").then((response) => {
     response.json().then((data) => {
       if (Array.isArray(data.transactions)) {
-        //sort basedon the date
-
         setExpenses(data.transactions);
       }
     });
