@@ -4,12 +4,11 @@ Expenser is an expense tracking application designed to help users manage their 
 
 ## Features
 
+- **Easy Expense Tracking:** Quickly add, edit, or remove expenses with just a few clicks.
+- **Categorized Expenses:** Group expenses into categories (like Food, Transportation, Shopping) for better organization.
+- **Analytics & Reports:** View summaries, charts, and expense patterns to analyze your spending habits.
+- **Secure Storage:** Data is securely stored so you can track your expenses over time.
 - **User Authentication**: Secure login and registration using JWT tokens.
-- **Transaction Management**: Create, read, update, and delete transactions.
-- **Transaction Types**: Categorize transactions with custom types.
-- **Responsive UI**: A modern and responsive interface using Material-UI components.
-- **RESTful API**: Structured API endpoints for seamless frontend-backend communication.
-- **Database Integration**: Persistent data storage with PostgreSQL.
 
 ## Technologies Used
 
@@ -48,10 +47,13 @@ Expenser is an expense tracking application designed to help users manage their 
 
    ```bash
    git clone https://github.com/keertirajmalik/expenser.git
-   cd expenser/expenser-server
+   ```
+2. **Navigate to the Backend Directory**
+   ```bash
+   cd expenser-server
    ```
 
-2. **Set Up Environment Variables**
+3. **Set Up Environment Variables**
 
    Create a `.env` file in the `expenser-server` directory:
 
@@ -67,25 +69,25 @@ Expenser is an expense tracking application designed to help users manage their 
    JWT_SECRET=<your_jwt_secret_key>
    ```
 
-3. **Install Dependencies**
+4. **Install Dependencies**
 
    ```bash
    go mod tidy
    ```
 
-4. **Run Database Migrations**
+5. **Run Database Migrations**
 
    ```bash
    # Using psql
    psql -U <username> -d <database_name> -f db/schema/001_init.sql
 
    # Or using a migration tool like golang-migrate
-   migrate -database "${DB_URL}" -path db/schema up
+   @goose postgres "user=${DB_USERNAME} dbname=${DB_DATABASE} sslmode=disable host=localhost password=${DB_PASSWORD}" -dir database/schema up
    ```
 
   Note: Ensure your database user has sufficient privileges to create tables and indexes.
 
-5. **Start the Server**
+6. **Start the Server**
 
    ```bash
    go run main.go
@@ -98,7 +100,7 @@ Expenser is an expense tracking application designed to help users manage their 
 1. **Navigate to the Frontend Directory**
 
    ```bash
-   cd ../expenser-ui
+   cd expenser-ui
    ```
 
 2. **Install Dependencies**
@@ -132,23 +134,32 @@ Expenser is an expense tracking application designed to help users manage their 
 ## Usage
 
 1. **Access the Application**
+   Once the development server is running, open http://localhost:3000 in your browser to view the application.
 
-   Open your web browser and navigate to `http://localhost:3000`.
-
-2. **Register a New Account**
+3. **Register a New Account**
 
    Click on the signup link and create a new user account.
 
-3. **Login**
+4. **Login**
 
    Use your credentials to log in to the application.
 
-4. **Manage Transactions**
+5. **Manage Transactions**
 
-   - Add new transactions.
+   - Click on "Add Expense" and fill in details like amount, description, and category.
    - View your transaction history.
    - Update or delete existing transactions.
-   - Create and manage transaction types.
+
+6. **Manage Categories**
+
+   - Create expense categories according to your needs.
+   - View your expense categories.
+   - Update or delete existing expense categories.
+
+8. **View Reports**
+
+   Navigate to the "Reports" section to get an overview of your expenses by category or date range
+
 
 ## Project Structure
 
@@ -190,3 +201,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Keertiraj Malik - [@keertiraj_malik](https://x.com/keertiraj_malik) - keertirajmalik@icloud.com
 Project Link: [https://github.com/keertirajmalik/expenser](https://github.com/keertirajmalik/expenser)
+
+Thank you for using Expenser! If you have any questions or suggestions, feel free to open an issue or contact the maintainers of the project.
