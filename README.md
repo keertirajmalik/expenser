@@ -86,8 +86,8 @@ Expenser is an expense tracking application designed to help users manage their 
    # Using psql
    psql -U <username> -d <database_name> -f db/schema/001_init.sql
 
-   # Or using a migration tool like golang-migrate
-   @goose postgres "user=${DB_USERNAME} dbname=${DB_DATABASE} sslmode=disable host=localhost password=${DB_PASSWORD}" -dir database/schema up
+   # Or using a migration tool like goose
+   goose postgres "user=${DB_USERNAME} dbname=${DB_DATABASE} sslmode=disable host=localhost password=${DB_PASSWORD}" -dir database/schema up
    ```
 
   Note: Ensure your database user has sufficient privileges to create tables and indexes.
@@ -173,18 +173,18 @@ expenser/
 │   ├── auth/              # Authentication logic
 │   ├── database/          # Database configurations and queries
 │   ├── internal/          # Internal packages (auth, database models)
-|   |   ├── handler/       # routes handlers
-|   |   ├── model/         # Data models
-|   |   ├── repository/    # DB related code
-|   |   └── server/        # server configuration
+│   │   ├── handler/       # routes handlers
+│   │   ├── model/         # Data models
+│   │   ├── repository/    # DB related code
+│   │   └── server/        # server configuration
 │   ├── middleware/        # Middleware functions
 │   └── main.go            # Entry point of the backend server
 └── expenser-ui/           # Frontend client code
     ├── src/
-    |   ├── app/           # Application pages
+    │   ├── app/           # Application pages
     │   ├── components/    # React components
     │   ├── hooks/         # Hooks
-    |   ├── lib/           # utils
+    │   ├── lib/           # utils
     │   ├── providers/     # Context providers
     │   └── types/         # Type definitions
     ├── tsconfig.json      # TypeScript configuration
