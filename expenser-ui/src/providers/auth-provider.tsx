@@ -10,7 +10,12 @@ import { useLocation, useNavigate } from "react-router";
 
 interface AuthContextType {
   isLoggedIn: boolean;
-  handleLogin: (token: string, name: string, username: string) => void;
+  handleLogin: (
+    token: string,
+    name: string,
+    username: string,
+    profileImage: string,
+  ) => void;
   handleLogout: () => void;
 }
 
@@ -21,6 +26,7 @@ function clearLocalStorage() {
   localStorage.removeItem("expireAt");
   localStorage.removeItem("name");
   localStorage.removeItem("username");
+  localStorage.removeItem("profileImage");
 }
 
 export const AuthProvider = ({
@@ -32,7 +38,7 @@ export const AuthProvider = ({
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { setName, setUsername } = useUser();
+  const { setName, setUsername, setProfileImage } = useUser();
 
   useEffect(() => {
     if (location.pathname.startsWith("/auth")) {
@@ -50,14 +56,21 @@ export const AuthProvider = ({
     handleLogout();
   }, [navigate]);
 
-  const handleLogin = (token: string, name: string, username: string) => {
+  const handleLogin = (
+    token: string,
+    name: string,
+    username: string,
+    profileImage: string,
+  ) => {
     const expireAt = new Date(Date.now() + 1000 * 60 * 30).toString();
     localStorage.setItem("token", token);
     localStorage.setItem("expireAt", expireAt);
     localStorage.setItem("name", name);
     localStorage.setItem("username", username);
+    localStorage.setItem("profileImage", profileImage);
     setName(name);
     setUsername(username);
+    setProfileImage(profileImage);
     setIsLoggedIn(true);
     navigate("/");
   };

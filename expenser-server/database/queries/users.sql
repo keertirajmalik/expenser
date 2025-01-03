@@ -14,6 +14,7 @@ SELECT * FROM users WHERE id=$1;
 
 -- name: UpdateUser :one
 UPDATE users
-SET name = $2
+SET name = $2,
+    image = $3
 WHERE id = $1
 RETURNING *;

@@ -35,6 +35,7 @@ type User struct {
 	Name           string             `json:"name"`
 	Username       string             `json:"username"`
 	HashedPassword string             `json:"hashed_password"`
+	Image          *string            `json:"image"`
 	CreatedAt      pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
 }

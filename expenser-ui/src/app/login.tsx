@@ -42,7 +42,7 @@ function LoginForm() {
         return response.json();
       })
       .then((res) => {
-        handleLogin(res.token, res.name, res.username);
+        handleLogin(res.token, res.name, res.username, res.image);
       })
       .catch((error) => {
         setError(error.message);
