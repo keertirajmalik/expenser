@@ -1,0 +1,67 @@
+services:
+  frontend:
+    build:
+      context: ./expenser-ui
+      dockerfile: Dockerfile
+    container_name: expenser-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    environment:
+      - VITE_API_URL=${BACKEND_URL:-http://backend:8080}
+    depends_on:
+      - backend
+    networks:
+      - expenser-network
+
+  backend:
+    build:
+      context: ./expenser-server
+      dockerfile: Dockerfile
+    container_name: expenser-backend
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8080}:8080"
+    environment:
+      PORT: ${PORT}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      CORS_ORIGIN: ${FRONTEND_URL:-http://frontend:3000}
+      JWT_SECRET: ${JWT_SECRET}
+      DB_SCHEMA: ${DB_SCHEMA}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - expenser-network
+
+  db:
+    image: postgres:latest
+    container_name: expenser-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - psql_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}'"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    networks:
+      - expenser-network
+
+volumes:
+  psql_volume:
+
+networks:
+  expenser-network:
+    driver: bridge
