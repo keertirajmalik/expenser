@@ -83,7 +83,7 @@ func (d Config) UpdateUserInDB(ctx context.Context, user User) (User, error) {
 	})
 
 	if err != nil {
-		log.Printf("Failed to create user in DB: %v", err)
+		log.Printf("Failed to update user in DB: %v", err)
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
 			return User{}, &database.ErrDuplicateData{Column: user.Username}

@@ -61,7 +61,7 @@ func HandleUserUpdate(data model.Config) http.HandlerFunc {
 		decoder := json.NewDecoder(r.Body)
 		decoder.DisallowUnknownFields()
 		params := parameters{}
-        err := decoder.Decode(&params)
+		err := decoder.Decode(&params)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "Couldn't decode parameters")
 			return
