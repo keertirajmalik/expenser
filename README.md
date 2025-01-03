@@ -28,7 +28,7 @@ Expenser is an expense tracking application designed to help users manage their 
 - React 18
 - TypeScript
 - Vite
-- Material-UI
+- Shadcn/ui
 - React Router
 - ESLint and Prettier for code styling
 - Context API for state management
@@ -37,9 +37,9 @@ Expenser is an expense tracking application designed to help users manage their 
 
 ### Prerequisites
 
-- Go 1.22 or higher installed
-- Node.js and npm installed
-- PostgreSQL database setup
+- [Go](https://golang.org/dl/)
+- [Node.js](https://nodejs.org/en/download/)
+- [Docker](https://www.docker.com/products/docker-desktop)
 
 ### Backend Setup
 
@@ -48,7 +48,9 @@ Expenser is an expense tracking application designed to help users manage their 
    ```bash
    git clone https://github.com/keertirajmalik/expenser.git
    ```
+
 2. **Navigate to the Backend Directory**
+
    ```bash
    cd expenser-server
    ```
@@ -63,10 +65,13 @@ Expenser is an expense tracking application designed to help users manage their 
 
    Add the following variables to `.env`:
 
-   ```
+   ```env
    PORT=8080
    DB_URL=postgresql://<username>:<password>@localhost:5432/<database_name>?sslmode=disable
    JWT_SECRET=<your_jwt_secret_key>
+   DB_USERNAME=<username>
+   DB_PASSWORD=<password>
+   DB_DATABASE=<database_name>
    ```
 
 4. **Install Dependencies**
@@ -119,7 +124,7 @@ Expenser is an expense tracking application designed to help users manage their 
 
    Add the following variable to `.env`:
 
-   ```
+   ```env
    VITE_APP_DEV_BACKEND_URL=http://localhost:8080
    ```
 
@@ -134,51 +139,54 @@ Expenser is an expense tracking application designed to help users manage their 
 ## Usage
 
 1. **Access the Application**
-   Once the development server is running, open http://localhost:3000 in your browser to view the application.
+   Once the development server is running, open `http://localhost:3000` in your browser to view the application.
 
-3. **Register a New Account**
+2. **Register a New Account**
 
    Click on the signup link and create a new user account.
 
-4. **Login**
+3. **Login**
 
    Use your credentials to log in to the application.
 
-5. **Manage Transactions**
+4. **Manage Transactions**
 
    - Click on "Add Expense" and fill in details like amount, description, and category.
    - View your transaction history.
    - Update or delete existing transactions.
 
-6. **Manage Categories**
+5. **Manage Categories**
 
    - Create expense categories according to your needs.
    - View your expense categories.
    - Update or delete existing expense categories.
 
-8. **View Reports**
+6. **View Reports**
 
-   Navigate to the "Reports" section to get an overview of your expenses by category or date range
-
+   Navigate to the "Dashboard" section to get an overview of your expenses by category or date range
 
 ## Project Structure
 
-```
+```doc
 expenser/
 ├── expenser-server/       # Backend server code
-│   ├── db/                # Database configurations and queries
-│   ├── handler/           # HTTP handler functions
+│   ├── auth/              # Authentication logic
+│   ├── database/          # Database configurations and queries
 │   ├── internal/          # Internal packages (auth, database models)
+|   |   ├── handler/       # routes handlers
+|   |   ├── model/         # Data models
+|   |   ├── repository/    # DB related code
+|   |   └── server/        # server configuration
 │   ├── middleware/        # Middleware functions
-│   ├── model/             # Data models and configurations
 │   └── main.go            # Entry point of the backend server
 └── expenser-ui/           # Frontend client code
     ├── src/
-    │   ├── component/     # React components
-    │   ├── modal/         # Modal components
+    |   ├── app/           # Application pages
+    │   ├── components/    # React components
+    │   ├── hooks/         # Hooks
+    |   ├── lib/           # utils
     │   ├── providers/     # Context providers
     │   └── types/         # Type definitions
-    ├── public/            # Static assets
     ├── tsconfig.json      # TypeScript configuration
     └── vite.config.ts     # Vite configuration
 ```
@@ -199,7 +207,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Keertiraj Malik - [@keertiraj_malik](https://x.com/keertiraj_malik) - keertirajmalik@icloud.com
+Keertiraj Malik - [@keertiraj_malik](https://x.com/keertiraj_malik) - <keertirajmalik@icloud.com>
 Project Link: [https://github.com/keertirajmalik/expenser](https://github.com/keertirajmalik/expenser)
 
 Thank you for using Expenser! If you have any questions or suggestions, feel free to open an issue or contact the maintainers of the project.
