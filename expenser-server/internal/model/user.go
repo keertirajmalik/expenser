@@ -16,6 +16,7 @@ type User struct {
 	Name           string    `json:"name"`
 	Username       string    `json:"username"`
 	HashedPassword string    `json:"-"`
+	Image          string    `json:"image"`
 }
 
 func (d Config) GetUsersFromDB(ctx context.Context) ([]User, error) {
@@ -65,11 +66,16 @@ func convertDBUserToUser(dbUsers []repository.User) []User {
 	users := []User{}
 
 	for _, user := range dbUsers {
+		image := ""
+		if user.Image != nil {
+			image = *user.Image
+		}
 		users = append(users, User{
 			ID:             user.ID,
 			Name:           user.Name,
 			Username:       user.Username,
 			HashedPassword: user.HashedPassword,
+			Image:          image,
 		})
 	}
 
@@ -78,8 +84,9 @@ func convertDBUserToUser(dbUsers []repository.User) []User {
 
 func (d Config) UpdateUserInDB(ctx context.Context, user User) (User, error) {
 	dbUser, err := d.Queries.UpdateUser(ctx, repository.UpdateUserParams{
-		ID:             user.ID,
-		Name:           user.Name,
+		ID:    user.ID,
+		Name:  user.Name,
+		Image: &user.Image,
 	})
 
 	if err != nil {

@@ -19,6 +19,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 		Name     string `json:"name"`
 		Username string `json:"username"`
 		Token    string `json:"token"`
+		Image    string `json:"image"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +53,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 			Name:     user.Name,
 			Username: user.Username,
 			Token:    accessToken,
+			Image:    user.Image,
 		})
 	}
 

@@ -53,7 +53,8 @@ func HandleUserCreate(data model.Config) http.HandlerFunc {
 
 func HandleUserUpdate(data model.Config) http.HandlerFunc {
 	type parameters struct {
-		Name string `json:"name"`
+		Name  string `json:"name"`
+		Image string `json:"image"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value("userID").(uuid.UUID)
@@ -67,7 +68,11 @@ func HandleUserUpdate(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		user, err := data.UpdateUserInDB(r.Context(), model.User{ID: userID, Name: params.Name})
+		user, err := data.UpdateUserInDB(r.Context(), model.User{
+			ID:    userID,
+			Name:  params.Name,
+			Image: params.Image,
+		})
 
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -77,6 +82,7 @@ func HandleUserUpdate(data model.Config) http.HandlerFunc {
 			ID:       user.ID,
 			Username: user.Username,
 			Name:     user.Name,
+			Image:    user.Image,
 		})
 	}
 

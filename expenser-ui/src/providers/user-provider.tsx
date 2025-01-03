@@ -11,6 +11,8 @@ interface UserContextType {
   setName: (name: string) => void;
   username: string;
   setUsername: (username: string) => void;
+  profileImage: string;
+  setProfileImage: (profileImage: string) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -26,14 +28,27 @@ export const UserProvider = ({
   const [username, setUsername] = useState<string>(() => {
     return localStorage.getItem("username") || "";
   });
+  const [profileImage, setProfileImage] = useState<string>(() => {
+    return localStorage.getItem("profileImage") || "";
+  });
 
   useEffect(() => {
     localStorage.setItem("name", name);
     localStorage.setItem("username", username);
-  }, [name, username]);
+    localStorage.setItem("profileImage", profileImage);
+  }, [name, username, profileImage]);
 
   return (
-    <UserContext.Provider value={{ name, setName, username, setUsername }}>
+    <UserContext.Provider
+      value={{
+        name,
+        setName,
+        username,
+        setUsername,
+        profileImage,
+        setProfileImage,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
