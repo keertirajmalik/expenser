@@ -4,6 +4,7 @@ import {
 } from "@/components/create-dialog/expense-form";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
 import { DeleteDialog } from "@/components/data-table/row-action";
+import { badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,6 +27,7 @@ import { ColumnDef, Row } from "@tanstack/react-table";
 import { format, parse } from "date-fns";
 import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router";
 import { z } from "zod";
 
 export const columns: ColumnDef<Expense>[] = [
@@ -42,6 +44,13 @@ export const columns: ColumnDef<Expense>[] = [
     accessorKey: "type",
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Type" />;
+    },
+    cell: ({ row }) => {
+      return (
+        <Link className={badgeVariants({ variant: "default" })} to="/type">
+          {row.getValue("type")}
+        </Link>
+      );
     },
   },
   {
