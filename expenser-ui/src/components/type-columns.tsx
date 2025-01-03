@@ -20,9 +20,9 @@ import {
 import { useState } from "react";
 import { TypeForm, TypeFormSchema } from "@/components/create-dialog/type-form";
 import { apiRequest } from "@/lib/apiRequest";
-import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { DeleteDialog } from "@/components/data-table/row-action";
+import { showToast } from "@/lib/showToast";
 
 export const columns: ColumnDef<ExpenseType>[] = [
   {
@@ -41,21 +41,8 @@ export const columns: ColumnDef<ExpenseType>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const toast = useToast();
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [alertDialogOpen, setAlertDialogOpen] = useState(false);
-
-      const handleToast = (
-        title: string,
-        description: string,
-        variant?: "default" | "destructive" | null | undefined,
-      ) => {
-        toast.toast({
-          title: title,
-          description: description,
-          variant: variant,
-        });
-      };
 
       function onSubmit(data: z.infer<typeof TypeFormSchema>) {
         apiRequest(`/cxf/type/${row.original.id}`, "PUT", data)
@@ -65,13 +52,13 @@ export const columns: ColumnDef<ExpenseType>[] = [
               throw new Error(errorData.error);
             }
             setEditSheetOpen(false);
-            handleToast(
+            showToast(
               "Expense Type Updated",
               "Expense type updated successfully.",
             );
           })
           .catch((error: Error) =>
-            handleToast(
+            showToast(
               "Expense Type Update Failed",
               error.message,
               "destructive",
@@ -87,13 +74,13 @@ export const columns: ColumnDef<ExpenseType>[] = [
               throw new Error(errorData.error);
             }
             setAlertDialogOpen(false);
-            handleToast(
+            showToast(
               "Expense Type Deleted",
               "Expense type deleted successfully.",
             );
           })
           .catch((error: Error) =>
-            handleToast(
+            showToast(
               "Expense Type Delete Failed",
               error.message,
               "destructive",

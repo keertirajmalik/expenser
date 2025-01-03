@@ -16,6 +16,7 @@ func (s *Server) RegisterRoutes(config model.Config) http.Handler {
 	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(config))
 
 	mux.HandleFunc("POST /cxf/user", handler.HandleUserCreate(config))
+	mux.HandleFunc("PUT /cxf/user", handler.HandleUserUpdate(config))
 
 	mux.HandleFunc("GET /cxf/transaction", handler.HandleTransactionGet(config))
 	mux.HandleFunc("POST /cxf/transaction", handler.HandleTransactionCreate(config))
