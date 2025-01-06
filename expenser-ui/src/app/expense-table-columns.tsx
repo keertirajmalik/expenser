@@ -85,7 +85,11 @@ export const columns: ColumnDef<Expense>[] = [
         mutationFn: async (data: z.infer<typeof ExpenseFormSchema>) => {
           const expenseData = {
             ...data,
-            amount: parseFloat(data.amount),
+            amount: Number.isFinite(parseFloat(data.amount))
+              ? parseFloat(data.amount)
+              : (() => {
+                  throw new Error("Invalid amount format");
+                })(),
             date: format(data.date, "dd/MM/yyyy"),
           };
           const res = await apiRequest(

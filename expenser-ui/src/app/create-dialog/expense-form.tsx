@@ -92,7 +92,7 @@ export function ExpenseForm({ onSubmit, initialData }: ExpenseFormProps) {
         return;
       }
       const data = await res.json();
-      const transformedData = data.transaction_types.map(
+      const transformedData = data.map(
         (type: { id: string; name: string }) => ({
           label: type.name,
           value: type.id,
