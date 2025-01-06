@@ -170,7 +170,7 @@ function EditExpenseSheet(
     <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Edit Expese Details</SheetTitle>
+          <SheetTitle>Edit Expense Details</SheetTitle>
           <SheetDescription>
             Make changes to your expense here. Click submit when you're done.
           </SheetDescription>
