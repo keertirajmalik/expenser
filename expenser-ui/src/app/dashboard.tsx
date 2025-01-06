@@ -13,8 +13,8 @@ const fetchExpenses = (
 ) => {
   apiRequest("/cxf/transaction", "GET").then((response) => {
     response.json().then((data) => {
-      if (Array.isArray(data.transactions)) {
-        setExpenses(data.transactions);
+      if (Array.isArray(data)) {
+        setExpenses(data);
       }
     });
   });

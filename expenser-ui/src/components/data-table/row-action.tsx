@@ -13,16 +13,16 @@ import {
 interface DeleteDialogProps {
   deleteDialogOpen: boolean;
   setDeleteDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  deleteFunction: () => void;
+  onDeleteClick: () => void;
 }
 
 export const DeleteDialog: React.FC<DeleteDialogProps> = ({
-  deleteDialogOpen: deleteDialogOpen,
-  setDeleteDialogOpen: setAlertDialogOpen,
-  deleteFunction,
+  deleteDialogOpen,
+  setDeleteDialogOpen,
+  onDeleteClick,
 }) => {
   return (
-    <AlertDialog open={deleteDialogOpen} onOpenChange={setAlertDialogOpen}>
+    <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -32,10 +32,10 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setAlertDialogOpen(false)}>
+          <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction onClick={() => deleteFunction()}>
+          <AlertDialogAction onClick={() => onDeleteClick()}>
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -16,6 +16,7 @@ import {
 import { apiRequest } from "@/lib/apiRequest";
 import { showToast } from "@/lib/showToast";
 import { Expense } from "@/types/expense";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { format, parse } from "date-fns";
 import { Pencil, Trash } from "lucide-react";
@@ -78,41 +79,52 @@ export const columns: ColumnDef<Expense>[] = [
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-      function onSubmit(data: z.infer<typeof ExpenseFormSchema>): void {
-        const expenseData = {
-          ...data,
-          amount: parseFloat(data.amount),
-          date: format(data.date, "dd/MM/yyyy"),
-        };
+      const queryClient = useQueryClient();
 
-        apiRequest(`/cxf/transaction/${row.original.id}`, "PUT", expenseData)
-          .then(async (res: Response) => {
-            if (!res.ok) {
-              const errorData = await res.json();
-              throw new Error(errorData.error);
-            }
-            setEditSheetOpen(false);
-            showToast("Expense Updated", "Expense updated successfully.");
-          })
-          .catch((error: Error) =>
-            showToast("Expense Update Failed", error.message, "destructive"),
+      const editExpenseMutation = useMutation({
+        mutationFn: async (data: z.infer<typeof ExpenseFormSchema>) => {
+          const expenseData = {
+            ...data,
+            amount: Number.isFinite(parseFloat(data.amount))
+              ? parseFloat(data.amount)
+              : (() => {
+                  throw new Error("Invalid amount format");
+                })(),
+            date: format(data.date, "dd/MM/yyyy"),
+          };
+          const res = await apiRequest(
+            `/cxf/transaction/${row.original.id}`,
+            "PUT",
+            expenseData,
           );
-      }
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error);
+          }
+          setEditSheetOpen(false);
+          showToast("Expense Updated", "Expense updated successfully.");
+        },
+        onSettled: () =>
+          queryClient.invalidateQueries({ queryKey: ["expenses"] }),
+        onError: (error) => showToast("Expense Update Failed", error.message),
+      });
 
-      function deleteExpense() {
-        apiRequest(`/cxf/transaction/${row.original.id}`, "DELETE")
-          .then(async (res: Response) => {
-            if (!res.ok) {
-              const errorData = await res.json();
-              throw new Error(errorData.error);
-            }
-            setDeleteDialogOpen(false);
-            showToast("Expense Deleted", "Expense deleted successfully.");
-          })
-          .catch((error: Error) =>
-            showToast("Expense Delete Failed", error.message, "destructive"),
+      const deleteExpenseMutation = useMutation({
+        mutationFn: async () => {
+          const res = await apiRequest(
+            `/cxf/transaction/${row.original.id}`,
+            "DELETE",
           );
-      }
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error);
+          }
+          showToast("Expense Deleted", "Expense deleted successfully.");
+        },
+        onSettled: () =>
+          queryClient.invalidateQueries({ queryKey: ["expenses"] }),
+        onError: (error) => showToast("Expense Deletion Failed", error.message),
+      });
 
       return (
         <>
@@ -131,11 +143,16 @@ export const columns: ColumnDef<Expense>[] = [
               className="cursor-pointer"
             />
           </div>
-          {EditExpenseSheet(editSheetOpen, setEditSheetOpen, onSubmit, row)}
+          {EditExpenseSheet(
+            editSheetOpen,
+            setEditSheetOpen,
+            editExpenseMutation.mutate,
+            row,
+          )}
           <DeleteDialog
             setDeleteDialogOpen={setDeleteDialogOpen}
             deleteDialogOpen={deleteDialogOpen}
-            deleteFunction={deleteExpense}
+            onDeleteClick={deleteExpenseMutation.mutate}
           />
         </>
       );
@@ -153,7 +170,7 @@ function EditExpenseSheet(
     <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Edit Expese Details</SheetTitle>
+          <SheetTitle>Edit Expense Details</SheetTitle>
           <SheetDescription>
             Make changes to your expense here. Click submit when you're done.
           </SheetDescription>

@@ -2,39 +2,27 @@ import { DataTable } from "@/components/data-table/data-table";
 import { columns } from "@/app/type-table-columns";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { apiRequest } from "@/lib/apiRequest";
-import { ExpenseType as type } from "@/types/expenseType";
 import { Separator } from "@radix-ui/react-separator";
-import { useCallback, useEffect, useState } from "react";
 import { CreateDialog } from "@/app/create-dialog/create-dialog";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
+import { showToast } from "@/lib/showToast";
+import * as expenseType from "@/types/expenseType";
 
-function fetchExpenseTypes(
-  setExpenseTypes: React.Dispatch<React.SetStateAction<type[]>>,
-) {
-  apiRequest("/cxf/type", "GET").then((response) => {
-    response.json().then((data) => {
-      if (Array.isArray(data.transaction_types)) {
-        const transformedData = data.transaction_types.map((item: type) => {
-          return {
-            id: item.id,
-            name: item.name,
-            description: item.description,
-          };
-        });
-        setExpenseTypes(transformedData);
-      }
-    });
-  });
-}
 export default function ExpenseType() {
-  const [expenseTypes, setExpenseTypes] = useState<type[]>([]);
+  const { isPending, error, data } = useQuery({
+    queryKey: ["types"],
+    queryFn: async (): Promise<expenseType.ExpenseType[]> => {
+      return (await apiRequest("/cxf/type", "GET")).json();
+    },
+  });
 
-  const refreshExpenseTypes = useCallback(() => {
-    fetchExpenseTypes(setExpenseTypes);
-  }, []);
+  if (error) {
+    showToast("An error has occurred", error.message);
+    return null;
+  }
 
-  useEffect(() => {
-    refreshExpenseTypes();
-  }, [refreshExpenseTypes]);
+  if (isPending) return <Skeleton />;
 
   return (
     <div className="flex h-96 w-full flex-col">
@@ -58,14 +46,13 @@ export default function ExpenseType() {
           creationType="Type"
           title="Create Expense Type"
           description=" Provide information regarding expense type."
-          onSuccess={refreshExpenseTypes}
         />
       </header>
       <main
         className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4"
         role="main"
       >
-        <DataTable columns={columns} data={expenseTypes} />
+        <DataTable columns={columns} data={data} />
       </main>
     </div>
   );

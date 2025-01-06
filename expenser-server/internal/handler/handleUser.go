@@ -9,6 +9,30 @@ import (
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 )
 
+func HandleUserGet(data model.Config) http.HandlerFunc {
+	type response struct {
+		Name     string `json:"name"`
+		Username string `json:"username"`
+		Image    string `json:"image"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := r.Context().Value("userID").(uuid.UUID)
+
+		user, err := data.GetUserByUserIdFromDB(r.Context(), userID)
+		if err != nil {
+			respondWithError(w, http.StatusUnauthorized, err.Error())
+			return
+		}
+
+		respondWithJson(w, http.StatusOK, response{
+			Name:     user.Name,
+			Username: user.Username,
+			Image:    user.Image,
+		})
+	}
+
+}
 func HandleUserCreate(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Name     string `json:"name"`
