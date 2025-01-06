@@ -42,37 +42,37 @@ export const columns: ColumnDef<ExpenseType>[] = [
 
       const editTypeMutation = useMutation({
         mutationFn: async (data: z.infer<typeof TypeFormSchema>) => {
-          apiRequest(`/cxf/type/${row.original.id}`, "PUT", data)
-            .then(async (res: Response) => {
-              if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.error);
-              }
-              setEditSheetOpen(false);
-              queryClient.invalidateQueries({ queryKey: ["types"] });
-              showToast("Type Updated", "Type updated successfully.");
-            })
-            .catch((error: Error) => {
-              showToast("Type Update Failed", error.message, "destructive");
-            });
+          const res = await apiRequest(
+            `/cxf/type/${row.original.id}`,
+            "PUT",
+            data,
+          );
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error);
+          }
+          setEditSheetOpen(false);
+          showToast("Type Updated", "Type updated successfully.");
         },
+        onSettled: () => queryClient.invalidateQueries({ queryKey: ["types"] }),
+        onError: (error) => showToast("Type Update Failed", error.message),
       });
 
       const deleteTypeMutation = useMutation({
         mutationFn: async () => {
-          apiRequest(`/cxf/type/${row.original.id}`, "DELETE")
-            .then(async (res: Response) => {
-              if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.error);
-              }
-              queryClient.invalidateQueries({ queryKey: ["types"] });
-              showToast("Type Deleted", "Type deleted successfully.");
-            })
-            .catch((error: Error) => {
-              showToast("Type Deletion Failed", error.message, "destructive");
-            });
+          const res = await apiRequest(
+            `/cxf/type/${row.original.id}`,
+            "DELETE",
+          );
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error);
+          }
+          showToast("Type Deleted", "Type deleted successfully.");
         },
+        onSettled: () => queryClient.invalidateQueries({ queryKey: ["types"] }),
+        onError: (error) => showToast("Type Deletion Failed", error.message),
       });
 
       return (

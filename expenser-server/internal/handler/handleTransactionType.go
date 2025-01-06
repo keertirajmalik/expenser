@@ -10,10 +10,6 @@ import (
 )
 
 func HandleTransactionTypeGet(data model.Config) http.HandlerFunc {
-	type validResponse struct {
-		TransactionTypes []model.ResponseTransactionType `json:"transaction_types"`
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value("userID").(uuid.UUID)
 		transactionTypes, err := data.GetTransactionTypesFromDB(r.Context(), userID)
@@ -21,9 +17,7 @@ func HandleTransactionTypeGet(data model.Config) http.HandlerFunc {
 			respondWithError(w, http.StatusInternalServerError, "Failed to retrieve transaction types")
 			return
 		}
-		respondWithJson(w, http.StatusOK, validResponse{
-			TransactionTypes: transactionTypes,
-		})
+		respondWithJson(w, http.StatusOK, transactionTypes)
 	}
 }
 

@@ -3,9 +3,11 @@ package model
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/keertirajmalik/expenser/expenser-server/database"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
@@ -66,6 +68,9 @@ func (d Config) GetUserByUserIdFromDB(ctx context.Context, userId uuid.UUID) (Us
 	dbUser, err := d.Queries.GetUserById(ctx, userId)
 	if err != nil {
 		log.Printf("Failed to get user from DB - userId: %s, error: %v", userId, err)
+        if errors.Is(err, pgx.ErrNoRows) {
+			return User{}, fmt.Errorf("user not found")
+		}
 		return User{}, err
 	}
 

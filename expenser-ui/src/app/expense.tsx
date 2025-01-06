@@ -1,22 +1,29 @@
 import { CreateDialog } from "@/app/create-dialog/create-dialog";
-import { DataTable } from "@/components/data-table/data-table";
 import { columns } from "@/app/expense-table-columns";
+import { DataTable } from "@/components/data-table/data-table";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { apiRequest } from "@/lib/apiRequest";
+import { showToast } from "@/lib/showToast";
+import * as expense from "@/types/expense";
 import { Separator } from "@radix-ui/react-separator";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/apiRequest";
 
 export default function Expense() {
   const { isPending, error, data } = useQuery({
     queryKey: ["expenses"],
-    queryFn: async () => {
-      return (await apiRequest("/cxf/transaction", "GET")).json();
+    queryFn: async (): Promise<expense.Expense[]> => {
+      const res = await apiRequest("/cxf/transaction", "GET");
+      return res.json();
     },
   });
 
-  if (isPending) return "Loading...";
+  if (isPending) return <Skeleton />;
 
-  if (error) return "An error has occurred: " + error.message;
+  if (error) {
+    showToast("An error has occurred", error.message);
+    return null;
+  }
 
   return (
     <div className="flex h-96 w-full flex-col">
@@ -46,7 +53,7 @@ export default function Expense() {
         className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4"
         role="main"
       >
-        <DataTable columns={columns} data={data.transactions} />
+        <DataTable columns={columns} data={data} />
       </main>
     </div>
   );

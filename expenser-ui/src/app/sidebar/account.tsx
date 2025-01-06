@@ -55,28 +55,26 @@ export default function AccountPage({
   const handleButtonClick = () => {
     fileInputRef.current?.click();
   };
+
   const queryClient = useQueryClient();
 
   const editAccountMutation = useMutation({
     mutationFn: async (event: React.FormEvent) => {
       event.preventDefault();
-      apiRequest("/cxf/user", "PUT", {
+      const res = await apiRequest("/cxf/user", "PUT", {
         name: accountName,
         image: avatarSrc,
-      })
-        .then(async (res: Response) => {
-          if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error);
-          }
-          setOpen(false);
-          queryClient.invalidateQueries({ queryKey: ["user"] });
-          showToast("Account Updated", "Account updated successfully.");
-        })
-        .catch((error: Error) =>
-          showToast("Account Update Failed", error.message, "destructive"),
-        );
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error);
+      }
+      setOpen(false);
+      showToast("Account Updated", "Account updated successfully.");
     },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["user"] }),
+    onError: (error) => showToast("Account Update Failed", error.message),
   });
 
   return (

@@ -88,42 +88,38 @@ export const columns: ColumnDef<Expense>[] = [
             amount: parseFloat(data.amount),
             date: format(data.date, "dd/MM/yyyy"),
           };
-
-          apiRequest(`/cxf/transaction/${row.original.id}`, "PUT", expenseData)
-            .then(async (res: Response) => {
-              if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.error);
-              }
-              setEditSheetOpen(false);
-              queryClient.invalidateQueries({ queryKey: ["expenses"] });
-              showToast("Expense Updated", "Expense updated successfully.");
-            })
-            .catch((error: Error) => {
-              showToast("Expense Update Failed", error.message, "destructive");
-            });
+          const res = await apiRequest(
+            `/cxf/transaction/${row.original.id}`,
+            "PUT",
+            expenseData,
+          );
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error);
+          }
+          setEditSheetOpen(false);
+          showToast("Expense Updated", "Expense updated successfully.");
         },
+        onSettled: () =>
+          queryClient.invalidateQueries({ queryKey: ["expenses"] }),
+        onError: (error) => showToast("Expense Update Failed", error.message),
       });
 
       const deleteExpenseMutation = useMutation({
         mutationFn: async () => {
-          apiRequest(`/cxf/transaction/${row.original.id}`, "DELETE")
-            .then(async (res: Response) => {
-              if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(errorData.error);
-              }
-              queryClient.invalidateQueries({ queryKey: ["expenses"] });
-              showToast("Expense Deleted", "Expense deleted successfully.");
-            })
-            .catch((error: Error) => {
-              showToast(
-                "Expense Deletion Failed",
-                error.message,
-                "destructive",
-              );
-            });
+          const res = await apiRequest(
+            `/cxf/transaction/${row.original.id}`,
+            "DELETE",
+          );
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error);
+          }
+          showToast("Expense Deleted", "Expense deleted successfully.");
         },
+        onSettled: () =>
+          queryClient.invalidateQueries({ queryKey: ["expenses"] }),
+        onError: (error) => showToast("Expense Deletion Failed", error.message),
       });
 
       return (

@@ -43,37 +43,30 @@ export function CreateDialog({
         date: format(data.date, "dd/MM/yyyy"),
       };
 
-      apiRequest("/cxf/transaction", "POST", expenseData)
-        .then((res: Response) => {
-          if (!res.ok) {
-            throw new Error(`Failed to save expense: ${res.statusText}`);
-          }
-          setOpen(false);
-          showToast("Expense Created", "Expense created successfully.");
-          queryClient.invalidateQueries({ queryKey: ["expenses"] });
-        })
-        .catch((error: Error) => {
-          showToast("Expense Creation Failed", error.message, "destructive");
-        });
+      const res = await apiRequest("/cxf/transaction", "POST", expenseData);
+      if (!res.ok) {
+        throw new Error(`Failed to save expense: ${res.statusText}`);
+      }
+      setOpen(false);
+      showToast("Expense Created", "Expense created successfully.");
     },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["expenses"] }),
+    onError: (error: Error) =>
+      showToast("Expense Creation Failed", error.message),
   });
 
   const createTypeMutation = useMutation({
     mutationFn: async (data: z.infer<typeof TypeFormSchema>) => {
-      apiRequest("/cxf/type", "POST", data)
-        .then(async (res: Response) => {
-          if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error);
-          }
-          setOpen(false);
-          showToast("Expense Created", "Expense created successfully.");
-          queryClient.invalidateQueries({ queryKey: ["types"] });
-        })
-        .catch((error: Error) => {
-          showToast("Expense Creation Failed", error.message, "destructive");
-        });
+      const res = await apiRequest("/cxf/type", "POST", data);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error);
+      }
+      setOpen(false);
+      showToast("Type Created", "Type created successfully.");
     },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["types"] }),
+    onError: (error: Error) => showToast("Type Creation Failed", error.message),
   });
 
   return (

@@ -11,10 +11,6 @@ import (
 )
 
 func HandleTransactionGet(data model.Config) http.HandlerFunc {
-	type validResponse struct {
-		Transactions []model.ResponseTransaction `json:"transactions"`
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value("userID").(uuid.UUID)
 		transactions, err := data.GetTransactionsFromDB(r.Context(), userID)
@@ -23,9 +19,7 @@ func HandleTransactionGet(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		respondWithJson(w, http.StatusOK, validResponse{
-			Transactions: transactions,
-		})
+		respondWithJson(w, http.StatusOK, transactions)
 	}
 }
 

@@ -15,9 +15,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { apiRequest } from "@/lib/apiRequest";
+import { showToast } from "@/lib/showToast";
 import { generateAvatarName } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
+import { User } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from "lucide-react";
 import { useState } from "react";
@@ -29,14 +32,15 @@ export function NavUser() {
 
   const { isLoading, error, data } = useQuery({
     queryKey: ["user"],
-    queryFn: async () => {
-      return (await apiRequest("/cxf/user", "GET")).json();
+    queryFn: async (): Promise<User> => {
+      const res = await apiRequest("/cxf/user", "GET");
+      return res.json();
     },
   });
 
-  if (isLoading) return "Loading...";
+  if (isLoading) return <Skeleton />;
 
-  if (error) return "An error has occurred: " + error.message;
+  if (error) showToast("An error has occurred", error.message);
 
   return (
     <>
@@ -49,14 +53,14 @@ export function NavUser() {
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={data.image} alt={data.name} />
+                  <AvatarImage src={data?.image} alt={data?.name} />
                   <AvatarFallback className="rounded-lg">
-                    {generateAvatarName(data.name)}
+                    {generateAvatarName(data?.name ?? "")}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{data.name}</span>
-                  <span className="truncate text-xs">{data.username}</span>
+                  <span className="truncate font-semibold">{data?.name}</span>
+                  <span className="truncate text-xs">{data?.username}</span>
                 </div>
                 <ChevronsUpDown className="ml-auto size-4" />
               </SidebarMenuButton>
@@ -70,14 +74,14 @@ export function NavUser() {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={data.image} alt={data.name} />
+                    <AvatarImage src={data?.image} alt={data?.name} />
                     <AvatarFallback className="rounded-lg">
-                      {generateAvatarName(data.name)}
+                      {generateAvatarName(data?.name ?? "")}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{data.name}</span>
-                    <span className="truncate text-xs">{data.username}</span>
+                    <span className="truncate font-semibold">{data?.name}</span>
+                    <span className="truncate text-xs">{data?.username}</span>
                   </div>
                 </div>
               </DropdownMenuLabel>
@@ -107,9 +111,9 @@ export function NavUser() {
       <AccountPage
         open={accountOpen}
         setOpen={setAccountOpen}
-        name={data.name}
-        username={data.username}
-        profileImage={data.image}
+        name={data?.name ?? ""}
+        username={data?.username ?? ""}
+        profileImage={data?.image ?? ""}
       />
     </>
   );

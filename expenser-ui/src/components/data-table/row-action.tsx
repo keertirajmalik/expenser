@@ -17,12 +17,12 @@ interface DeleteDialogProps {
 }
 
 export const DeleteDialog: React.FC<DeleteDialogProps> = ({
-  deleteDialogOpen: deleteDialogOpen,
-  setDeleteDialogOpen: setAlertDialogOpen,
-  onDeleteClick: onDeleteClick,
+  deleteDialogOpen,
+  setDeleteDialogOpen,
+  onDeleteClick,
 }) => {
   return (
-    <AlertDialog open={deleteDialogOpen} onOpenChange={setAlertDialogOpen}>
+    <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -32,7 +32,7 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setAlertDialogOpen(false)}>
+          <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
             Cancel
           </AlertDialogCancel>
           <AlertDialogAction onClick={() => onDeleteClick()}>
