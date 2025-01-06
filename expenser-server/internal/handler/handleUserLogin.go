@@ -53,7 +53,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 			Name:     user.Name,
 			Username: user.Username,
 			Token:    accessToken,
-			Image:    user.Image,
+            Image: user.Image,
 		})
 	}
 

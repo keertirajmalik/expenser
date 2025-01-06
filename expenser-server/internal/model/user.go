@@ -62,6 +62,17 @@ func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (U
 	return user[0], nil
 }
 
+func (d Config) GetUserByUserIdFromDB(ctx context.Context, userId uuid.UUID) (User, error) {
+	dbUser, err := d.Queries.GetUserById(ctx, userId)
+	if err != nil {
+		log.Printf("Failed to get user from DB - userId: %s, error: %v", userId, err)
+		return User{}, err
+	}
+
+	user := convertDBUserToUser([]repository.User{dbUser})
+	return user[0], nil
+}
+
 func convertDBUserToUser(dbUsers []repository.User) []User {
 	users := []User{}
 

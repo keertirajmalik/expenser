@@ -2,49 +2,21 @@ import { CreateDialog } from "@/app/create-dialog/create-dialog";
 import { DataTable } from "@/components/data-table/data-table";
 import { columns } from "@/app/expense-table-columns";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { apiRequest } from "@/lib/apiRequest";
-import { Expense as expense } from "@/types/expense";
 import { Separator } from "@radix-ui/react-separator";
-import { useCallback, useEffect, useState } from "react";
-
-const fetchExpenses = (
-  setExpenses: React.Dispatch<React.SetStateAction<expense[]>>,
-) => {
-  apiRequest("/cxf/transaction", "GET")
-    .then((response) => {
-      response.json().then((data) => {
-        if (Array.isArray(data.transactions)) {
-          const formattedData = data.transactions.map((item: expense) => {
-            return {
-              id: item.id,
-              name: item.name,
-              type: item.type,
-              amount: item.amount,
-              date: item.date,
-              note: item.note,
-            };
-          });
-          setExpenses(formattedData);
-        } else {
-          setExpenses([]);
-        }
-      });
-    })
-    .catch(() => {
-      setExpenses([]);
-    });
-};
+import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/apiRequest";
 
 export default function Expense() {
-  const [expenses, setExpenses] = useState<expense[]>([]);
+  const { isPending, error, data } = useQuery({
+    queryKey: ["expenses"],
+    queryFn: async () => {
+      return (await apiRequest("/cxf/transaction", "GET")).json();
+    },
+  });
 
-  const refreshExpenses = useCallback(() => {
-    fetchExpenses(setExpenses);
-  }, []);
+  if (isPending) return "Loading...";
 
-  useEffect(() => {
-    refreshExpenses();
-  }, [refreshExpenses]);
+  if (error) return "An error has occurred: " + error.message;
 
   return (
     <div className="flex h-96 w-full flex-col">
@@ -68,14 +40,13 @@ export default function Expense() {
           creationType="Expense"
           title="Create Expense"
           description=" Provide information regarding expense."
-          onSuccess={refreshExpenses}
         />
       </header>
       <main
         className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4"
         role="main"
       >
-        <DataTable columns={columns} data={expenses} />
+        <DataTable columns={columns} data={data.transactions} />
       </main>
     </div>
   );

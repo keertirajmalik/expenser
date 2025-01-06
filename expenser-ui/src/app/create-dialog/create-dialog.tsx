@@ -1,3 +1,8 @@
+import {
+  ExpenseForm,
+  ExpenseFormSchema,
+} from "@/app/create-dialog/expense-form";
+import { TypeForm, TypeFormSchema } from "@/app/create-dialog/type-form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,79 +12,69 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState } from "react";
-import { Plus } from "lucide-react";
-import {
-  ExpenseForm,
-  ExpenseFormSchema,
-} from "@/app/create-dialog/expense-form";
-import { TypeForm, TypeFormSchema } from "@/app/create-dialog/type-form";
 import { apiRequest } from "@/lib/apiRequest";
+import { showToast } from "@/lib/showToast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useToast } from "@/hooks/use-toast";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 import { z } from "zod";
 
 interface CreateDialogProps {
   creationType: "Expense" | "Type";
   title: string;
   description: string;
-  onSuccess: () => void;
 }
 
 export function CreateDialog({
   creationType,
   title,
   description,
-  onSuccess,
 }: CreateDialogProps) {
-  const toast = useToast();
   const [open, setOpen] = useState(false);
 
-  const handleError = (error: Error) => {
-    const message =
-      error instanceof Error ? error.message : "An unexpected error occurred";
-    toast.toast({
-      title: `${creationType} creation Failed`,
-      description: message,
-      variant: "destructive",
-    });
-  };
+  const queryClient = useQueryClient();
 
-  function onExpenseFormSubmit(data: z.infer<typeof ExpenseFormSchema>) {
-    const expenseData = {
-      ...data,
-      amount: parseFloat(data.amount),
-      date: format(data.date, "dd/MM/yyyy"),
-    };
-    apiRequest("/cxf/transaction", "POST", expenseData)
-      .then((res: Response) => {
-        if (!res.ok) {
-          throw new Error(`Failed to save expense: ${res.statusText}`);
-        }
-        setOpen(false);
-        toast.toast({
-          description: "Expense created successfully.",
-        });
-        onSuccess();
-      })
-      .catch(handleError);
-  }
+  const createExpenseMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof ExpenseFormSchema>) => {
+      const expenseData = {
+        ...data,
+        amount: parseFloat(data.amount),
+        date: format(data.date, "dd/MM/yyyy"),
+      };
 
-  function onTypeFormSubmit(data: z.infer<typeof TypeFormSchema>) {
-    apiRequest("/cxf/type", "POST", data)
-      .then(async (res: Response) => {
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error);
-        }
-        setOpen(false);
-        toast.toast({
-          description: "Expense type created successfully.",
+      apiRequest("/cxf/transaction", "POST", expenseData)
+        .then((res: Response) => {
+          if (!res.ok) {
+            throw new Error(`Failed to save expense: ${res.statusText}`);
+          }
+          setOpen(false);
+          showToast("Expense Created", "Expense created successfully.");
+          queryClient.invalidateQueries({ queryKey: ["expenses"] });
+        })
+        .catch((error: Error) => {
+          showToast("Expense Creation Failed", error.message, "destructive");
         });
-        onSuccess();
-      })
-      .catch(handleError);
-  }
+    },
+  });
+
+  const createTypeMutation = useMutation({
+    mutationFn: async (data: z.infer<typeof TypeFormSchema>) => {
+      apiRequest("/cxf/type", "POST", data)
+        .then(async (res: Response) => {
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error);
+          }
+          setOpen(false);
+          showToast("Expense Created", "Expense created successfully.");
+          queryClient.invalidateQueries({ queryKey: ["types"] });
+        })
+        .catch((error: Error) => {
+          showToast("Expense Creation Failed", error.message, "destructive");
+        });
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -95,9 +90,9 @@ export function CreateDialog({
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         {creationType === "Expense" ? (
-          <ExpenseForm onSubmit={onExpenseFormSubmit} />
+          <ExpenseForm onSubmit={createExpenseMutation.mutate} />
         ) : (
-          <TypeForm onSubmit={onTypeFormSubmit} />
+          <TypeForm onSubmit={createTypeMutation.mutate} />
         )}
       </DialogContent>
     </Dialog>

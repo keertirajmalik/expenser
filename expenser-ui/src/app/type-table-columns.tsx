@@ -12,6 +12,7 @@ import {
 import { apiRequest } from "@/lib/apiRequest";
 import { showToast } from "@/lib/showToast";
 import { ExpenseType } from "@/types/expenseType";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
@@ -37,49 +38,42 @@ export const columns: ColumnDef<ExpenseType>[] = [
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-      function onSubmit(data: z.infer<typeof TypeFormSchema>) {
-        apiRequest(`/cxf/type/${row.original.id}`, "PUT", data)
-          .then(async (res: Response) => {
-            if (!res.ok) {
-              const errorData = await res.json();
-              throw new Error(errorData.error);
-            }
-            setEditSheetOpen(false);
-            showToast(
-              "Expense Type Updated",
-              "Expense type updated successfully.",
-            );
-          })
-          .catch((error: Error) =>
-            showToast(
-              "Expense Type Update Failed",
-              error.message,
-              "destructive",
-            ),
-          );
-      }
+      const queryClient = useQueryClient();
 
-      function deleteExpenseType() {
-        apiRequest(`/cxf/type/${row.original.id}`, "DELETE")
-          .then(async (res: Response) => {
-            if (!res.ok) {
-              const errorData = await res.json();
-              throw new Error(errorData.error);
-            }
-            setDeleteDialogOpen(false);
-            showToast(
-              "Expense Type Deleted",
-              "Expense type deleted successfully.",
-            );
-          })
-          .catch((error: Error) =>
-            showToast(
-              "Expense Type Delete Failed",
-              error.message,
-              "destructive",
-            ),
-          );
-      }
+      const editTypeMutation = useMutation({
+        mutationFn: async (data: z.infer<typeof TypeFormSchema>) => {
+          apiRequest(`/cxf/type/${row.original.id}`, "PUT", data)
+            .then(async (res: Response) => {
+              if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error);
+              }
+              setEditSheetOpen(false);
+              queryClient.invalidateQueries({ queryKey: ["types"] });
+              showToast("Type Updated", "Type updated successfully.");
+            })
+            .catch((error: Error) => {
+              showToast("Type Update Failed", error.message, "destructive");
+            });
+        },
+      });
+
+      const deleteTypeMutation = useMutation({
+        mutationFn: async () => {
+          apiRequest(`/cxf/type/${row.original.id}`, "DELETE")
+            .then(async (res: Response) => {
+              if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error);
+              }
+              queryClient.invalidateQueries({ queryKey: ["types"] });
+              showToast("Type Deleted", "Type deleted successfully.");
+            })
+            .catch((error: Error) => {
+              showToast("Type Deletion Failed", error.message, "destructive");
+            });
+        },
+      });
 
       return (
         <>
@@ -98,11 +92,16 @@ export const columns: ColumnDef<ExpenseType>[] = [
               className="cursor-pointer"
             />
           </div>
-          {EditTypeSheet(editSheetOpen, setEditSheetOpen, onSubmit, row)}
+          {EditTypeSheet(
+            editSheetOpen,
+            setEditSheetOpen,
+            editTypeMutation.mutate,
+            row,
+          )}
           <DeleteDialog
             setDeleteDialogOpen={setDeleteDialogOpen}
             deleteDialogOpen={deleteDialogOpen}
-            deleteFunction={deleteExpenseType}
+            onDeleteClick={deleteTypeMutation.mutate}
           />
         </>
       );

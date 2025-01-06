@@ -18,12 +18,9 @@ import { useAuth } from "@/providers/auth-provider";
 function LoginForm() {
   const { handleLogin } = useAuth();
 
+  const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
-  const [showPassword, setShowPassword] = useState(false);
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
-
   const [error, setError] = useState("");
 
   const handleSubmit = (e: FormEvent) => {
@@ -42,7 +39,7 @@ function LoginForm() {
         return response.json();
       })
       .then((res) => {
-        handleLogin(res.token, res.name, res.username, res.image);
+        handleLogin(res.token);
       })
       .catch((error) => {
         setError(error.message);
@@ -96,7 +93,7 @@ function LoginForm() {
                 variant="ghost"
                 size="icon"
                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                onClick={togglePasswordVisibility}
+                onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />

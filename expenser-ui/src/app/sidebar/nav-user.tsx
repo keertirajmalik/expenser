@@ -1,5 +1,4 @@
-import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from "lucide-react";
-import { useState } from "react";
+import AccountPage from "@/app/sidebar/account";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -16,20 +15,28 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/providers/auth-provider";
-import { useUser } from "@/providers/user-provider";
-import { useMemo } from "react";
-import AccountPage from "@/app/account";
+import { apiRequest } from "@/lib/apiRequest";
 import { generateAvatarName } from "@/lib/utils";
+import { useAuth } from "@/providers/auth-provider";
+import { useQuery } from "@tanstack/react-query";
+import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from "lucide-react";
+import { useState } from "react";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { name, username, profileImage } = useUser();
   const { handleLogout } = useAuth();
-  const avatarFallback = useMemo(() => generateAvatarName(name), [name]);
   const [accountOpen, setAccountOpen] = useState(false);
-  const [accountName, setAccountName] = useState(name);
-  const [avatarSrc, setAvatarSrc] = useState(profileImage);
+
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      return (await apiRequest("/cxf/user", "GET")).json();
+    },
+  });
+
+  if (isLoading) return "Loading...";
+
+  if (error) return "An error has occurred: " + error.message;
 
   return (
     <>
@@ -42,14 +49,14 @@ export function NavUser() {
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={avatarSrc} alt={accountName} />
+                  <AvatarImage src={data.image} alt={data.name} />
                   <AvatarFallback className="rounded-lg">
-                    {avatarFallback}
+                    {generateAvatarName(data.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{accountName}</span>
-                  <span className="truncate text-xs">{username}</span>
+                  <span className="truncate font-semibold">{data.name}</span>
+                  <span className="truncate text-xs">{data.username}</span>
                 </div>
                 <ChevronsUpDown className="ml-auto size-4" />
               </SidebarMenuButton>
@@ -63,16 +70,14 @@ export function NavUser() {
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={avatarSrc} alt={accountName} />
+                    <AvatarImage src={data.image} alt={data.name} />
                     <AvatarFallback className="rounded-lg">
-                      {avatarFallback}
+                      {generateAvatarName(data.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {accountName}
-                    </span>
-                    <span className="truncate text-xs">{username}</span>
+                    <span className="truncate font-semibold">{data.name}</span>
+                    <span className="truncate text-xs">{data.username}</span>
                   </div>
                 </div>
               </DropdownMenuLabel>
@@ -102,10 +107,9 @@ export function NavUser() {
       <AccountPage
         open={accountOpen}
         setOpen={setAccountOpen}
-        name={accountName}
-        setName={setAccountName}
-        profileImage={avatarSrc}
-        setProfileImage={setAvatarSrc}
+        name={data.name}
+        username={data.username}
+        profileImage={data.image}
       />
     </>
   );

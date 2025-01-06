@@ -13,13 +13,13 @@ import {
 interface DeleteDialogProps {
   deleteDialogOpen: boolean;
   setDeleteDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  deleteFunction: () => void;
+  onDeleteClick: () => void;
 }
 
 export const DeleteDialog: React.FC<DeleteDialogProps> = ({
   deleteDialogOpen: deleteDialogOpen,
   setDeleteDialogOpen: setAlertDialogOpen,
-  deleteFunction,
+  onDeleteClick: onDeleteClick,
 }) => {
   return (
     <AlertDialog open={deleteDialogOpen} onOpenChange={setAlertDialogOpen}>
@@ -35,7 +35,7 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({
           <AlertDialogCancel onClick={() => setAlertDialogOpen(false)}>
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction onClick={() => deleteFunction()}>
+          <AlertDialogAction onClick={() => onDeleteClick()}>
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

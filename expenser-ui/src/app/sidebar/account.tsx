@@ -1,5 +1,3 @@
-// use this to switch between setting different account details: https://ui.shadcn.com/docs/components/tabs
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,28 +13,24 @@ import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/apiRequest";
 import { showToast } from "@/lib/showToast";
 import { generateAvatarName } from "@/lib/utils";
-import { useUser } from "@/providers/user-provider";
-import { User } from "@/types/user";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChangeEvent, useRef, useState } from "react";
 
 interface AccountPageProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   name: string;
-  setName: (name: string) => void;
+  username: string;
   profileImage: string;
-  setProfileImage: (profileImage: string) => void;
 }
 
 export default function AccountPage({
   open,
   setOpen,
   name,
-  setName,
+  username,
   profileImage,
-  setProfileImage,
 }: AccountPageProps) {
-  const { username } = useUser();
   const [accountName, setAccountName] = useState(name);
   const [avatarSrc, setAvatarSrc] = useState(profileImage);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -61,30 +55,29 @@ export default function AccountPage({
   const handleButtonClick = () => {
     fileInputRef.current?.click();
   };
+  const queryClient = useQueryClient();
 
-  function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    apiRequest("/cxf/user", "PUT", {
-      name: accountName,
-      image: avatarSrc,
-    })
-      .then(async (res: Response) => {
-        if (!res.ok) {
-          const errorData = await res.json();
-          throw new Error(errorData.error);
-        }
-        setOpen(false);
-        const data: User = await res.json();
-        setName(data.name);
-        setProfileImage(data.image);
-        localStorage.setItem("name", data.name);
-        localStorage.setItem("profileImage", data.image);
-        showToast("Account Updated", "Account updated successfully.");
+  const editAccountMutation = useMutation({
+    mutationFn: async (event: React.FormEvent) => {
+      event.preventDefault();
+      apiRequest("/cxf/user", "PUT", {
+        name: accountName,
+        image: avatarSrc,
       })
-      .catch((error: Error) =>
-        showToast("Account Update Failed", error.message, "destructive"),
-      );
-  }
+        .then(async (res: Response) => {
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error);
+          }
+          setOpen(false);
+          queryClient.invalidateQueries({ queryKey: ["user"] });
+          showToast("Account Updated", "Account updated successfully.");
+        })
+        .catch((error: Error) =>
+          showToast("Account Update Failed", error.message, "destructive"),
+        );
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -138,7 +131,7 @@ export default function AccountPage({
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={handleSubmit}>
+          <Button type="submit" onClick={editAccountMutation.mutate}>
             Save changes
           </Button>
         </DialogFooter>
