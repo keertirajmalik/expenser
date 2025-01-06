@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest } from "@/lib/apiRequest";
 import { showToast } from "@/lib/showToast";
+import { generateAvatarName } from "@/lib/utils";
 import { useUser } from "@/providers/user-provider";
 import { User } from "@/types/user";
 import { ChangeEvent, useRef, useState } from "react";
@@ -97,7 +98,7 @@ export default function AccountPage({
         <div className="flex justify-center">
           <Avatar className="w-24 h-24">
             <AvatarImage src={avatarSrc} alt="User Avatar" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarFallback>{generateAvatarName(name)}</AvatarFallback>
           </Avatar>
         </div>
         <div className="flex items-center justify-center">

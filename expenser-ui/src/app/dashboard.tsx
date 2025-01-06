@@ -1,7 +1,7 @@
 import { BarChartComponent } from "@/components/chart/bar-chart";
 import { LineChartComponent } from "@/components/chart/line-chart";
 import { PieChartComponent } from "@/components/chart/pie-chart";
-import { RecentSales } from "@/components/chart/recent-sales";
+import { RecentExpenses } from "@/components/chart/recent-expense";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
@@ -48,7 +48,7 @@ export default function Dashboard() {
         </div>
         <div className="flex gap-2">
           <PieChartComponent data={expenses} />
-          <RecentSales data={expenses} />
+          <RecentExpenses data={expenses} />
         </div>
       </main>
     </div>

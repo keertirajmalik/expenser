@@ -1,11 +1,11 @@
-import { CreateDialog } from "@/components/create-dialog/create-dialog";
 import { DataTable } from "@/components/data-table/data-table";
-import { columns } from "@/components/type-columns";
+import { columns } from "@/app/type-columns";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { apiRequest } from "@/lib/apiRequest";
 import { ExpenseType as type } from "@/types/expenseType";
 import { Separator } from "@radix-ui/react-separator";
 import { useCallback, useEffect, useState } from "react";
+import { CreateDialog } from "@/app/create-dialog/create-dialog";
 
 function fetchExpenseTypes(
   setExpenseTypes: React.Dispatch<React.SetStateAction<type[]>>,

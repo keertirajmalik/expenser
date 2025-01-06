@@ -1,18 +1,15 @@
 import {
-  ExpenseForm,
-  ExpenseFormSchema,
-} from "@/components/create-dialog/expense-form";
-import { DataTableColumnHeader } from "@/components/data-table/column-header";
-import { DeleteDialog } from "@/components/data-table/row-action";
-import { badgeVariants } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
   DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { ColumnDef, Row } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DataTableColumnHeader } from "@/components/data-table/column-header";
+import { ExpenseType } from "@/types/expenseType";
 import {
   Sheet,
   SheetContent,
@@ -20,17 +17,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { apiRequest } from "@/lib/apiRequest";
-import { showToast } from "@/lib/showToast";
-import { Expense } from "@/types/expense";
-import { ColumnDef, Row } from "@tanstack/react-table";
-import { format, parse } from "date-fns";
-import { MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router";
+import { TypeForm, TypeFormSchema } from "@/app/create-dialog/type-form";
+import { apiRequest } from "@/lib/apiRequest";
 import { z } from "zod";
+import { DeleteDialog } from "@/components/data-table/row-action";
+import { showToast } from "@/lib/showToast";
 
-export const columns: ColumnDef<Expense>[] = [
+export const columns: ColumnDef<ExpenseType>[] = [
   {
     id: "id",
   },
@@ -41,42 +35,8 @@ export const columns: ColumnDef<Expense>[] = [
     },
   },
   {
-    accessorKey: "type",
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Type" />;
-    },
-    cell: ({ row }) => {
-      return (
-        <Link className={badgeVariants({ variant: "default" })} to="/type">
-          {row.getValue("type")}
-        </Link>
-      );
-    },
-  },
-  {
-    accessorKey: "amount",
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Amount" />;
-    },
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "INR",
-      }).format(amount);
-
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
-  },
-  {
-    accessorKey: "date",
-    header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Date" />;
-    },
-  },
-  {
-    accessorKey: "note",
-    header: "Note",
+    accessorKey: "description",
+    header: "Description",
   },
   {
     id: "actions",
@@ -84,39 +44,47 @@ export const columns: ColumnDef<Expense>[] = [
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [alertDialogOpen, setAlertDialogOpen] = useState(false);
 
-      function onSubmit(data: z.infer<typeof ExpenseFormSchema>): void {
-        const expenseData = {
-          ...data,
-          amount: parseFloat(data.amount),
-          date: format(data.date, "dd/MM/yyyy"),
-        };
-
-        apiRequest(`/cxf/transaction/${row.original.id}`, "PUT", expenseData)
+      function onSubmit(data: z.infer<typeof TypeFormSchema>) {
+        apiRequest(`/cxf/type/${row.original.id}`, "PUT", data)
           .then(async (res: Response) => {
             if (!res.ok) {
               const errorData = await res.json();
               throw new Error(errorData.error);
             }
             setEditSheetOpen(false);
-            showToast("Expense Updated", "Expense updated successfully.");
+            showToast(
+              "Expense Type Updated",
+              "Expense type updated successfully.",
+            );
           })
           .catch((error: Error) =>
-            showToast("Expense Update Failed", error.message, "destructive"),
+            showToast(
+              "Expense Type Update Failed",
+              error.message,
+              "destructive",
+            ),
           );
       }
 
-      function deleteExpense() {
-        apiRequest(`/cxf/transaction/${row.original.id}`, "DELETE")
+      function deleteExpenseType() {
+        apiRequest(`/cxf/type/${row.original.id}`, "DELETE")
           .then(async (res: Response) => {
             if (!res.ok) {
               const errorData = await res.json();
               throw new Error(errorData.error);
             }
             setAlertDialogOpen(false);
-            showToast("Expense Deleted", "Expense deleted successfully.");
+            showToast(
+              "Expense Type Deleted",
+              "Expense type deleted successfully.",
+            );
           })
           .catch((error: Error) =>
-            showToast("Expense Delete Failed", error.message, "destructive"),
+            showToast(
+              "Expense Type Delete Failed",
+              error.message,
+              "destructive",
+            ),
           );
       }
 
@@ -147,11 +115,11 @@ export const columns: ColumnDef<Expense>[] = [
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          {EditExpenseSheet(editSheetOpen, setEditSheetOpen, onSubmit, row)}
+          {EditTypeSheet(editSheetOpen, setEditSheetOpen, onSubmit, row)}
           <DeleteDialog
             setAlertDialogOpen={setAlertDialogOpen}
             alertDialogOpen={alertDialogOpen}
-            deleteFunction={deleteExpense}
+            deleteFunction={deleteExpenseType}
           />
         </>
       );
@@ -159,11 +127,11 @@ export const columns: ColumnDef<Expense>[] = [
   },
 ];
 
-function EditExpenseSheet(
+function EditTypeSheet(
   editSheetOpen: boolean,
   setEditSheetOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  onSubmit: (data: z.infer<typeof ExpenseFormSchema>) => void,
-  row: Row<Expense>,
+  onSubmit: (data: z.infer<typeof TypeFormSchema>) => void,
+  row: Row<ExpenseType>,
 ) {
   return (
     <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
@@ -175,14 +143,11 @@ function EditExpenseSheet(
           </SheetDescription>
         </SheetHeader>
 
-        <ExpenseForm
+        <TypeForm
           onSubmit={onSubmit}
           initialData={{
             name: row.original.name,
-            type: row.original.type,
-            amount: row.original.amount.toString(),
-            date: parse(row.original.date.toString(), "dd/MM/yyyy", new Date()),
-            note: row.original.note,
+            description: row.original.description,
           }}
         />
         <Button

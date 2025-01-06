@@ -20,15 +20,16 @@ watch:
 
 # Create DB container
 docker-run:
-	@if docker compose up  -d --build 2>/dev/null; then \
+	@if docker compose up  db -d --build 2>/dev/null; then \
 		: ; \
 	else \
 		echo "Falling back to Docker Compose V1"; \
-		docker-compose up --build; \
+		docker-compose up db --build; \
 	fi
 	@for i in {1..10}; do \
 		if echo > /dev/tcp/localhost/5432 2>/dev/null; then \
 			echo "Database is ready!"; \
+			sleep 5; \
 			break; \
 		fi; \
 		echo "Waiting for PostgreSQL... ($$i/10)"; \
@@ -42,11 +43,11 @@ docker-run:
 docker-down:
 	@echo "Running database migrations..."
 	@goose postgres "user=${DB_USERNAME} dbname=${DB_DATABASE} sslmode=disable host=localhost password=${DB_PASSWORD}" -dir database/schema reset
-	@if docker compose down 2>/dev/null; then \
+	@if docker compose down db 2>/dev/null; then \
 		: ; \
 	else \
 		echo "Falling back to Docker Compose V1"; \
-		docker-compose down; \
+		docker-compose down db; \
 	fi
 
 .PHONY: watch docker-run docker-down

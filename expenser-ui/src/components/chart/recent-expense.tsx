@@ -8,11 +8,11 @@ import {
 } from "@/components/ui/card";
 import { Expense } from "@/types/expense";
 
-interface RecentSalesProps {
+interface RecentExpenseProps {
   data: Expense[];
 }
 
-export function RecentSales({ data }: RecentSalesProps) {
+export function RecentExpenses({ data }: RecentExpenseProps) {
   const total = data
     .reduce((acc, data) => acc + parseFloat(data.amount), 0)
     .toFixed(2);

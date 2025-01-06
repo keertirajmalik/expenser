@@ -1,6 +1,6 @@
-import { CreateDialog } from "@/components/create-dialog/create-dialog";
+import { CreateDialog } from "@/app/create-dialog/create-dialog";
 import { DataTable } from "@/components/data-table/data-table";
-import { columns } from "@/components/expense-columns";
+import { columns } from "@/app/expense-columns";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { apiRequest } from "@/lib/apiRequest";
 import { Expense as expense } from "@/types/expense";

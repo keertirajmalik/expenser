@@ -11,14 +11,15 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
-  LayoutDashboard,
   ArrowLeftRight,
-  ListTree,
   IndianRupee,
+  LayoutDashboard,
+  ListTree,
 } from "lucide-react";
-import { NavMain } from "@/components/sidebar/nav-main";
-import { NavSecondary } from "@/components/sidebar/nav-secondary";
-import { NavUser } from "@/components/sidebar/nav-user";
+
+import { NavMain } from "@/app/sidebar/nav-main";
+import { NavSecondary } from "@/app/sidebar/nav-secondary";
+import { NavUser } from "@/app/sidebar/nav-user";
 import { Link } from "react-router";
 
 const data = {

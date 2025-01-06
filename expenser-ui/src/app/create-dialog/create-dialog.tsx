@@ -12,8 +12,8 @@ import { Plus } from "lucide-react";
 import {
   ExpenseForm,
   ExpenseFormSchema,
-} from "@/components/create-dialog/expense-form";
-import { TypeForm, TypeFormSchema } from "@/components/create-dialog/type-form";
+} from "@/app/create-dialog/expense-form";
+import { TypeForm, TypeFormSchema } from "@/app/create-dialog/type-form";
 import { apiRequest } from "@/lib/apiRequest";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";

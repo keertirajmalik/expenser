@@ -20,30 +20,13 @@ import { useAuth } from "@/providers/auth-provider";
 import { useUser } from "@/providers/user-provider";
 import { useMemo } from "react";
 import AccountPage from "@/app/account";
-
-function stringAvatar(name: string) {
-  if (!name?.trim()) {
-    return "?";
-  }
-  // Clean the name string
-  const cleanName = name.replace(/[^a-zA-Z\s]/g, "").trim();
-  if (!cleanName) {
-    return name[0] || "?";
-  }
-  const nameParts = cleanName.split(" ");
-  const initials =
-    nameParts.length > 1
-      ? `${nameParts[0][0]}${nameParts[1][0]}`
-      : nameParts[0][0];
-
-  return initials.toUpperCase();
-}
+import { generateAvatarName } from "@/lib/utils";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { name, username, profileImage } = useUser();
   const { handleLogout } = useAuth();
-  const avatarFallback = useMemo(() => stringAvatar(name), [name]);
+  const avatarFallback = useMemo(() => generateAvatarName(name), [name]);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountName, setAccountName] = useState(name);
   const [avatarSrc, setAvatarSrc] = useState(profileImage);
