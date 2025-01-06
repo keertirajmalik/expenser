@@ -7,13 +7,6 @@ import { DeleteDialog } from "@/components/data-table/row-action";
 import { badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Sheet,
   SheetContent,
   SheetDescription,
@@ -25,7 +18,7 @@ import { showToast } from "@/lib/showToast";
 import { Expense } from "@/types/expense";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { format, parse } from "date-fns";
-import { MoreHorizontal } from "lucide-react";
+import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import { z } from "zod";
@@ -80,9 +73,10 @@ export const columns: ColumnDef<Expense>[] = [
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
       const [editSheetOpen, setEditSheetOpen] = useState(false);
-      const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+      const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
       function onSubmit(data: z.infer<typeof ExpenseFormSchema>): void {
         const expenseData = {
@@ -112,7 +106,7 @@ export const columns: ColumnDef<Expense>[] = [
               const errorData = await res.json();
               throw new Error(errorData.error);
             }
-            setAlertDialogOpen(false);
+            setDeleteDialogOpen(false);
             showToast("Expense Deleted", "Expense deleted successfully.");
           })
           .catch((error: Error) =>
@@ -122,35 +116,25 @@ export const columns: ColumnDef<Expense>[] = [
 
       return (
         <>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => {
-                  setEditSheetOpen(true);
-                }}
-              >
-                Edit expense
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setAlertDialogOpen(true);
-                }}
-              >
-                Delete expense
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="flex items-center h-8 flex-row gap-4">
+            <Pencil
+              onClick={() => setEditSheetOpen(true)}
+              size="20px"
+              strokeWidth="1px"
+              className="cursor-pointer"
+            />
+            <Trash
+              onClick={() => setDeleteDialogOpen(true)}
+              size="20px"
+              color="#EF4444"
+              strokeWidth="1px"
+              className="cursor-pointer"
+            />
+          </div>
           {EditExpenseSheet(editSheetOpen, setEditSheetOpen, onSubmit, row)}
           <DeleteDialog
-            setAlertDialogOpen={setAlertDialogOpen}
-            alertDialogOpen={alertDialogOpen}
+            setDeleteDialogOpen={setDeleteDialogOpen}
+            deleteDialogOpen={deleteDialogOpen}
             deleteFunction={deleteExpense}
           />
         </>

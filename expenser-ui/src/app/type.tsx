@@ -1,5 +1,5 @@
 import { DataTable } from "@/components/data-table/data-table";
-import { columns } from "@/app/type-columns";
+import { columns } from "@/app/type-table-columns";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { apiRequest } from "@/lib/apiRequest";
 import { ExpenseType as type } from "@/types/expenseType";
