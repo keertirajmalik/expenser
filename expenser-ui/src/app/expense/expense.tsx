@@ -1,5 +1,5 @@
 import { CreateDialog } from "@/app/create-dialog/create-dialog";
-import { columns } from "@/app/expense-table-columns";
+import { columns } from "@/app/expense/column";
 import { DataTable } from "@/components/data-table/data-table";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
