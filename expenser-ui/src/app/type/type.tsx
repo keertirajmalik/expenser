@@ -1,28 +1,12 @@
 import { DataTable } from "@/components/data-table/data-table";
 import { columns } from "@/app/type/column";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { apiRequest } from "@/lib/apiRequest";
 import { Separator } from "@radix-ui/react-separator";
 import { CreateDialog } from "@/app/create-dialog/create-dialog";
-import { useQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
-import { showToast } from "@/lib/showToast";
-import * as expenseType from "@/types/expenseType";
+import { useGetTypeQuery } from "@/hooks/use-type-query";
 
 export default function ExpenseType() {
-  const { isPending, error, data } = useQuery({
-    queryKey: ["types"],
-    queryFn: async (): Promise<expenseType.ExpenseType[]> => {
-      return (await apiRequest("/cxf/type", "GET")).json();
-    },
-  });
-
-  if (error) {
-    showToast("An error has occurred", error.message);
-    return null;
-  }
-
-  if (isPending) return <Skeleton />;
+  const { data } = useGetTypeQuery();
 
   return (
     <div className="flex h-96 w-full flex-col">
@@ -52,7 +36,7 @@ export default function ExpenseType() {
         className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4"
         role="main"
       >
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={data ?? []} />
       </main>
     </div>
   );

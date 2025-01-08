@@ -23,10 +23,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { apiRequest } from "@/lib/apiRequest";
-import { showToast } from "@/lib/showToast";
+import { useGetTypeQuery } from "@/hooks/use-type-query";
 import { cn } from "@/lib/utils";
-import { ExpenseType } from "@/types/expenseType";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
@@ -61,10 +59,10 @@ export const ExpenseFormSchema = z.object({
   note: z.string(),
 });
 
-export function ExpenseForm({ onSubmit, initialData }: ExpenseFormProps) {
+export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
   const [openType, setOpenType] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
-  const [expenseTypes, setExpenseTypes] = useState<ExpenseType[]>([]);
+  const { data: expenseTypes } = useGetTypeQuery();
 
   const form = useForm<z.infer<typeof ExpenseFormSchema>>({
     resolver: zodResolver(ExpenseFormSchema),
@@ -78,25 +76,10 @@ export function ExpenseForm({ onSubmit, initialData }: ExpenseFormProps) {
   });
 
   useEffect(() => {
-    apiRequest("/cxf/type", "GET").then(async (res: Response) => {
-      if (!res.ok) {
-        showToast(
-          "Type fetch failed",
-          "Failed to fetch expense types.",
-          "destructive",
-        );
-        return;
-      }
-      const data = await res.json();
-      setExpenseTypes(data);
-    });
-  }, []);
-
-  useEffect(() => {
     if (initialData) {
       form.reset(initialData);
       if (initialData.type) {
-        const typeOption = expenseTypes.find(
+        const typeOption = expenseTypes?.find(
           (type) => type.name === initialData.type,
         );
         if (typeOption) {
@@ -140,7 +123,7 @@ export function ExpenseForm({ onSubmit, initialData }: ExpenseFormProps) {
                       )}
                     >
                       {field.value
-                        ? expenseTypes.find((type) => type.id === field.value)
+                        ? expenseTypes?.find((type) => type.id === field.value)
                             ?.name
                         : "Select Expense Type"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -153,7 +136,7 @@ export function ExpenseForm({ onSubmit, initialData }: ExpenseFormProps) {
                     <CommandList>
                       <CommandEmpty>No expense type found.</CommandEmpty>
                       <CommandGroup>
-                        {expenseTypes.map((type) => (
+                        {expenseTypes?.map((type) => (
                           <CommandItem
                             value={type.name}
                             key={type.id}

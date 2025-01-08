@@ -9,10 +9,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { apiRequest } from "@/lib/apiRequest";
-import { showToast } from "@/lib/showToast";
+import { useDeleteTypeQuery, useUpdateTypeQuery } from "@/hooks/use-type-query";
 import { ExpenseType } from "@/types/expenseType";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
@@ -38,42 +36,17 @@ export const columns: ColumnDef<ExpenseType>[] = [
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-      const queryClient = useQueryClient();
+      const editTypeMutation = useUpdateTypeQuery();
+      const onSubmit = (data: z.infer<typeof TypeFormSchema>) => {
+        editTypeMutation.mutate({ type: data, id: row.original.id });
+        setEditSheetOpen(false);
+      };
 
-      const editTypeMutation = useMutation({
-        mutationFn: async (data: z.infer<typeof TypeFormSchema>) => {
-          const res = await apiRequest(
-            `/cxf/type/${row.original.id}`,
-            "PUT",
-            data,
-          );
-          if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error);
-          }
-          setEditSheetOpen(false);
-          showToast("Type Updated", "Type updated successfully.");
-        },
-        onSettled: () => queryClient.invalidateQueries({ queryKey: ["types"] }),
-        onError: (error) => showToast("Type Update Failed", error.message),
-      });
-
-      const deleteTypeMutation = useMutation({
-        mutationFn: async () => {
-          const res = await apiRequest(
-            `/cxf/type/${row.original.id}`,
-            "DELETE",
-          );
-
-          if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error);
-          }
-          showToast("Type Deleted", "Type deleted successfully.");
-        },
-        onSettled: () => queryClient.invalidateQueries({ queryKey: ["types"] }),
-        onError: (error) => showToast("Type Deletion Failed", error.message),
-      });
+      const deleteTypeMutation = useDeleteTypeQuery();
+      const onDeleteClick = () => {
+        deleteTypeMutation.mutate(row.original.id);
+        setDeleteDialogOpen(false);
+      };
 
       return (
         <>
@@ -92,16 +65,11 @@ export const columns: ColumnDef<ExpenseType>[] = [
               className="cursor-pointer"
             />
           </div>
-          {EditTypeSheet(
-            editSheetOpen,
-            setEditSheetOpen,
-            editTypeMutation.mutate,
-            row,
-          )}
+          {EditTypeSheet(editSheetOpen, setEditSheetOpen, onSubmit, row)}
           <DeleteDialog
             setDeleteDialogOpen={setDeleteDialogOpen}
             deleteDialogOpen={deleteDialogOpen}
-            onDeleteClick={deleteTypeMutation.mutate}
+            onDeleteClick={onDeleteClick}
           />
         </>
       );

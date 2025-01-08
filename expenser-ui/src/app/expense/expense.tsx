@@ -2,28 +2,11 @@ import { CreateDialog } from "@/app/create-dialog/create-dialog";
 import { columns } from "@/app/expense/column";
 import { DataTable } from "@/components/data-table/data-table";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { apiRequest } from "@/lib/apiRequest";
-import { showToast } from "@/lib/showToast";
-import * as expense from "@/types/expense";
+import { useGetExpensesQuery } from "@/hooks/use-expense-query";
 import { Separator } from "@radix-ui/react-separator";
-import { useQuery } from "@tanstack/react-query";
 
 export default function Expense() {
-  const { isPending, error, data } = useQuery({
-    queryKey: ["expenses"],
-    queryFn: async (): Promise<expense.Expense[]> => {
-      const res = await apiRequest("/cxf/transaction", "GET");
-      return res.json();
-    },
-  });
-
-  if (isPending) return <Skeleton />;
-
-  if (error) {
-    showToast("An error has occurred", error.message);
-    return null;
-  }
+  const { data } = useGetExpensesQuery();
 
   return (
     <div className="flex h-96 w-full flex-col">
@@ -53,7 +36,7 @@ export default function Expense() {
         className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4"
         role="main"
       >
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={data ?? []} />
       </main>
     </div>
   );

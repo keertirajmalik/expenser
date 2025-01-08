@@ -4,27 +4,10 @@ import { PieChartComponent } from "@/components/chart/pie-chart";
 import { RecentExpenses } from "@/components/chart/recent-expense";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { useEffect, useState } from "react";
-import { apiRequest } from "@/lib/apiRequest";
-import { Expense } from "@/types/expense";
-
-const fetchExpenses = (
-  setExpenses: React.Dispatch<React.SetStateAction<Expense[]>>,
-) => {
-  apiRequest("/cxf/transaction", "GET").then((response) => {
-    response.json().then((data) => {
-      if (Array.isArray(data)) {
-        setExpenses(data);
-      }
-    });
-  });
-};
+import { useGetExpensesQuery } from "@/hooks/use-expense-query";
 
 export default function Dashboard() {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  useEffect(() => {
-    fetchExpenses(setExpenses);
-  }, []);
+  const { data } = useGetExpensesQuery();
 
   return (
     <div className="flex h-96 w-full flex-col gap-2">
@@ -43,12 +26,12 @@ export default function Dashboard() {
       </header>
       <main className="flex flex-col  items-center gap-2" role="main">
         <div className="flex gap-2">
-          <BarChartComponent data={expenses} />
-          <LineChartComponent data={expenses} />
+          <BarChartComponent data={data ?? []} />
+          <LineChartComponent data={data ?? []} />
         </div>
         <div className="flex gap-2">
-          <PieChartComponent data={expenses} />
-          <RecentExpenses data={expenses} />
+          <PieChartComponent data={data ?? []} />
+          <RecentExpenses data={data ?? []} />
         </div>
       </main>
     </div>

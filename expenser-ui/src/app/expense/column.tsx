@@ -20,12 +20,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { apiRequest } from "@/lib/apiRequest";
-import { showToast } from "@/lib/showToast";
+import {
+  useDeleteExpenseQuery,
+  useUpdateExpenseQuery,
+} from "@/hooks/use-expense-query";
 import { Expense } from "@/types/expense";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { format, parse } from "date-fns";
+import { parse } from "date-fns";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
@@ -86,52 +87,22 @@ export const columns: ColumnDef<Expense>[] = [
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-      const queryClient = useQueryClient();
+      const editExpenseMutation = useUpdateExpenseQuery();
+      const onSubmit = (data: z.infer<typeof ExpenseFormSchema>) => {
+        editExpenseMutation.mutate(
+          { expense: data, id: row.original.id },
+          {
+            onSuccess: () => {
+              setEditSheetOpen(false);
+            },
+          },
+        );
+      };
 
-      const editExpenseMutation = useMutation({
-        mutationFn: async (data: z.infer<typeof ExpenseFormSchema>) => {
-          const expenseData = {
-            ...data,
-            amount: Number.isFinite(parseFloat(data.amount))
-              ? parseFloat(data.amount)
-              : (() => {
-                  throw new Error("Invalid amount format");
-                })(),
-            date: format(data.date, "dd/MM/yyyy"),
-          };
-          const res = await apiRequest(
-            `/cxf/transaction/${row.original.id}`,
-            "PUT",
-            expenseData,
-          );
-          if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error);
-          }
-          setEditSheetOpen(false);
-          showToast("Expense Updated", "Expense updated successfully.");
-        },
-        onSettled: () =>
-          queryClient.invalidateQueries({ queryKey: ["expenses"] }),
-        onError: (error) => showToast("Expense Update Failed", error.message),
-      });
-
-      const deleteExpenseMutation = useMutation({
-        mutationFn: async () => {
-          const res = await apiRequest(
-            `/cxf/transaction/${row.original.id}`,
-            "DELETE",
-          );
-          if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.error);
-          }
-          showToast("Expense Deleted", "Expense deleted successfully.");
-        },
-        onSettled: () =>
-          queryClient.invalidateQueries({ queryKey: ["expenses"] }),
-        onError: (error) => showToast("Expense Deletion Failed", error.message),
-      });
+      const deleteExpenseMutation = useDeleteExpenseQuery();
+      const onDeleteClick = () => {
+        deleteExpenseMutation.mutate(row.original.id);
+      };
 
       return (
         <>
@@ -162,16 +133,11 @@ export const columns: ColumnDef<Expense>[] = [
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          {EditExpenseSheet(
-            editSheetOpen,
-            setEditSheetOpen,
-            editExpenseMutation.mutate,
-            row,
-          )}
+          {EditExpenseSheet(editSheetOpen, setEditSheetOpen, onSubmit, row)}
           <DeleteDialog
             setDeleteDialogOpen={setDeleteDialogOpen}
             deleteDialogOpen={deleteDialogOpen}
-            onDeleteClick={deleteExpenseMutation.mutate}
+            onDeleteClick={onDeleteClick}
           />
         </>
       );
@@ -196,7 +162,6 @@ function EditExpenseSheet(
         </SheetHeader>
 
         <ExpenseForm
-          onSubmit={onSubmit}
           initialData={{
             name: row.original.name,
             type: row.original.type,
@@ -204,6 +169,7 @@ function EditExpenseSheet(
             date: parse(row.original.date.toString(), "dd/MM/yyyy", new Date()),
             note: row.original.note,
           }}
+          onSubmit={onSubmit}
         />
         <Button
           type="reset"

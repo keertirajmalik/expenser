@@ -10,10 +10,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { apiRequest } from "@/lib/apiRequest";
-import { showToast } from "@/lib/showToast";
+import { useUpdateUserQuery } from "@/hooks/use-user-query";
 import { generateAvatarName } from "@/lib/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChangeEvent, useRef, useState } from "react";
 
 interface AccountPageProps {
@@ -56,26 +54,18 @@ export default function AccountPage({
     fileInputRef.current?.click();
   };
 
-  const queryClient = useQueryClient();
+  const editAccountMutation = useUpdateUserQuery();
 
-  const editAccountMutation = useMutation({
-    mutationFn: async (event: React.FormEvent) => {
-      event.preventDefault();
-      const res = await apiRequest("/cxf/user", "PUT", {
-        name: accountName,
-        image: avatarSrc,
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error);
-      }
-      setOpen(false);
-      showToast("Account Updated", "Account updated successfully.");
-    },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["user"] }),
-    onError: (error) => showToast("Account Update Failed", error.message),
-  });
+  const onClick = () => {
+    editAccountMutation.mutate(
+      { name: accountName, image: avatarSrc },
+      {
+        onSuccess: () => {
+          setOpen(false);
+        },
+      },
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -129,7 +119,7 @@ export default function AccountPage({
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={editAccountMutation.mutate}>
+          <Button type="submit" onClick={onClick}>
             Save changes
           </Button>
         </DialogFooter>
