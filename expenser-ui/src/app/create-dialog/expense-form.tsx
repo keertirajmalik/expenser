@@ -23,20 +23,16 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/apiRequest";
+import { showToast } from "@/lib/showToast";
 import { cn } from "@/lib/utils";
+import { ExpenseType } from "@/types/expenseType";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-interface SelectionOption {
-  label: string;
-  value: string;
-}
 
 interface ExpenseFormProps {
   onSubmit: (data: z.infer<typeof ExpenseFormSchema>) => void;
@@ -66,10 +62,9 @@ export const ExpenseFormSchema = z.object({
 });
 
 export function ExpenseForm({ onSubmit, initialData }: ExpenseFormProps) {
-  const toast = useToast();
   const [openType, setOpenType] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
-  const [expenseTypes, setExpenseTypes] = useState<SelectionOption[]>([]);
+  const [expenseTypes, setExpenseTypes] = useState<ExpenseType[]>([]);
 
   const form = useForm<z.infer<typeof ExpenseFormSchema>>({
     resolver: zodResolver(ExpenseFormSchema),
@@ -85,20 +80,15 @@ export function ExpenseForm({ onSubmit, initialData }: ExpenseFormProps) {
   useEffect(() => {
     apiRequest("/cxf/type", "GET").then(async (res: Response) => {
       if (!res.ok) {
-        toast.toast({
-          description: "Failed to fetch expense types.",
-          variant: "destructive",
-        });
+        showToast(
+          "Type fetch failed",
+          "Failed to fetch expense types.",
+          "destructive",
+        );
         return;
       }
       const data = await res.json();
-      const transformedData = data.map(
-        (type: { id: string; name: string }) => ({
-          label: type.name,
-          value: type.id,
-        }),
-      );
-      setExpenseTypes(transformedData);
+      setExpenseTypes(data);
     });
   }, []);
 
@@ -107,10 +97,10 @@ export function ExpenseForm({ onSubmit, initialData }: ExpenseFormProps) {
       form.reset(initialData);
       if (initialData.type) {
         const typeOption = expenseTypes.find(
-          (type) => type.label === initialData.type,
+          (type) => type.name === initialData.type,
         );
         if (typeOption) {
-          form.setValue("type", typeOption.value);
+          form.setValue("type", typeOption.id);
         }
       }
     }
@@ -150,9 +140,8 @@ export function ExpenseForm({ onSubmit, initialData }: ExpenseFormProps) {
                       )}
                     >
                       {field.value
-                        ? expenseTypes.find(
-                            (type) => type.value === field.value,
-                          )?.label
+                        ? expenseTypes.find((type) => type.id === field.value)
+                            ?.name
                         : "Select Expense Type"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
@@ -166,18 +155,18 @@ export function ExpenseForm({ onSubmit, initialData }: ExpenseFormProps) {
                       <CommandGroup>
                         {expenseTypes.map((type) => (
                           <CommandItem
-                            value={type.label}
-                            key={type.value}
+                            value={type.name}
+                            key={type.id}
                             onSelect={() => {
-                              form.setValue("type", type.value);
+                              form.setValue("type", type.id);
                               setOpenType(false);
                             }}
                           >
-                            {type.label}
+                            {type.name}
                             <Check
                               className={cn(
                                 "ml-auto",
-                                type.value === field.value
+                                type.id === field.value
                                   ? "opacity-100"
                                   : "opacity-0",
                               )}

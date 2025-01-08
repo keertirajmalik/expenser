@@ -1,11 +1,11 @@
-import Expense from "@/app/expense";
+import Expense from "@/app/expense/expense";
 import Dashboard from "@/app/dashboard";
-import { LoginPage } from "@/app/login";
-import { SignupPage } from "@/app/signup";
+import { LoginPage } from "@/app/auth/login";
+import { SignupPage } from "@/app/auth/signup";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Routes, Route, Navigate } from "react-router";
 import { ROUTES } from "@/types/routes";
-import ExpenseType from "@/app/type";
+import ExpenseType from "@/app/type/type";
 import { AppSidebar } from "@/app/sidebar/app-sidebar";
 
 export function App() {

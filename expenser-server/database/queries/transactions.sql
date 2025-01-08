@@ -31,7 +31,7 @@ FROM transactions
 INNER JOIN users ON transactions.user_id = users.id
 INNER JOIN transaction_types ON transactions."type"  = transaction_types.id
 WHERE transactions.user_id=$1
-ORDER BY transactions.created_at DESC;
+ORDER BY transactions.date DESC;
 
 -- name: DeleteTransaction :execresult
 DELETE FROM transactions where id = $1 AND user_id=$2;

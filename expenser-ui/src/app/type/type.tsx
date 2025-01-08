@@ -1,5 +1,5 @@
 import { DataTable } from "@/components/data-table/data-table";
-import { columns } from "@/app/type-table-columns";
+import { columns } from "@/app/type/column";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { apiRequest } from "@/lib/apiRequest";
 import { Separator } from "@radix-ui/react-separator";
