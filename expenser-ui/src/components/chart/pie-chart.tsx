@@ -12,7 +12,7 @@ import {
 import { Expense } from "@/types/expense";
 
 interface ChartData {
-  type: string;
+  category: string;
   amount: number;
   fill: string;
 }
@@ -31,15 +31,15 @@ const generateColors = (count: number): string[] => {
   });
 };
 
-const getUniqueTypes = (expenses: Expense[]): string[] => {
-  return Array.from(new Set(expenses.map((item: Expense) => item.type)));
+const getUniqueCategorys = (expenses: Expense[]): string[] => {
+  return Array.from(new Set(expenses.map((item: Expense) => item.category)));
 };
 
 const createChartConfig = (data: Expense[]): ChartConfig => {
-  const uniqueTypes = getUniqueTypes(data);
-  const colors = generateColors(uniqueTypes.length);
-  return uniqueTypes.reduce<ChartConfig>((acc, type, index) => {
-    acc[type] = { label: type, color: colors[index] };
+  const uniqueCategorys = getUniqueCategorys(data);
+  const colors = generateColors(uniqueCategorys.length);
+  return uniqueCategorys.reduce<ChartConfig>((acc, category, index) => {
+    acc[category] = { label: category, color: colors[index] };
     return acc;
   }, {});
 };
@@ -47,14 +47,14 @@ const createChartConfig = (data: Expense[]): ChartConfig => {
 const generateChartData = (expenses: Expense[]): ChartData[] => {
   const typeMap = expenses.reduce((acc: Record<string, number>, item) => {
     const amount = parseFloat(item.amount);
-    acc[item.type] = (acc[item.type] || 0) + amount;
+    acc[item.category] = (acc[item.category] || 0) + amount;
     return acc;
   }, {});
-  const uniqueTypes = Object.keys(typeMap);
-  const colors = generateColors(uniqueTypes.length);
-  return uniqueTypes.map((type, index) => ({
-    type,
-    amount: typeMap[type],
+  const uniqueCategorys = Object.keys(typeMap);
+  const colors = generateColors(uniqueCategorys.length);
+  return uniqueCategorys.map((category, index) => ({
+    category,
+    amount: typeMap[category],
     fill: colors[index],
   }));
 };
@@ -66,7 +66,7 @@ export function PieChartComponent({ data }: PieChartProps) {
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0 ">
-        <CardTitle>Expense By Type Chart</CardTitle>
+        <CardTitle>Expense By Category Chart</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0 ">
         <ChartContainer

@@ -2,7 +2,10 @@ import {
   ExpenseForm,
   ExpenseFormSchema,
 } from "@/app/create-dialog/expense-form";
-import { TypeForm, TypeFormSchema } from "@/app/create-dialog/type-form";
+import {
+  CategoryForm,
+  CategoryFormSchema,
+} from "@/app/create-dialog/category-form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,19 +16,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useCreateExpenseMutation } from "@/hooks/use-expense-query";
-import { useCreateTypeMutation } from "@/hooks/use-type-query";
+import { useCreateCategoryMutation } from "@/hooks/use-category-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
 interface CreateDialogProps {
-  creationType: "Expense" | "Type";
+  creationCategory: "Expense" | "Category";
   title: string;
   description: string;
 }
 
 export function CreateDialog({
-  creationType,
+  creationCategory,
   title,
   description,
 }: CreateDialogProps) {
@@ -40,9 +43,9 @@ export function CreateDialog({
     });
   };
 
-  const createTypeMutation = useCreateTypeMutation();
-  const onTypeSubmit = (data: z.infer<typeof TypeFormSchema>) => {
-    createTypeMutation.mutate(data, {
+  const createCategoryMutation = useCreateCategoryMutation();
+  const onCategorySubmit = (data: z.infer<typeof CategoryFormSchema>) => {
+    createCategoryMutation.mutate(data, {
       onSuccess: () => {
         setOpen(false);
       },
@@ -54,7 +57,7 @@ export function CreateDialog({
       <DialogTrigger asChild>
         <Button variant="default">
           <Plus />
-          Create {creationType}
+          Create {creationCategory}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -62,10 +65,10 @@ export function CreateDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        {creationType === "Expense" ? (
+        {creationCategory === "Expense" ? (
           <ExpenseForm onSubmit={onExpenseSubmit} />
         ) : (
-          <TypeForm onSubmit={onTypeSubmit} />
+          <CategoryForm onSubmit={onCategorySubmit} />
         )}
       </DialogContent>
     </Dialog>

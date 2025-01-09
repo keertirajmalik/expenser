@@ -1,12 +1,12 @@
 import { DataTable } from "@/components/data-table/data-table";
-import { columns } from "@/app/type/column";
+import { columns } from "@/app/category/column";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
 import { CreateDialog } from "@/app/create-dialog/create-dialog";
-import { useGetTypeQuery } from "@/hooks/use-type-query";
+import { useGetCategoryQuery } from "@/hooks/use-category-query";
 
-export default function Type() {
-  const { data } = useGetTypeQuery();
+export default function Category() {
+  const { data } = useGetCategoryQuery();
 
   return (
     <div className="flex h-96 w-full flex-col">
@@ -22,14 +22,16 @@ export default function Type() {
             decorative={true}
           />
           <div className="flex flex-col">
-            <h1 className="text-lg font-semibold">Expense Type</h1>
-            <p className="text-sm text-gray-500">List of Your Expense Types</p>
+            <h1 className="text-lg font-semibold">Expense Category</h1>
+            <p className="text-sm text-gray-500">
+              List of Your Expense Categories
+            </p>
           </div>
         </div>
         <CreateDialog
-          creationType="Type"
-          title="Create Expense Type"
-          description=" Provide information regarding expense type."
+          creationCategory="Category"
+          title="Create Expense Category"
+          description=" Provide information regarding expense category."
         />
       </header>
       <main

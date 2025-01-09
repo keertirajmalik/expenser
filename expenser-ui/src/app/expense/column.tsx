@@ -35,7 +35,7 @@ export const columns: ColumnDef<Expense>[] = [
   {
     accessorKey: "type",
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Type" />;
+      return <DataTableColumnHeader column={column} title="Category" />;
     },
     cell: ({ row }) => {
       return (

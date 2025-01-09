@@ -35,8 +35,8 @@ const data = {
       icon: ArrowLeftRight,
     },
     {
-      name: "Type",
-      url: "/type",
+      name: "Category",
+      url: "/category",
       icon: ListTree,
     },
   ],

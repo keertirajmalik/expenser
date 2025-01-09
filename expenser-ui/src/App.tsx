@@ -5,7 +5,7 @@ import { SignupPage } from "@/app/auth/signup";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Routes, Route, Navigate } from "react-router";
 import { ROUTES } from "@/types/routes";
-import Type from "@/app/type/type";
+import Category from "@/app/category/category";
 import { AppSidebar } from "@/app/sidebar/app-sidebar";
 
 export function App() {
@@ -36,7 +36,7 @@ function MainRoutes() {
           <Routes>
             <Route path={ROUTES.MAIN.DASHBOARD} element={<Dashboard />} />
             <Route path={ROUTES.MAIN.EXPENSE} element={<Expense />} />
-            <Route path={ROUTES.MAIN.TYPE} element={<Type />} />
+            <Route path={ROUTES.MAIN.CATEGORY} element={<Category />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>
