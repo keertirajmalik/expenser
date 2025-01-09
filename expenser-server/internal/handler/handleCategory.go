@@ -9,26 +9,22 @@ import (
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 )
 
-func HandleTransactionTypeGet(data model.Config) http.HandlerFunc {
+func HandleGetCategory(data model.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value("userID").(uuid.UUID)
-		transactionTypes, err := data.GetTransactionTypesFromDB(r.Context(), userID)
+		categories, err := data.GetCategoriesFromDB(r.Context(), userID)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "Failed to retrieve transaction types")
+			respondWithError(w, http.StatusInternalServerError, "Failed to retrieve categories")
 			return
 		}
-		respondWithJson(w, http.StatusOK, transactionTypes)
+		respondWithJson(w, http.StatusOK, categories)
 	}
 }
 
-func HandleTransactionTypeCreate(data model.Config) http.HandlerFunc {
+func HandleCreateCategory(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Name        string `json:"name"`
 		Description string `json:"description"`
-	}
-
-	type response struct {
-		TransactionTypes model.ResponseTransactionType `json:"transaction_types"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -42,16 +38,16 @@ func HandleTransactionTypeCreate(data model.Config) http.HandlerFunc {
 		}
 
 		if len(params.Name) == 0 {
-			respondWithError(w, http.StatusBadRequest, "Transaction type name cannot be empty")
+			respondWithError(w, http.StatusBadRequest, "Category name cannot be empty")
 			return
 		}
 		if len(params.Name) > 50 {
-			respondWithError(w, http.StatusBadRequest, "Transaction type name too long")
+			respondWithError(w, http.StatusBadRequest, "Category name too long")
 			return
 		}
 
 		userID := r.Context().Value("userID").(uuid.UUID)
-		transactionType, err := data.AddTransactionTypeData(r.Context(), model.TransactionType{
+		category, err := data.AddCategoryToDB(r.Context(), model.Category{
 			ID:          uuid.New(),
 			Name:        params.Name,
 			Description: params.Description,
@@ -63,20 +59,14 @@ func HandleTransactionTypeCreate(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		respondWithJson(w, http.StatusOK, response{
-			TransactionTypes: transactionType,
-		})
+		respondWithJson(w, http.StatusOK, category)
 	}
 }
 
-func HandleTransactionTypeUpdate(data model.Config) http.HandlerFunc {
+func HandleUpdateCategory(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Name        string `json:"name"`
 		Description string `json:"description"`
-	}
-
-	type response struct {
-		TransactionTypes model.ResponseTransactionType `json:"transaction_types"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -98,8 +88,17 @@ func HandleTransactionTypeUpdate(data model.Config) http.HandlerFunc {
 			return
 		}
 
+		if len(params.Name) == 0 {
+			respondWithError(w, http.StatusBadRequest, "Category name cannot be empty")
+			return
+		}
+		if len(params.Name) > 50 {
+			respondWithError(w, http.StatusBadRequest, "Category name too long")
+			return
+		}
+
 		userID := r.Context().Value("userID").(uuid.UUID)
-		transactionType, err := data.UpdateTransactionTypeInDB(r.Context(), model.TransactionType{
+		category, err := data.UpdateCategoryInDB(r.Context(), model.Category{
 			ID:          id,
 			Name:        params.Name,
 			Description: params.Description,
@@ -110,12 +109,10 @@ func HandleTransactionTypeUpdate(data model.Config) http.HandlerFunc {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		respondWithJson(w, http.StatusOK, response{
-			TransactionTypes: transactionType,
-		})
+		respondWithJson(w, http.StatusOK, category)
 	}
 }
-func HandleTransactionTypeDelete(data model.Config) http.HandlerFunc {
+func HandleDeleteCategory(data model.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 
@@ -126,7 +123,7 @@ func HandleTransactionTypeDelete(data model.Config) http.HandlerFunc {
 		}
 
 		userID := r.Context().Value("userID").(uuid.UUID)
-		err = data.DeleteTransactionTypeFromDB(r.Context(), id, userID)
+		err = data.DeleteCategoryFromDB(r.Context(), id, userID)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return

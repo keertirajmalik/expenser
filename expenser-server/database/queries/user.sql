@@ -1,19 +1,19 @@
 -- name: CreateUser :one
-INSERT INTO users(id, name,username, hashed_password)
+INSERT INTO account(id, name,username, hashed_password)
 VALUES ($1, $2, $3, $4)
 RETURNING *;
 
--- name: GetUsers :many
-SELECT * FROM users;
+-- name: GetUser :many
+SELECT * FROM account;
 
 -- name: GetUserByUsername :one
-SELECT * FROM users WHERE username=$1;
+SELECT * FROM account WHERE username=$1;
 
 -- name: GetUserById :one
-SELECT * FROM users WHERE id=$1;
+SELECT * FROM account WHERE id=$1;
 
 -- name: UpdateUser :one
-UPDATE users
+UPDATE account
 SET name = $2,
     image = $3
 WHERE id = $1

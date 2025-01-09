@@ -22,7 +22,7 @@ type User struct {
 }
 
 func (d Config) GetUsersFromDB(ctx context.Context) ([]User, error) {
-	dbUsers, err := d.Queries.GetUsers(ctx)
+	dbUsers, err := d.Queries.GetUser(ctx)
 	if err != nil {
 		log.Println("Couldn't get users from DB", err)
 		return []User{}, err
@@ -48,7 +48,7 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 		return User{}, err
 	}
 
-	users := convertDBUserToUser([]repository.User{dbUser})
+	users := convertDBUserToUser([]repository.Account{dbUser})
 
 	return users[0], nil
 }
@@ -60,7 +60,7 @@ func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (U
 		return User{}, err
 	}
 
-	user := convertDBUserToUser([]repository.User{dbUser})
+	user := convertDBUserToUser([]repository.Account{dbUser})
 	return user[0], nil
 }
 
@@ -74,11 +74,11 @@ func (d Config) GetUserByUserIdFromDB(ctx context.Context, userId uuid.UUID) (Us
 		return User{}, err
 	}
 
-	user := convertDBUserToUser([]repository.User{dbUser})
+	user := convertDBUserToUser([]repository.Account{dbUser})
 	return user[0], nil
 }
 
-func convertDBUserToUser(dbUsers []repository.User) []User {
+func convertDBUserToUser(dbUsers []repository.Account) []User {
 	users := []User{}
 
 	for _, user := range dbUsers {
@@ -114,7 +114,7 @@ func (d Config) UpdateUserInDB(ctx context.Context, user User) (User, error) {
 		return User{}, err
 	}
 
-	users := convertDBUserToUser([]repository.User{dbUser})
+	users := convertDBUserToUser([]repository.Account{dbUser})
 
 	return users[0], nil
 }

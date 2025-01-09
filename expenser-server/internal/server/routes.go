@@ -24,10 +24,10 @@ func (s *Server) RegisterRoutes(config model.Config) http.Handler {
 	mux.HandleFunc("DELETE /cxf/transaction/{id}", handler.HandleTransactionDelete(config))
 	mux.HandleFunc("PUT /cxf/transaction/{id}", handler.HandleTransactionUpdate(config))
 
-	mux.HandleFunc("GET /cxf/type", handler.HandleTransactionTypeGet(config))
-	mux.HandleFunc("POST /cxf/type", handler.HandleTransactionTypeCreate(config))
-	mux.HandleFunc("DELETE /cxf/type/{id}", handler.HandleTransactionTypeDelete(config))
-	mux.HandleFunc("PUT /cxf/type/{id}", handler.HandleTransactionTypeUpdate(config))
+	mux.HandleFunc("GET /cxf/category", handler.HandleGetCategory(config))
+	mux.HandleFunc("POST /cxf/category", handler.HandleCreateCategory(config))
+	mux.HandleFunc("DELETE /cxf/category/{id}", handler.HandleDeleteCategory(config))
+	mux.HandleFunc("PUT /cxf/category/{id}", handler.HandleUpdateCategory(config))
 
 	return mux
 }

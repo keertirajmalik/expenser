@@ -9,7 +9,7 @@ export const useGetCategoryQuery = () => {
   const query = useQuery({
     queryKey: ["categories"],
     queryFn: async (): Promise<Category[]> => {
-      const res = await apiRequest("/cxf/type", "GET");
+      const res = await apiRequest("/cxf/category", "GET");
       return res.json();
     },
   });
@@ -21,7 +21,7 @@ export const useCreateCategoryMutation = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: z.infer<typeof CategoryFormSchema>) => {
-      const res = await apiRequest("/cxf/type", "POST", data);
+      const res = await apiRequest("/cxf/category", "POST", data);
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.error);
@@ -45,7 +45,7 @@ export const useUpdateCategoryMutation = () => {
       id: string;
     }) => {
       const res = await apiRequest(
-        `/cxf/type/${data.id}`,
+        `/cxf/category/${data.id}`,
         "PUT",
         data.category,
       );
@@ -55,8 +55,10 @@ export const useUpdateCategoryMutation = () => {
       }
       showToast("Category Updated", "Category updated successfully.");
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ["categories"] }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+    },
     onError: (error) => showToast("Category Update Failed", error.message),
   });
   return mutation;
@@ -66,7 +68,7 @@ export const useDeleteCategoryMutation = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await apiRequest(`/cxf/type/${id}`, "DELETE");
+      const res = await apiRequest(`/cxf/category/${id}`, "DELETE");
 
       if (!res.ok) {
         const errorData = await res.json();
@@ -74,8 +76,10 @@ export const useDeleteCategoryMutation = () => {
       }
       showToast("Category Deleted", "Category deleted successfully.");
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ["categories"] }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+    },
     onError: (error) => showToast("Category Deletion Failed", error.message),
   });
   return mutation;
