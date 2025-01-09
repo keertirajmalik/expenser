@@ -17,7 +17,7 @@ export const useGetExpensesQuery = () => {
   return query;
 };
 
-export const useCreateExpenseQuery = () => {
+export const useCreateExpenseMutation = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -43,7 +43,7 @@ export const useCreateExpenseQuery = () => {
   return mutation;
 };
 
-export const useUpdateExpenseQuery = () => {
+export const useUpdateExpenseMutation = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({

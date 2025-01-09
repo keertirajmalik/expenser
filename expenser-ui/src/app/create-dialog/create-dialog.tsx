@@ -12,8 +12,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCreateExpenseQuery } from "@/hooks/use-expense-query";
-import { useCreateTypeQuery } from "@/hooks/use-type-query";
+import { useCreateExpenseMutation } from "@/hooks/use-expense-query";
+import { useCreateTypeMutation } from "@/hooks/use-type-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
@@ -31,7 +31,7 @@ export function CreateDialog({
 }: CreateDialogProps) {
   const [open, setOpen] = useState(false);
 
-  const createExpenseMutation = useCreateExpenseQuery();
+  const createExpenseMutation = useCreateExpenseMutation();
   const onExpenseSubmit = (data: z.infer<typeof ExpenseFormSchema>) => {
     createExpenseMutation.mutate(data, {
       onSuccess: () => {
@@ -40,7 +40,7 @@ export function CreateDialog({
     });
   };
 
-  const createTypeMutation = useCreateTypeQuery();
+  const createTypeMutation = useCreateTypeMutation();
   const onTypeSubmit = (data: z.infer<typeof TypeFormSchema>) => {
     createTypeMutation.mutate(data, {
       onSuccess: () => {

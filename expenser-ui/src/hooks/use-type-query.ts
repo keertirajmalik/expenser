@@ -1,14 +1,14 @@
 import { TypeFormSchema } from "@/app/create-dialog/type-form";
 import { apiRequest } from "@/lib/apiRequest";
 import { showToast } from "@/lib/showToast";
-import { ExpenseType } from "@/types/expenseType";
+import { Type } from "@/types/expenseType";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 
 export const useGetTypeQuery = () => {
   const query = useQuery({
     queryKey: ["types"],
-    queryFn: async (): Promise<ExpenseType[]> => {
+    queryFn: async (): Promise<Type[]> => {
       const res = await apiRequest("/cxf/type", "GET");
       return res.json();
     },
@@ -16,7 +16,7 @@ export const useGetTypeQuery = () => {
   return query;
 };
 
-export const useCreateTypeQuery = () => {
+export const useCreateTypeMutation = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
@@ -35,7 +35,7 @@ export const useCreateTypeQuery = () => {
   return mutation;
 };
 
-export const useUpdateTypeQuery = () => {
+export const useUpdateTypeMutation = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (data: {
@@ -55,7 +55,7 @@ export const useUpdateTypeQuery = () => {
   return mutation;
 };
 
-export const useDeleteTypeQuery = () => {
+export const useDeleteTypeMutation = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (id: string) => {

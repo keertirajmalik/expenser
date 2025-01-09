@@ -5,7 +5,7 @@ import { Separator } from "@radix-ui/react-separator";
 import { CreateDialog } from "@/app/create-dialog/create-dialog";
 import { useGetTypeQuery } from "@/hooks/use-type-query";
 
-export default function ExpenseType() {
+export default function Type() {
   const { data } = useGetTypeQuery();
 
   return (

@@ -1,22 +1,18 @@
-import { TypeForm, TypeFormSchema } from "@/app/create-dialog/type-form";
+import { TypeFormSchema } from "@/app/create-dialog/type-form";
+import { EditTypeSheet } from "@/app/type/editsheet";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
 import { DeleteDialog } from "@/components/data-table/row-action";
-import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import { useDeleteTypeQuery, useUpdateTypeQuery } from "@/hooks/use-type-query";
-import { ExpenseType } from "@/types/expenseType";
-import { ColumnDef, Row } from "@tanstack/react-table";
+  useDeleteTypeMutation,
+  useUpdateTypeMutation,
+} from "@/hooks/use-type-query";
+import { Type } from "@/types/expenseType";
+import { ColumnDef } from "@tanstack/react-table";
 import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
-export const columns: ColumnDef<ExpenseType>[] = [
+export const columns: ColumnDef<Type>[] = [
   {
     id: "id",
   },
@@ -36,13 +32,13 @@ export const columns: ColumnDef<ExpenseType>[] = [
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-      const editTypeMutation = useUpdateTypeQuery();
+      const editTypeMutation = useUpdateTypeMutation();
       const onSubmit = (data: z.infer<typeof TypeFormSchema>) => {
         editTypeMutation.mutate({ type: data, id: row.original.id });
         setEditSheetOpen(false);
       };
 
-      const deleteTypeMutation = useDeleteTypeQuery();
+      const deleteTypeMutation = useDeleteTypeMutation();
       const onDeleteClick = () => {
         deleteTypeMutation.mutate(row.original.id);
         setDeleteDialogOpen(false);
@@ -65,7 +61,12 @@ export const columns: ColumnDef<ExpenseType>[] = [
               className="cursor-pointer"
             />
           </div>
-          {EditTypeSheet(editSheetOpen, setEditSheetOpen, onSubmit, row)}
+          <EditTypeSheet
+            row={row}
+            editSheetOpen={editSheetOpen}
+            setEditSheetOpen={setEditSheetOpen}
+            onSubmit={onSubmit}
+          />
           <DeleteDialog
             setDeleteDialogOpen={setDeleteDialogOpen}
             deleteDialogOpen={deleteDialogOpen}
@@ -76,39 +77,3 @@ export const columns: ColumnDef<ExpenseType>[] = [
     },
   },
 ];
-
-function EditTypeSheet(
-  editSheetOpen: boolean,
-  setEditSheetOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  onSubmit: (data: z.infer<typeof TypeFormSchema>) => void,
-  row: Row<ExpenseType>,
-) {
-  return (
-    <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Edit Expese Details</SheetTitle>
-          <SheetDescription>
-            Make changes to your expense here. Click submit when you're done.
-          </SheetDescription>
-        </SheetHeader>
-
-        <TypeForm
-          onSubmit={onSubmit}
-          initialData={{
-            name: row.original.name,
-            description: row.original.description,
-          }}
-        />
-        <Button
-          type="reset"
-          variant="secondary"
-          className="w-full my-4"
-          onClick={() => setEditSheetOpen(false)}
-        >
-          Cancel
-        </Button>
-      </SheetContent>
-    </Sheet>
-  );
-}

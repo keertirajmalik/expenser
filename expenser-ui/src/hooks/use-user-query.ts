@@ -1,8 +1,21 @@
 import { apiRequest } from "@/lib/apiRequest";
 import { showToast } from "@/lib/showToast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { User } from "@/types/user";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const useUpdateUserQuery = () => {
+export const useGetUserQuery = () => {
+  const query = useQuery({
+    queryKey: ["user"],
+    queryFn: async (): Promise<User> => {
+      const res = await apiRequest("/cxf/user", "GET");
+      return res.json();
+    },
+  });
+
+  return query;
+};
+
+export const useUpdateUserMutation = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({

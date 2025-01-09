@@ -15,13 +15,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { apiRequest } from "@/lib/apiRequest";
-import { showToast } from "@/lib/showToast";
+import { useGetUserQuery } from "@/hooks/use-user-query";
 import { generateAvatarName } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
-import { User } from "@/types/user";
-import { useQuery } from "@tanstack/react-query";
 import { BadgeCheck, Bell, ChevronsUpDown, LogOut } from "lucide-react";
 import { useState } from "react";
 
@@ -30,17 +26,7 @@ export function NavUser() {
   const { handleLogout } = useAuth();
   const [accountOpen, setAccountOpen] = useState(false);
 
-  const { isLoading, error, data } = useQuery({
-    queryKey: ["user"],
-    queryFn: async (): Promise<User> => {
-      const res = await apiRequest("/cxf/user", "GET");
-      return res.json();
-    },
-  });
-
-  if (isLoading) return <Skeleton />;
-
-  if (error) showToast("An error has occurred", error.message);
+  const { data } = useGetUserQuery();
 
   return (
     <>

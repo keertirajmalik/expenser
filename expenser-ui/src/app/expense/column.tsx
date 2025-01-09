@@ -1,7 +1,5 @@
-import {
-  ExpenseForm,
-  ExpenseFormSchema,
-} from "@/app/create-dialog/expense-form";
+import { ExpenseFormSchema } from "@/app/create-dialog/expense-form";
+import { EditExpenseSheet } from "@/app/expense/editsheet";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
 import { DeleteDialog } from "@/components/data-table/row-action";
 import { badgeVariants } from "@/components/ui/badge";
@@ -14,19 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import {
   useDeleteExpenseQuery,
-  useUpdateExpenseQuery,
+  useUpdateExpenseMutation,
 } from "@/hooks/use-expense-query";
 import { Expense } from "@/types/expense";
-import { ColumnDef, Row } from "@tanstack/react-table";
-import { parse } from "date-fns";
+import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
@@ -87,7 +77,7 @@ export const columns: ColumnDef<Expense>[] = [
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-      const editExpenseMutation = useUpdateExpenseQuery();
+      const editExpenseMutation = useUpdateExpenseMutation();
       const onSubmit = (data: z.infer<typeof ExpenseFormSchema>) => {
         editExpenseMutation.mutate(
           { expense: data, id: row.original.id },
@@ -133,7 +123,12 @@ export const columns: ColumnDef<Expense>[] = [
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          {EditExpenseSheet(editSheetOpen, setEditSheetOpen, onSubmit, row)}
+          <EditExpenseSheet
+            editSheetOpen={editSheetOpen}
+            setEditSheetOpen={setEditSheetOpen}
+            onSubmit={onSubmit}
+            row={row}
+          />
           <DeleteDialog
             setDeleteDialogOpen={setDeleteDialogOpen}
             deleteDialogOpen={deleteDialogOpen}
@@ -144,42 +139,3 @@ export const columns: ColumnDef<Expense>[] = [
     },
   },
 ];
-
-function EditExpenseSheet(
-  editSheetOpen: boolean,
-  setEditSheetOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  onSubmit: (data: z.infer<typeof ExpenseFormSchema>) => void,
-  row: Row<Expense>,
-) {
-  return (
-    <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle>Edit Expense Details</SheetTitle>
-          <SheetDescription>
-            Make changes to your expense here. Click submit when you're done.
-          </SheetDescription>
-        </SheetHeader>
-
-        <ExpenseForm
-          initialData={{
-            name: row.original.name,
-            type: row.original.type,
-            amount: row.original.amount.toString(),
-            date: parse(row.original.date.toString(), "dd/MM/yyyy", new Date()),
-            note: row.original.note,
-          }}
-          onSubmit={onSubmit}
-        />
-        <Button
-          type="reset"
-          variant="secondary"
-          className="w-full my-4"
-          onClick={() => setEditSheetOpen(false)}
-        >
-          Cancel
-        </Button>
-      </SheetContent>
-    </Sheet>
-  );
-}

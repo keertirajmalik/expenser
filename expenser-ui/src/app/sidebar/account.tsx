@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useUpdateUserQuery } from "@/hooks/use-user-query";
+import { useUpdateUserMutation } from "@/hooks/use-user-query";
 import { generateAvatarName } from "@/lib/utils";
 import { ChangeEvent, useRef, useState } from "react";
 
@@ -54,7 +54,7 @@ export default function AccountPage({
     fileInputRef.current?.click();
   };
 
-  const editAccountMutation = useUpdateUserQuery();
+  const editAccountMutation = useUpdateUserMutation();
 
   const onClick = () => {
     editAccountMutation.mutate(
@@ -119,9 +119,7 @@ export default function AccountPage({
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={onClick}>
-            Save changes
-          </Button>
+          <Button onClick={onClick}>Save changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
