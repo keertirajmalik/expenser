@@ -32,7 +32,7 @@ type ResponseCategory struct {
 func (d Config) GetCategoriesFromDB(ctx context.Context, userId uuid.UUID) ([]ResponseCategory, error) {
 	dbCategories, err := d.Queries.GetCategory(ctx, userId)
 	if err != nil {
-		log.Println("Couldn't get transaction type from in DB", err)
+		log.Println("Couldn't get categories from in DB", err)
 		return []ResponseCategory{}, err
 	}
 
@@ -76,19 +76,19 @@ func (d Config) GetCategoryByIdFromDB(ctx context.Context, id, userId uuid.UUID)
 	return category, nil
 }
 
-func (d Config) AddCategoryToDB(ctx context.Context, transactionType Category) (ResponseCategory, error) {
+func (d Config) AddCategoryToDB(ctx context.Context, category Category) (ResponseCategory, error) {
 	dbCategory, err := d.Queries.CreateCategory(ctx, repository.CreateCategoryParams{
 		ID:          uuid.New(),
-		Name:        transactionType.Name,
-		Description: &transactionType.Description,
-		UserID:      transactionType.UserID,
+		Name:        category.Name,
+		Description: &category.Description,
+		UserID:      category.UserID,
 	})
 
 	if err != nil {
-		log.Printf("Failed to create transaction type %s for user %s: %v", transactionType.ID, transactionType.UserID, err)
+        log.Printf("Failed to create category %s for user %s: %v", category.ID, category.UserID, err)
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
-			return ResponseCategory{}, &database.ErrDuplicateData{Column: transactionType.Name}
+			return ResponseCategory{}, &database.ErrDuplicateData{Column: category.Name}
 		}
 		return ResponseCategory{}, err
 	}

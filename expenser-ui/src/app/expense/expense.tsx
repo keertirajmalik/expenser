@@ -27,7 +27,7 @@ export default function Expense() {
           </div>
         </div>
         <CreateDialog
-          creationCategory="Expense"
+          creation="Expense"
           title="Create Expense"
           description=" Provide information regarding expense."
         />

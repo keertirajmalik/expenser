@@ -31,14 +31,14 @@ const generateColors = (count: number): string[] => {
   });
 };
 
-const getUniqueCategorys = (expenses: Expense[]): string[] => {
+const getUniqueCategories = (expenses: Expense[]): string[] => {
   return Array.from(new Set(expenses.map((item: Expense) => item.category)));
 };
 
 const createChartConfig = (data: Expense[]): ChartConfig => {
-  const uniqueCategorys = getUniqueCategorys(data);
-  const colors = generateColors(uniqueCategorys.length);
-  return uniqueCategorys.reduce<ChartConfig>((acc, category, index) => {
+  const uniqueCategories = getUniqueCategories(data);
+  const colors = generateColors(uniqueCategories.length);
+  return uniqueCategories.reduce<ChartConfig>((acc, category, index) => {
     acc[category] = { label: category, color: colors[index] };
     return acc;
   }, {});
@@ -81,7 +81,7 @@ export function PieChartComponent({ data }: PieChartProps) {
             <Pie
               data={chartData}
               dataKey="amount"
-              nameKey="type"
+              nameKey="category"
               innerRadius={60}
               strokeWidth={5}
             >
@@ -118,7 +118,7 @@ export function PieChartComponent({ data }: PieChartProps) {
               />
             </Pie>
             <ChartLegend
-              content={<ChartLegendContent nameKey="type" />}
+              content={<ChartLegendContent nameKey="category" />}
               className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
             />
           </PieChart>

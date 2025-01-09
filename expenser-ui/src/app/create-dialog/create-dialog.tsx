@@ -22,13 +22,13 @@ import { useState } from "react";
 import { z } from "zod";
 
 interface CreateDialogProps {
-  creationCategory: "Expense" | "Category";
+  creation: "Expense" | "Category";
   title: string;
   description: string;
 }
 
 export function CreateDialog({
-  creationCategory,
+  creation: creationCategory,
   title,
   description,
 }: CreateDialogProps) {

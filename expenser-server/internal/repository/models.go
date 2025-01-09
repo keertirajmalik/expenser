@@ -9,16 +9,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Account struct {
-	ID             uuid.UUID          `json:"id"`
-	Name           string             `json:"name"`
-	Username       string             `json:"username"`
-	HashedPassword string             `json:"hashed_password"`
-	Image          *string            `json:"image"`
-	CreatedAt      pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
-}
-
 type Category struct {
 	ID          uuid.UUID          `json:"id"`
 	Name        string             `json:"name"`
@@ -38,4 +28,14 @@ type Transaction struct {
 	UserID    uuid.UUID          `json:"user_id"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type User struct {
+	ID             uuid.UUID          `json:"id"`
+	Name           string             `json:"name"`
+	Username       string             `json:"username"`
+	HashedPassword string             `json:"hashed_password"`
+	Image          *string            `json:"image"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
 }

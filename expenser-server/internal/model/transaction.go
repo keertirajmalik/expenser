@@ -181,8 +181,8 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTra
 	if err != nil {
 		log.Printf("Failed to update transaction %s for user %s: %v", transaction.ID, transaction.UserID, err)
 		var pgErr *pgconn.PgError
-		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeForiegnKeyViolation {
-			return ResponseTransaction{}, &database.ErrForiegnKeyViolation{Column: "Category"}
+		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeForeignKeyViolation {
+			return ResponseTransaction{}, &database.ErrForeignKeyViolation{Column: "Category"}
 		}
 		if errors.Is(err, pgx.ErrNoRows) {
 			return ResponseTransaction{}, errors.New("Transaction not found")

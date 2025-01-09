@@ -15,7 +15,7 @@ import { z } from "zod";
 
 export const CategoryFormSchema = z.object({
   name: z.string().nonempty({
-    message: "Expense  category name is required.",
+    message: "Expense category name is required.",
   }),
   description: z.string(),
 });

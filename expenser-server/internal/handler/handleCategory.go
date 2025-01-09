@@ -83,7 +83,7 @@ func HandleUpdateCategory(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err = decoder.Decode(&params)
 		if err != nil {
-			log.Printf("Error while decoding parameters:%v", err)
+			log.Printf("Error while decoding parameters: %v", err)
 			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
 			return
 		}
@@ -112,6 +112,7 @@ func HandleUpdateCategory(data model.Config) http.HandlerFunc {
 		respondWithJson(w, http.StatusOK, category)
 	}
 }
+
 func HandleDeleteCategory(data model.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")

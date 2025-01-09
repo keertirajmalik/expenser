@@ -48,7 +48,7 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 		return User{}, err
 	}
 
-	users := convertDBUserToUser([]repository.Account{dbUser})
+	users := convertDBUserToUser([]repository.User{dbUser})
 
 	return users[0], nil
 }
@@ -60,7 +60,7 @@ func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (U
 		return User{}, err
 	}
 
-	user := convertDBUserToUser([]repository.Account{dbUser})
+	user := convertDBUserToUser([]repository.User{dbUser})
 	return user[0], nil
 }
 
@@ -74,11 +74,11 @@ func (d Config) GetUserByUserIdFromDB(ctx context.Context, userId uuid.UUID) (Us
 		return User{}, err
 	}
 
-	user := convertDBUserToUser([]repository.Account{dbUser})
+	user := convertDBUserToUser([]repository.User{dbUser})
 	return user[0], nil
 }
 
-func convertDBUserToUser(dbUsers []repository.Account) []User {
+func convertDBUserToUser(dbUsers []repository.User) []User {
 	users := []User{}
 
 	for _, user := range dbUsers {
@@ -114,7 +114,7 @@ func (d Config) UpdateUserInDB(ctx context.Context, user User) (User, error) {
 		return User{}, err
 	}
 
-	users := convertDBUserToUser([]repository.Account{dbUser})
+	users := convertDBUserToUser([]repository.User{dbUser})
 
 	return users[0], nil
 }
