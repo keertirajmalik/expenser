@@ -9,29 +9,31 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/keertirajmalik/expenser/expenser-server/database"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 	"github.com/shopspring/decimal"
 )
 
 type InputTransaction struct {
-	ID              uuid.UUID       `json:"id"`
-	Name            string          `json:"name"`
-	Amount          decimal.Decimal `json:"amount"`
-	TransactionType uuid.UUID       `json:"type"`
-	Date            string          `json:"date"`
-	Note            string          `json:"note"`
-	UserID          uuid.UUID       `json:"user_id"`
+	ID       uuid.UUID       `json:"id"`
+	Name     string          `json:"name"`
+	Amount   decimal.Decimal `json:"amount"`
+	Category uuid.UUID       `json:"category"`
+	Date     string          `json:"date"`
+	Note     string          `json:"note"`
+	UserID   uuid.UUID       `json:"user_id"`
 }
 
 type ResponseTransaction struct {
-	ID              uuid.UUID       `json:"id"`
-	Name            string          `json:"name"`
-	Amount          decimal.Decimal `json:"amount"`
-	TransactionType string          `json:"type"`
-	Date            string          `json:"date"`
-	Note            string          `json:"note"`
-	User            string          `json:"user"`
+	ID       uuid.UUID       `json:"id"`
+	Name     string          `json:"name"`
+	Amount   decimal.Decimal `json:"amount"`
+	Category string          `json:"category"`
+	Date     string          `json:"date"`
+	Note     string          `json:"note"`
+	User     string          `json:"user"`
 }
 
 func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]ResponseTransaction, error) {
@@ -68,13 +70,13 @@ func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]
 		}
 
 		transactions = append(transactions, ResponseTransaction{
-			ID:              transaction.ID,
-			Name:            transaction.Name,
-			Amount:          money,
-			TransactionType: transaction.Type,
-			Date:            date,
-			Note:            noteValue,
-			User:            transaction.User,
+			ID:       transaction.ID,
+			Name:     transaction.Name,
+			Amount:   money,
+			Category: transaction.Category,
+			Date:     date,
+			Note:     noteValue,
+			User:     transaction.User,
 		})
 	}
 
@@ -97,10 +99,10 @@ func (d Config) AddTransactionToDB(ctx context.Context, transaction InputTransac
 	}
 
 	dbTransaction, err := d.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
-		ID:     uuid.New(),
-		Name:   transaction.Name,
-		Type:   transaction.TransactionType,
-		Amount: *money,
+		ID:       uuid.New(),
+		Name:     transaction.Name,
+		Category: transaction.Category,
+		Amount:   *money,
 		Date: pgtype.Date{
 			Time:  parsedDate,
 			Valid: true,
@@ -138,13 +140,13 @@ func (d Config) AddTransactionToDB(ctx context.Context, transaction InputTransac
 		}
 	}
 	transactionResponse := ResponseTransaction{
-		ID:              dbTransaction.ID,
-		Name:            dbTransaction.Name,
-		Amount:          dbMoney,
-		TransactionType: dbTransaction.Name,
-		Date:            date,
-		Note:            noteValue,
-		User:            dbTransaction.User,
+		ID:       dbTransaction.ID,
+		Name:     dbTransaction.Name,
+		Amount:   dbMoney,
+		Category: dbTransaction.Category,
+		Date:     date,
+		Note:     noteValue,
+		User:     dbTransaction.User,
 	}
 	return transactionResponse, nil
 }
@@ -164,10 +166,10 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTra
 	}
 
 	dbTransaction, err := d.Queries.UpdateTransaction(ctx, repository.UpdateTransactionParams{
-		ID:     transaction.ID,
-		Name:   transaction.Name,
-		Type:   transaction.TransactionType,
-		Amount: *money,
+		ID:       transaction.ID,
+		Name:     transaction.Name,
+		Category: transaction.Category,
+		Amount:   *money,
 		Date: pgtype.Date{
 			Time:  parsedDate,
 			Valid: true,
@@ -178,6 +180,10 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTra
 
 	if err != nil {
 		log.Printf("Failed to update transaction %s for user %s: %v", transaction.ID, transaction.UserID, err)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeForeignKeyViolation {
+			return ResponseTransaction{}, &database.ErrForeignKeyViolation{Column: "Category"}
+		}
 		if errors.Is(err, pgx.ErrNoRows) {
 			return ResponseTransaction{}, errors.New("Transaction not found")
 		}
@@ -208,13 +214,13 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTra
 		}
 	}
 	transactionResponse := ResponseTransaction{
-		ID:              dbTransaction.ID,
-		Name:            dbTransaction.Name,
-		Amount:          dbMoney,
-		TransactionType: dbTransaction.Name,
-		Date:            date,
-		Note:            noteValue,
-		User:            dbTransaction.User,
+		ID:       dbTransaction.ID,
+		Name:     dbTransaction.Name,
+		Amount:   dbMoney,
+		Category: dbTransaction.Category,
+		Date:     date,
+		Note:     noteValue,
+		User:     dbTransaction.User,
 	}
 	return transactionResponse, nil
 }

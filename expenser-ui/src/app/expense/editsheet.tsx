@@ -41,7 +41,7 @@ export function EditExpenseSheet({
         <ExpenseForm
           initialData={{
             name: row.original.name,
-            type: row.original.type,
+            category: row.original.category,
             amount: row.original.amount.toString(),
             date: parse(row.original.date.toString(), "dd/MM/yyyy", new Date()),
             note: row.original.note,

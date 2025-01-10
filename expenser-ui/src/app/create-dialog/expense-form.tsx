@@ -23,7 +23,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { useGetTypeQuery } from "@/hooks/use-type-query";
+import { useGetCategoryQuery } from "@/hooks/use-category-query";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
@@ -36,7 +36,7 @@ interface ExpenseFormProps {
   onSubmit: (data: z.infer<typeof ExpenseFormSchema>) => void;
   initialData?: {
     name: string;
-    type: string;
+    category: string;
     amount: string;
     date: Date;
     note: string;
@@ -47,8 +47,8 @@ export const ExpenseFormSchema = z.object({
   name: z.string().nonempty({
     message: "Expense name is required.",
   }),
-  type: z.string().nonempty({
-    message: "Expense type is required.",
+  category: z.string().nonempty({
+    message: "Expense category is required.",
   }),
   amount: z.string().nonempty({
     message: "Expense amount is required.",
@@ -60,15 +60,15 @@ export const ExpenseFormSchema = z.object({
 });
 
 export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
-  const [openType, setOpenType] = useState(false);
+  const [openCategory, setOpenCategory] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
-  const { data: expenseTypes } = useGetTypeQuery();
+  const { data: categories } = useGetCategoryQuery();
 
   const form = useForm<z.infer<typeof ExpenseFormSchema>>({
     resolver: zodResolver(ExpenseFormSchema),
     defaultValues: initialData || {
       name: "",
-      type: "",
+      category: "",
       amount: "",
       date: undefined,
       note: "",
@@ -78,16 +78,16 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
   useEffect(() => {
     if (initialData) {
       form.reset(initialData);
-      if (initialData.type) {
-        const typeOption = expenseTypes?.find(
-          (type) => type.name === initialData.type,
+      if (initialData.category) {
+        const categoryOption = categories?.find(
+          (category) => category.name === initialData.category,
         );
-        if (typeOption) {
-          form.setValue("type", typeOption.id);
+        if (categoryOption) {
+          form.setValue("category", categoryOption.id);
         }
       }
     }
-  }, [initialData, expenseTypes]);
+  }, [initialData, categories]);
 
   return (
     <Form {...form}>
@@ -107,11 +107,11 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
         />
         <FormField
           control={form.control}
-          name="type"
+          name="category"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Expense Type</FormLabel>
-              <Popover open={openType} onOpenChange={setOpenType}>
+              <FormLabel>Expense Category</FormLabel>
+              <Popover open={openCategory} onOpenChange={setOpenCategory}>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
@@ -123,33 +123,34 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
                       )}
                     >
                       {field.value
-                        ? expenseTypes?.find((type) => type.id === field.value)
-                            ?.name
-                        : "Select Expense Type"}
+                        ? categories?.find(
+                            (category) => category.id === field.value,
+                          )?.name
+                        : "Select Expense Category"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-[200px] p-0">
+                <PopoverContent className="w-[250px] p-0">
                   <Command>
-                    <CommandInput placeholder="Search expense type..." />
+                    <CommandInput placeholder="Search expense category..." />
                     <CommandList>
-                      <CommandEmpty>No expense type found.</CommandEmpty>
+                      <CommandEmpty>No expense category found.</CommandEmpty>
                       <CommandGroup>
-                        {expenseTypes?.map((type) => (
+                        {categories?.map((category) => (
                           <CommandItem
-                            value={type.name}
-                            key={type.id}
+                            value={category.name}
+                            key={category.id}
                             onSelect={() => {
-                              form.setValue("type", type.id);
-                              setOpenType(false);
+                              form.setValue("category", category.id);
+                              setOpenCategory(false);
                             }}
                           >
-                            {type.name}
+                            {category.name}
                             <Check
                               className={cn(
                                 "ml-auto",
-                                type.id === field.value
+                                category.id === field.value
                                   ? "opacity-100"
                                   : "opacity-0",
                               )}

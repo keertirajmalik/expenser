@@ -1,6 +1,6 @@
 -- +goose Up
 
-CREATE TABLE transaction_types(
+CREATE TABLE categories(
     id UUID PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
@@ -10,12 +10,12 @@ CREATE TABLE transaction_types(
     UNIQUE(name, user_id)
 );
 
-CREATE INDEX idx_transaction_types_name ON transaction_types(name);
+CREATE INDEX idx_categories_name ON categories(name);
 
-CREATE TRIGGER update_transaction_types_updated_at
-    BEFORE UPDATE ON transaction_types
+CREATE TRIGGER update_categories_updated_at
+    BEFORE UPDATE ON categories
     FOR EACH ROW
     EXECUTE FUNCTION trigger_set_timestamp();
 
 -- +goose Down
-DROP TABLE transaction_types;
+DROP TABLE categories;

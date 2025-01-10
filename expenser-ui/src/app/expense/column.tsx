@@ -33,14 +33,14 @@ export const columns: ColumnDef<Expense>[] = [
     },
   },
   {
-    accessorKey: "type",
+    accessorKey: "category",
     header: ({ column }) => {
-      return <DataTableColumnHeader column={column} title="Type" />;
+      return <DataTableColumnHeader column={column} title="Category" />;
     },
     cell: ({ row }) => {
       return (
-        <Link className={badgeVariants({ variant: "default" })} to="/type">
-          {row.getValue("type")}
+        <Link className={badgeVariants({ variant: "default" })} to="/category">
+          {row.getValue("category")}
         </Link>
       );
     },

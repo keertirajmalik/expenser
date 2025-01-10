@@ -9,25 +9,25 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Transaction struct {
-	ID        uuid.UUID          `json:"id"`
-	Name      string             `json:"name"`
-	Amount    pgtype.Numeric     `json:"amount"`
-	Type      uuid.UUID          `json:"type"`
-	Date      pgtype.Date        `json:"date"`
-	Note      *string            `json:"note"`
-	UserID    uuid.UUID          `json:"user_id"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-}
-
-type TransactionType struct {
+type Category struct {
 	ID          uuid.UUID          `json:"id"`
 	Name        string             `json:"name"`
 	Description *string            `json:"description"`
 	UserID      uuid.UUID          `json:"user_id"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+}
+
+type Transaction struct {
+	ID        uuid.UUID          `json:"id"`
+	Name      string             `json:"name"`
+	Amount    pgtype.Numeric     `json:"amount"`
+	Category  uuid.UUID          `json:"category"`
+	Date      pgtype.Date        `json:"date"`
+	Note      *string            `json:"note"`
+	UserID    uuid.UUID          `json:"user_id"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
 type User struct {

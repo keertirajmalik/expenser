@@ -13,24 +13,24 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-export const TypeFormSchema = z.object({
+export const CategoryFormSchema = z.object({
   name: z.string().nonempty({
-    message: "Expense  type name is required.",
+    message: "Expense category name is required.",
   }),
   description: z.string(),
 });
 
-interface TypeFormProps {
-  onSubmit: (data: z.infer<typeof TypeFormSchema>) => void;
+interface CategoryFormProps {
+  onSubmit: (data: z.infer<typeof CategoryFormSchema>) => void;
   initialData?: {
     name: string;
     description: string;
   };
 }
 
-export function TypeForm({ onSubmit, initialData }: TypeFormProps) {
-  const form = useForm<z.infer<typeof TypeFormSchema>>({
-    resolver: zodResolver(TypeFormSchema),
+export function CategoryForm({ onSubmit, initialData }: CategoryFormProps) {
+  const form = useForm<z.infer<typeof CategoryFormSchema>>({
+    resolver: zodResolver(CategoryFormSchema),
     defaultValues: initialData || {
       name: "",
       description: "",
@@ -47,7 +47,7 @@ export function TypeForm({ onSubmit, initialData }: TypeFormProps) {
             <FormItem>
               <FormLabel>Expense Name</FormLabel>
               <FormControl>
-                <Input placeholder="Name of your expense type" {...field} />
+                <Input placeholder="Name of your expense category" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -61,7 +61,7 @@ export function TypeForm({ onSubmit, initialData }: TypeFormProps) {
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Tell us a little bit about expense type"
+                  placeholder="Tell us a little bit about expense category"
                   className="resize-none"
                   {...field}
                 />

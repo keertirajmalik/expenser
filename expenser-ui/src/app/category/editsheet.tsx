@@ -1,4 +1,7 @@
-import { TypeFormSchema, TypeForm } from "@/app/create-dialog/type-form";
+import {
+  CategoryFormSchema,
+  CategoryForm,
+} from "@/app/create-dialog/category-form";
 import { Button } from "@/components/ui/button";
 import {
   SheetContent,
@@ -7,34 +10,35 @@ import {
   SheetDescription,
   Sheet,
 } from "@/components/ui/sheet";
-import { Type } from "@/types/expenseType";
+import { Category } from "@/types/category";
 import { Row } from "@tanstack/react-table";
 import { z } from "zod";
 
-interface EditTypeSheetProps {
+interface EditCategorySheetProps {
   editSheetOpen: boolean;
   setEditSheetOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onSubmit: (data: z.infer<typeof TypeFormSchema>) => void;
-  row: Row<Type>;
+  onSubmit: (data: z.infer<typeof CategoryFormSchema>) => void;
+  row: Row<Category>;
 }
 
-export function EditTypeSheet({
+export function EditCategorySheet({
   editSheetOpen,
   setEditSheetOpen,
   onSubmit,
   row,
-}: EditTypeSheetProps) {
+}: EditCategorySheetProps) {
   return (
     <Sheet open={editSheetOpen} onOpenChange={setEditSheetOpen}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Edit Expese Details</SheetTitle>
+          <SheetTitle>Edit Category Details</SheetTitle>
           <SheetDescription>
-            Make changes to your expense here. Click submit when you're done.
+            Make changes to your category details here. Click submit when you're
+            done.
           </SheetDescription>
         </SheetHeader>
 
-        <TypeForm
+        <CategoryForm
           onSubmit={onSubmit}
           initialData={{
             name: row.original.name,

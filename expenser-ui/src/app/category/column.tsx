@@ -1,18 +1,18 @@
-import { TypeFormSchema } from "@/app/create-dialog/type-form";
-import { EditTypeSheet } from "@/app/type/editsheet";
+import { CategoryFormSchema } from "@/app/create-dialog/category-form";
+import { EditCategorySheet } from "@/app/category/editsheet";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
 import { DeleteDialog } from "@/components/data-table/row-action";
 import {
-  useDeleteTypeMutation,
-  useUpdateTypeMutation,
-} from "@/hooks/use-type-query";
-import { Type } from "@/types/expenseType";
+  useDeleteCategoryMutation,
+  useUpdateCategoryMutation,
+} from "@/hooks/use-category-query";
+import { Category } from "@/types/category";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
-export const columns: ColumnDef<Type>[] = [
+export const columns: ColumnDef<Category>[] = [
   {
     id: "id",
   },
@@ -32,15 +32,15 @@ export const columns: ColumnDef<Type>[] = [
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-      const editTypeMutation = useUpdateTypeMutation();
-      const onSubmit = (data: z.infer<typeof TypeFormSchema>) => {
-        editTypeMutation.mutate({ type: data, id: row.original.id });
+      const editCategoryMutation = useUpdateCategoryMutation();
+      const onSubmit = (data: z.infer<typeof CategoryFormSchema>) => {
+        editCategoryMutation.mutate({ category: data, id: row.original.id });
         setEditSheetOpen(false);
       };
 
-      const deleteTypeMutation = useDeleteTypeMutation();
+      const deleteCategoryMutation = useDeleteCategoryMutation();
       const onDeleteClick = () => {
-        deleteTypeMutation.mutate(row.original.id);
+        deleteCategoryMutation.mutate(row.original.id);
         setDeleteDialogOpen(false);
       };
 
@@ -61,7 +61,7 @@ export const columns: ColumnDef<Type>[] = [
               className="cursor-pointer"
             />
           </div>
-          <EditTypeSheet
+          <EditCategorySheet
             row={row}
             editSheetOpen={editSheetOpen}
             setEditSheetOpen={setEditSheetOpen}

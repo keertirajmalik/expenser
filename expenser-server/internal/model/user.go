@@ -22,7 +22,7 @@ type User struct {
 }
 
 func (d Config) GetUsersFromDB(ctx context.Context) ([]User, error) {
-	dbUsers, err := d.Queries.GetUsers(ctx)
+	dbUsers, err := d.Queries.GetUser(ctx)
 	if err != nil {
 		log.Println("Couldn't get users from DB", err)
 		return []User{}, err
