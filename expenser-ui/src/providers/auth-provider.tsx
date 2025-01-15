@@ -54,7 +54,7 @@ export const AuthProvider = ({
     localStorage.setItem("token", token);
     localStorage.setItem("expireAt", expireAt);
     setIsLoggedIn(true);
-    navigate("/");
+    navigate("/dashboard");
   };
 
   const handleLogout = () => {

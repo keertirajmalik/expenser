@@ -7,7 +7,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetExpensesQuery } from "@/hooks/use-expense-query";
 
 export default function Dashboard() {
-  const { data } = useGetExpensesQuery();
+  const { data = [] } = useGetExpensesQuery();
 
   return (
     <div className="flex h-96 w-full flex-col gap-2">
@@ -26,12 +26,12 @@ export default function Dashboard() {
       </header>
       <main className="flex flex-col  items-center gap-2" role="main">
         <div className="flex gap-2">
-          <BarChartComponent data={data ?? []} />
-          <LineChartComponent data={data ?? []} />
+          <BarChartComponent data={data} />
+          <LineChartComponent data={data} />
         </div>
         <div className="flex gap-2">
-          <PieChartComponent data={data ?? []} />
-          <RecentExpenses data={data ?? []} />
+          <PieChartComponent data={data} />
+          <RecentExpenses data={data} />
         </div>
       </main>
     </div>
