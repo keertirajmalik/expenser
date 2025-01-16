@@ -14,7 +14,26 @@ export const useGetUserQuery = () => {
 
   return query;
 };
-
+export const useCreateUserMutation = () => {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: async (data: {
+      name: string;
+      username: string;
+      password: string;
+    }) => {
+      const res = await apiRequest("/cxf/user", "POST", data);
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error);
+      }
+      showToast("User Created", "User created successfully.");
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["user"] }),
+    onError: (error: Error) => showToast("User Creation Failed", error.message),
+  });
+  return mutation;
+};
 export const useUpdateUserMutation = () => {
   const queryClient = useQueryClient();
 

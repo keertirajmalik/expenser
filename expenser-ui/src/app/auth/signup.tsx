@@ -14,6 +14,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
+import { useCreateUserMutation, useGetUserQuery } from "@/hooks/use-user-query";
 
 const validatePassword = (pass: string) => {
   if (pass.length < 8) {
@@ -30,13 +31,13 @@ const validatePassword = (pass: string) => {
 
 function SignupForm() {
   const navigate = useNavigate();
-  const toast = useToast();
   const [username, setUsername] = useState("");
   const [fullname, setFullname] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
   const [error, setError] = useState("");
+  const createUserMutation = useCreateUserMutation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,24 +50,12 @@ function SignupForm() {
       setError(passwordError);
       return;
     }
-    apiRequest("/cxf/user", "POST", { name: fullname, username, password })
-      .then(async (response) => {
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.error);
-        }
-        return response.json();
-      })
-      .then(() => {
+    const data = { name: fullname, username, password };
+    createUserMutation.mutate(data, {
+      onSuccess: () => {
         navigate("/auth/login");
-      })
-      .catch((error) => {
-        toast.toast({
-          title: "User creation failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      });
+      },
+    });
   };
 
   return (
