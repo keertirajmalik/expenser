@@ -80,7 +80,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
       form.reset(initialData);
       if (initialData.category) {
         const categoryOption = categories?.find(
-          (category) => category.name === initialData.category,
+          (category) => category.name === initialData.category
         );
         if (categoryOption) {
           form.setValue("category", categoryOption.id);
@@ -119,12 +119,12 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
                       role="combobox"
                       className={cn(
                         "justify-between",
-                        !field.value && "text-muted-foreground",
+                        !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value
                         ? categories?.find(
-                            (category) => category.id === field.value,
+                            (category) => category.id === field.value
                           )?.name
                         : "Select Expense Category"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -152,7 +152,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
                                 "ml-auto",
                                 category.id === field.value
                                   ? "opacity-100"
-                                  : "opacity-0",
+                                  : "opacity-0"
                               )}
                             />
                           </CommandItem>
@@ -185,14 +185,18 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Expense Date</FormLabel>
-              <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
+              <Popover
+                open={openCalendar}
+                onOpenChange={setOpenCalendar}
+                modal={true}
+              >
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       variant={"outline"}
                       className={cn(
                         "pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground",
+                        !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value ? (
