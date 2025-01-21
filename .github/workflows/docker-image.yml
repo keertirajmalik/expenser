@@ -41,8 +41,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=keertirajmalik/expenser-backend:buildcache
-          cache-to: type=registry,ref=keertirajmalik/expenser-backend:buildcache,mode=max
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
