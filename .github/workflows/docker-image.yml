@@ -9,7 +9,6 @@ jobs:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     permissions:
-      packages: write
       contents: read
       attestations: write
       id-token: write
@@ -28,6 +27,10 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: keertirajmalik/expenser-backend
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=sha-
 
       - name: Build and push Docker image
         id: push
@@ -38,6 +41,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=keertirajmalik/expenser-backend:buildcache
+          cache-to: type=registry,ref=keertirajmalik/expenser-backend:buildcache,mode=max
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
