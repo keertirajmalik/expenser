@@ -15,6 +15,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGetUserQuery } from "@/hooks/use-user-query";
 import { generateAvatarName } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
@@ -26,7 +27,16 @@ export function NavUser() {
   const { handleLogout } = useAuth();
   const [accountOpen, setAccountOpen] = useState(false);
 
-  const { data } = useGetUserQuery();
+  const { data, error, isLoading } = useGetUserQuery();
+
+  if (isLoading) {
+    return <Skeleton className="w-[100px] h-[20px] rounded-full" />;
+  }
+
+  if (error) {
+    console.error("Error fetching user data:", error);
+    return <div>Error loading user data</div>;
+  }
 
   return (
     <>
