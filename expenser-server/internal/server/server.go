@@ -11,6 +11,7 @@ import (
 	"github.com/keertirajmalik/expenser/expenser-server/database"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
+	"github.com/keertirajmalik/expenser/expenser-server/logger"
 	"github.com/keertirajmalik/expenser/expenser-server/middleware"
 )
 
@@ -60,7 +61,6 @@ func NewServer() *http.Server {
 |_____| /_/\_\ | .__/   \___| |_| |_| |___/  \___| |_|
                |_|                                       `)
 
-	log.Printf("Server is running on port %d\n", port)
-
+	logger.Info(fmt.Sprintf("Server is running on port %d\n", port))
 	return server
 }

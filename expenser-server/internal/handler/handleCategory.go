@@ -2,11 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
+	"github.com/keertirajmalik/expenser/expenser-server/logger"
 )
 
 func HandleGetCategory(data model.Config) http.HandlerFunc {
@@ -32,7 +32,7 @@ func HandleCreateCategory(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err := decoder.Decode(&params)
 		if err != nil {
-			log.Printf("Error while decoding parameters:%s", err)
+			logger.Error("Error while decoding parameters:%s", err)
 			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
 			return
 		}
@@ -74,7 +74,7 @@ func HandleUpdateCategory(data model.Config) http.HandlerFunc {
 
 		id, err := uuid.Parse(idStr)
 		if err != nil {
-			log.Println("Error while parsing uuid: ", err)
+			logger.Error("Error while parsing uuid: ", err)
 			respondWithError(w, http.StatusBadRequest, "Invalid id")
 			return
 		}
@@ -83,7 +83,7 @@ func HandleUpdateCategory(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err = decoder.Decode(&params)
 		if err != nil {
-			log.Printf("Error while decoding parameters: %v", err)
+			logger.Error("Error while decoding parameters: %v", err)
 			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
 			return
 		}

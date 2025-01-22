@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,6 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/keertirajmalik/expenser/expenser-server/database"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
+	"github.com/keertirajmalik/expenser/expenser-server/logger"
 )
 
 type Category struct {
@@ -32,7 +32,7 @@ type ResponseCategory struct {
 func (d Config) GetCategoriesFromDB(ctx context.Context, userId uuid.UUID) ([]ResponseCategory, error) {
 	dbCategories, err := d.Queries.GetCategory(ctx, userId)
 	if err != nil {
-		log.Println("Couldn't get categories from in DB", err)
+		logger.Error("Couldn't get categories from in DB", err)
 		return []ResponseCategory{}, err
 	}
 
@@ -58,7 +58,7 @@ func (d Config) GetCategoriesFromDB(ctx context.Context, userId uuid.UUID) ([]Re
 func (d Config) GetCategoryByIdFromDB(ctx context.Context, id, userId uuid.UUID) (ResponseCategory, error) {
 	dbCategory, err := d.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: id, UserID: userId})
 	if err != nil {
-		log.Println("Couldn't get transaction type from in DB", err)
+		logger.Error("Couldn't get transaction type from in DB", err)
 		return ResponseCategory{}, err
 	}
 
@@ -85,7 +85,7 @@ func (d Config) AddCategoryToDB(ctx context.Context, category Category) (Respons
 	})
 
 	if err != nil {
-		log.Printf("Failed to create category %s for user %s: %v", category.ID, category.UserID, err)
+		logger.Error("Failed to create category %s for user %s: %v", category.ID, category.UserID, err)
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
 			return ResponseCategory{}, &database.ErrDuplicateData{Column: category.Name}
@@ -111,7 +111,7 @@ func (d Config) AddCategoryToDB(ctx context.Context, category Category) (Respons
 func (d Config) DeleteCategoryFromDB(ctx context.Context, id, userID uuid.UUID) error {
 	result, err := d.Queries.DeleteCategory(ctx, repository.DeleteCategoryParams{ID: id, UserID: userID})
 	if err != nil {
-		log.Printf("Failed to delete category %s for user %s: %v", id, userID, err)
+		logger.Error("Failed to delete category %s for user %s: %v", id, userID, err)
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeForeignKeyViolation {
 			data, _ := d.GetCategoryByIdFromDB(ctx, id, userID)
@@ -120,13 +120,13 @@ func (d Config) DeleteCategoryFromDB(ctx context.Context, id, userID uuid.UUID) 
 		if errors.Is(err, pgx.ErrNoRows) {
 			return errors.New("Category not found")
 		}
-		log.Println("Couldn't delete category from DB", err)
+		logger.Error("Couldn't delete category from DB", err)
 		return err
 	}
 
 	rowAffected := result.RowsAffected()
 	if rowAffected == 0 {
-		log.Printf("Failed to delete category %s for user %s: %v", id, userID, err)
+		logger.Error("Failed to delete category %s for user %s: %v", id, userID, err)
 		return fmt.Errorf("category %s not found for user %s", id, userID)
 	}
 
@@ -142,7 +142,7 @@ func (d Config) UpdateCategoryInDB(ctx context.Context, category Category) (Resp
 	})
 
 	if err != nil {
-		log.Printf("Failed to update category %s for user %s: %v", category.ID, category.UserID, err)
+		logger.Error("Failed to update category %s for user %s: %v", category.ID, category.UserID, err)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return ResponseCategory{}, errors.New("Category not found")
 		}
