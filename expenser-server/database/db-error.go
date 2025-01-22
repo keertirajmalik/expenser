@@ -13,7 +13,7 @@ type ErrDuplicateData struct {
 }
 
 func (e *ErrDuplicateData) Error() string {
-	return fmt.Sprintf("Data %s already exist", e.Column)
+	return fmt.Sprintf("%s already exist", e.Column)
 }
 
 type ErrNotNullConstraint struct {
@@ -25,9 +25,9 @@ func (e *ErrNotNullConstraint) Error() string {
 }
 
 type ErrForeignKeyViolation struct {
-	Column string
+	Message string
 }
 
 func (e *ErrForeignKeyViolation) Error() string {
-    return fmt.Sprintf("%s column has foreign key constraint violation", e.Column)
+    return e.Message
 }
