@@ -61,6 +61,6 @@ func NewServer() *http.Server {
 |_____| /_/\_\ | .__/   \___| |_| |_| |___/  \___| |_|
                |_|                                       `)
 
-	logger.Info(fmt.Sprintf("Server is running on port %d\n", port))
+	logger.Info(fmt.Sprintf("Server is running on port %d", port))
 	return server
 }

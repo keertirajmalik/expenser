@@ -11,7 +11,7 @@ import (
 type customLogger struct{}
 
 func (c customLogger) Println(level string, v ...interface{}) {
-	file, line := getCallerInfo()
+	file, line := getCallerInfo(3)
 	timestamp := time.Now().UTC().Format(time.RFC3339) // ISO 8601 timestamp
 
 	if file == "unknown" {
@@ -29,16 +29,48 @@ func (c customLogger) Println(level string, v ...interface{}) {
 	)
 	log.Println(message)
 }
+func (c *customLogger) Error(format string, v ...interface{}) {
+	file, line := getCallerInfo(0) // Adjust skip value
+	timestamp := time.Now().UTC().Format(time.RFC3339)
+	message := fmt.Sprintf(v[0].(string), v[1:]...)
 
-func getCallerInfo() (string, int) {
-	for i := 1; i < 10; i++ { // Traverse up to 10 stack levels
+	// Include stack trace for errors
+	stackTrace := GetStackTrace(4) // Start 4 levels up to skip logger frames
+
+	if file == "unknown" {
+		log.Printf("%s [ERROR] %s\nStack Trace:\n%s", timestamp, message, stackTrace)
+	} else {
+		log.Printf("%s [ERROR] %s | Caller: %s:%d\nStack Trace:\n%s", timestamp, message, file, line, stackTrace)
+	}
+}
+
+func getCallerInfo(skip int) (string, int) {
+	for i := skip; i < skip+10; i++ { // Traverse up to 10 stack levels starting at `skip`
 		_, file, line, ok := runtime.Caller(i)
-		if ok && strings.Contains(file, "your-repo-name") { // Replace with your repo name
-			shortFile := file[strings.Index(file, "your-repo-name/"):]
+		if ok && strings.Contains(file, "expenser-server") {
+			shortFile := file[strings.Index(file, "expenser-server/"):]
 			return shortFile, line
 		}
 	}
 	return "unknown", 0
+}
+
+func GetStackTrace(skip int) string {
+	var sb strings.Builder
+	pc := make([]uintptr, 10) // Adjust size for more stack frames if needed
+	n := runtime.Callers(skip, pc)
+	frames := runtime.CallersFrames(pc[:n])
+
+	for {
+		frame, more := frames.Next()
+		// Format each frame
+		sb.WriteString(fmt.Sprintf("%s:%d - %s\n", frame.File, frame.Line, frame.Function))
+		if !more {
+			break
+		}
+	}
+
+	return sb.String()
 }
 
 var logger = customLogger{}
@@ -53,7 +85,7 @@ func Info(v ...interface{}) {
 }
 
 func Error(v ...interface{}) {
-	logger.Println("ERROR", v...)
+	logger.Error("ERROR", v...)
 }
 
 func Debug(v ...interface{}) {
