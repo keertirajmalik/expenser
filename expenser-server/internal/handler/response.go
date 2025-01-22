@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/keertirajmalik/expenser/expenser-server/logger"
 )
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	if code > 499 {
-		logger.Error("Responding with 5XX error: %s", msg)
 	}
 
 	type errorResponse struct {
@@ -26,7 +24,6 @@ func respondWithJson(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	dat, err := json.Marshal(payload)
 	if err != nil {
-		logger.Error("Error marshalling JSON: %s", err)
 		w.WriteHeader(500)
 		return
 	}

@@ -36,7 +36,7 @@ func Logging(next http.Handler) http.Handler {
 			r.URL.Path,         // Request path
 			duration,           // Duration
 		)
-		logger.Info(logMessage)
+		logger.Info(r.Context(), logMessage)
 	})
 }
 

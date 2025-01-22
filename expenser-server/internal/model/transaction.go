@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/google/uuid"
@@ -39,7 +40,7 @@ type ResponseTransaction struct {
 func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]ResponseTransaction, error) {
 	dbTransactions, err := d.Queries.GetTransaction(ctx, userID)
 	if err != nil {
-		logger.Error("Couldn't get transaction from DB: %v", err)
+		logger.Error(ctx, "Couldn't get transaction from DB: %v", err)
 		return []ResponseTransaction{}, err
 	}
 
@@ -65,7 +66,7 @@ func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]
 			var err error
 			money, err = decimal.NewFromString(numStr)
 			if err != nil {
-				logger.Error("Failed to convert Amount: %v", err)
+				logger.Error(ctx, "Failed to convert Amount: %v", err)
 			}
 		}
 
@@ -86,7 +87,7 @@ func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]
 func (d Config) AddTransactionToDB(ctx context.Context, transaction InputTransaction) (ResponseTransaction, error) {
 	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
 	if err != nil {
-		logger.Error("Invalid date format: %v", err)
+		logger.Error(ctx, "Invalid date format: %v", err)
 		return ResponseTransaction{}, fmt.Errorf("invalid date format: %w", err)
 
 	}
@@ -94,7 +95,7 @@ func (d Config) AddTransactionToDB(ctx context.Context, transaction InputTransac
 	money := &pgtype.Numeric{}
 	err = money.Scan(transaction.Amount.String())
 	if err != nil {
-		logger.Error("Invalid amount format: %v", err)
+		logger.Error(ctx, "Invalid amount format: %v", err)
 		return ResponseTransaction{}, fmt.Errorf("Failed to convert amount type: %w", err)
 	}
 
@@ -112,7 +113,7 @@ func (d Config) AddTransactionToDB(ctx context.Context, transaction InputTransac
 	})
 
 	if err != nil {
-		logger.Error("Couldn't create transaction in DB: %v", err)
+		logger.Error(ctx, "Couldn't create transaction in DB: %v", err)
 		return ResponseTransaction{}, fmt.Errorf("failed to create transaction: %w", err)
 	}
 
@@ -136,7 +137,7 @@ func (d Config) AddTransactionToDB(ctx context.Context, transaction InputTransac
 		var err error
 		dbMoney, err = decimal.NewFromString(numStr)
 		if err != nil {
-			logger.Error("Failed to convert Amount: %v", err)
+			logger.Error(ctx, "Failed to convert Amount: %v", err)
 		}
 	}
 	transactionResponse := ResponseTransaction{
@@ -154,14 +155,14 @@ func (d Config) AddTransactionToDB(ctx context.Context, transaction InputTransac
 func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTransaction) (ResponseTransaction, error) {
 	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
 	if err != nil {
-		logger.Error("Invalid date format: %v", err)
+		logger.Error(ctx, "Invalid date format: %v", err)
 		return ResponseTransaction{}, fmt.Errorf("invalid date format: %w", err)
 	}
 
 	money := &pgtype.Numeric{}
 	err = money.Scan(transaction.Amount.String())
 	if err != nil {
-		logger.Error("Invalid amount format: %v", err)
+		logger.Error(ctx, "Invalid amount format: %v", err)
 		return ResponseTransaction{}, fmt.Errorf("Failed to convert amount type: %w", err)
 	}
 
@@ -179,7 +180,13 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTra
 	})
 
 	if err != nil {
-		logger.Error("Failed to update transaction %s for user %s: %v", transaction.ID, transaction.UserID, err)
+		logger.Error(ctx, // Pass the context
+			"Failed to update transaction",
+			err, // Pass the error
+			slog.Any("transaction_id", transaction.ID),
+			slog.Any("user_id", transaction.UserID),
+		)
+
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeForeignKeyViolation {
 			return ResponseTransaction{}, &database.ErrForeignKeyViolation{Message: "Non-existent category"}
@@ -210,7 +217,7 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTra
 		var err error
 		dbMoney, err = decimal.NewFromString(numStr)
 		if err != nil {
-			logger.Error("Failed to convert Amount: %v", err)
+			logger.Error(ctx, "Failed to convert Amount: %v", err)
 		}
 	}
 	transactionResponse := ResponseTransaction{
@@ -231,7 +238,13 @@ func (d Config) DeleteTransactionFromDB(ctx context.Context, id, userID uuid.UUI
 		UserID: userID,
 	})
 	if err != nil {
-		logger.Error("Failed to delete transaction %s for user %s: %v", id, userID, err)
+		logger.Error(ctx, // Pass the context
+			"Failed to delete transaction",
+			err, // Pass the error
+			slog.Any("transaction_id", id),
+			slog.Any("user_id", userID),
+		)
+
 		if errors.Is(err, pgx.ErrNoRows) {
 			return errors.New("Transaction not found: " + id.String())
 		}
@@ -240,7 +253,12 @@ func (d Config) DeleteTransactionFromDB(ctx context.Context, id, userID uuid.UUI
 
 	rowAffected := result.RowsAffected()
 	if rowAffected == 0 {
-		logger.Error("Transaction not found: %v", id.String())
+		logger.Error(ctx, // Pass the context
+			"Failed to delete transaction",
+			err, // Pass the error
+			slog.Any("transaction_id", id),
+			slog.Any("user_id", userID),
+		)
 		return errors.New("Transaction not found")
 	}
 

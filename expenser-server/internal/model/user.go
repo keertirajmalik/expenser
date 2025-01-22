@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -24,7 +25,7 @@ type User struct {
 func (d Config) GetUsersFromDB(ctx context.Context) ([]User, error) {
 	dbUsers, err := d.Queries.GetUser(ctx)
 	if err != nil {
-		logger.Error("Couldn't get users from DB", err)
+		logger.Error(ctx, "Couldn't get users from DB", err)
 		return []User{}, err
 	}
 
@@ -40,7 +41,7 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 	})
 
 	if err != nil {
-		logger.Error("Failed to create user in DB: %v", err)
+		logger.Error(ctx, "Failed to create user in DB: %v", err)
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
 			return User{}, &database.ErrDuplicateData{Column: user.Username}
@@ -56,7 +57,12 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (User, error) {
 	dbUser, err := d.Queries.GetUserByUsername(ctx, username)
 	if err != nil {
-		logger.Error("Failed to get user from DB - username: %s, error: %v", username, err)
+		logger.Error(
+			ctx, // Pass the context
+			"Failed to get user",
+			err, // Pass the error
+			slog.Any("user_name", username),
+		)
 		return User{}, err
 	}
 
@@ -67,8 +73,13 @@ func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (U
 func (d Config) GetUserByUserIdFromDB(ctx context.Context, userId uuid.UUID) (User, error) {
 	dbUser, err := d.Queries.GetUserById(ctx, userId)
 	if err != nil {
-		logger.Error("Failed to get user from DB - userId: %s, error: %v", userId, err)
-        if errors.Is(err, pgx.ErrNoRows) {
+		logger.Error(
+			ctx, // Pass the context
+			"Failed to get user",
+			err, // Pass the error
+			slog.Any("user_id", userId),
+		)
+		if errors.Is(err, pgx.ErrNoRows) {
 			return User{}, fmt.Errorf("user not found")
 		}
 		return User{}, err
@@ -106,7 +117,7 @@ func (d Config) UpdateUserInDB(ctx context.Context, user User) (User, error) {
 	})
 
 	if err != nil {
-		logger.Error("Failed to update user in DB: %v", err)
+		logger.Error(ctx, "Failed to update user in DB: %v", err)
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
 			return User{}, &database.ErrDuplicateData{Column: user.Username}

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -61,6 +62,6 @@ func NewServer() *http.Server {
 |_____| /_/\_\ | .__/   \___| |_| |_| |___/  \___| |_|
                |_|                                       `)
 
-	logger.Info(fmt.Sprintf("Server is running on port %d", port))
+	logger.Info(context.Background(), fmt.Sprintf("Server is running on port %d", port))
 	return server
 }

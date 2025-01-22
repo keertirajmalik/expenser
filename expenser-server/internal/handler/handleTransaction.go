@@ -76,7 +76,7 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 
 		id, err := uuid.Parse(idStr)
 		if err != nil {
-			logger.Error("Error while parsing uuid: ", err)
+			logger.Error(r.Context(), "Error while parsing uuid: ", err)
 			respondWithError(w, http.StatusBadRequest, "Invalid id")
 			return
 		}
@@ -85,7 +85,7 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err = decoder.Decode(&params)
 		if err != nil {
-			logger.Error("Error while decoding parameters:%v", err)
+			logger.Error(r.Context(), "Error while decoding parameters:%v", err)
 			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
 			return
 		}
