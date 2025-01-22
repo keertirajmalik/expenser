@@ -21,7 +21,7 @@ func (c customLogger) Println(level string, v ...interface{}) {
 	}
 
 	message := fmt.Sprintf("%s [%s] %s | Caller: %s:%d",
-		time.Now().UTC().Format(time.RFC3339),
+		timestamp,
 		level,
 		fmt.Sprintf(v[0].(string), v[1:]...), // Format the message correctly with the arguments
 		file,
@@ -82,6 +82,10 @@ func init() {
 
 func Info(v ...interface{}) {
 	logger.Println("INFO", v...)
+}
+
+func Warn(v ...interface{}) {
+	logger.Error("WARN", v...)
 }
 
 func Error(v ...interface{}) {

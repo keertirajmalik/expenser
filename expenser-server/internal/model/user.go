@@ -40,7 +40,7 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 	})
 
 	if err != nil {
-		logger.Error("Failed to create user in DB: %v", err)
+		logger.Error(fmt.Sprintf("Failed to create user: %v", err))
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
 			return User{}, &database.ErrDuplicateData{Column: user.Username}
@@ -56,10 +56,15 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (User, error) {
 	dbUser, err := d.Queries.GetUserByUsername(ctx, username)
 	if err != nil {
-		logger.Error("Failed to get user from DB - username: %s, error: %v", username, err)
-		return User{}, err
+		if errors.Is(err, pgx.ErrNoRows) {
+			logger.Error(fmt.Sprintf("User not found"), map[string]interface{}{"username": username, "error": err})
+			return User{}, fmt.Errorf("user not found")
+		}
+		logger.Error(fmt.Sprintf("Failed to get user from DB"), map[string]interface{}{
+			"username": username,
+			"error":    err,
+		})
 	}
-
 	user := convertDBUserToUser([]repository.User{dbUser})
 	return user[0], nil
 }
@@ -67,11 +72,14 @@ func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (U
 func (d Config) GetUserByUserIdFromDB(ctx context.Context, userId uuid.UUID) (User, error) {
 	dbUser, err := d.Queries.GetUserById(ctx, userId)
 	if err != nil {
-		logger.Error("Failed to get user from DB - userId: %s, error: %v", userId, err)
-        if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
+			logger.Error(fmt.Sprintf("User not found"), map[string]interface{}{"userId": userId})
 			return User{}, fmt.Errorf("user not found")
 		}
-		return User{}, err
+		logger.Error(fmt.Sprintf("Failed to get user from DB"), map[string]interface{}{
+			"userId": userId,
+			"error":  err,
+		})
 	}
 
 	user := convertDBUserToUser([]repository.User{dbUser})

@@ -111,13 +111,22 @@ func (d Config) AddCategoryToDB(ctx context.Context, category Category) (Respons
 func (d Config) DeleteCategoryFromDB(ctx context.Context, id, userID uuid.UUID) error {
 	result, err := d.Queries.DeleteCategory(ctx, repository.DeleteCategoryParams{ID: id, UserID: userID})
 	if err != nil {
-		logger.Error("Failed to delete category %s for user %s: %v", id, userID, err)
+		logger.Error(fmt.Sprintf("Failed to delete category"), map[string]interface{}{
+			"category_id": id,
+			"user_id":     userID,
+			"error":       err,
+			"error_type":  "foreign_key_violation",
+		})
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeForeignKeyViolation {
 			data, _ := d.GetCategoryByIdFromDB(ctx, id, userID)
 			return &database.ErrForeignKeyViolation{Message: fmt.Sprintf("%s category has been used in transaction", data.Name)}
 		}
 		if errors.Is(err, pgx.ErrNoRows) {
+			logger.Error(fmt.Sprintf("Category not found"), map[string]interface{}{
+				"category_id": id,
+				"user_id":     userID,
+			})
 			return errors.New("Category not found")
 		}
 		logger.Error("Couldn't delete category from DB", err)
@@ -142,10 +151,18 @@ func (d Config) UpdateCategoryInDB(ctx context.Context, category Category) (Resp
 	})
 
 	if err != nil {
-		logger.Error("Failed to update category %s for user %s: %v", category.ID, category.UserID, err)
 		if errors.Is(err, pgx.ErrNoRows) {
+			logger.Error(fmt.Sprintf("Category not found during update"), map[string]interface{}{
+				"category_id": category.ID,
+				"user_id":     category.UserID,
+			})
 			return ResponseCategory{}, errors.New("Category not found")
 		}
+		logger.Error(fmt.Sprintf("Failed to update category"), map[string]interface{}{
+			"category_id": category.ID,
+			"user_id":     category.UserID,
+			"error":       err,
+		})
 		return ResponseCategory{}, err
 	}
 
