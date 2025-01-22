@@ -85,7 +85,7 @@ func (d Config) AddCategoryToDB(ctx context.Context, category Category) (Respons
 	})
 
 	if err != nil {
-        log.Printf("Failed to create category %s for user %s: %v", category.ID, category.UserID, err)
+		log.Printf("Failed to create category %s for user %s: %v", category.ID, category.UserID, err)
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
 			return ResponseCategory{}, &database.ErrDuplicateData{Column: category.Name}
@@ -112,6 +112,11 @@ func (d Config) DeleteCategoryFromDB(ctx context.Context, id, userID uuid.UUID) 
 	result, err := d.Queries.DeleteCategory(ctx, repository.DeleteCategoryParams{ID: id, UserID: userID})
 	if err != nil {
 		log.Printf("Failed to delete category %s for user %s: %v", id, userID, err)
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeForeignKeyViolation {
+			data, _ := d.GetCategoryByIdFromDB(ctx, id, userID)
+			return &database.ErrForeignKeyViolation{Message: fmt.Sprintf("%s category has been used in transaction", data.Name)}
+		}
 		if errors.Is(err, pgx.ErrNoRows) {
 			return errors.New("Category not found")
 		}
