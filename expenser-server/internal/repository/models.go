@@ -30,6 +30,15 @@ type Transaction struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
+type TransactionHistory struct {
+	ID            uuid.UUID          `json:"id"`
+	TransactionID uuid.UUID          `json:"transaction_id"`
+	FieldName     string             `json:"field_name"`
+	OldValue      string             `json:"old_value"`
+	NewValue      string             `json:"new_value"`
+	ChangedAt     pgtype.Timestamptz `json:"changed_at"`
+}
+
 type User struct {
 	ID             uuid.UUID          `json:"id"`
 	Name           string             `json:"name"`
