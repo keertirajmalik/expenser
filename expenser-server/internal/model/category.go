@@ -125,6 +125,11 @@ func (d Config) DeleteCategoryFromDB(ctx context.Context, id, userID uuid.UUID) 
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeForeignKeyViolation {
 			data, _ := d.GetCategoryByIdFromDB(ctx, id, userID)
+			logger.Error("Couldn't delete category", map[string]interface{}{
+				"category_id": id,
+				"user_id":     userID,
+				"error":       err,
+			})
 			return &database.ErrForeignKeyViolation{Message: fmt.Sprintf("%s category has been used in transaction", data.Name)}
 		}
 		if errors.Is(err, pgx.ErrNoRows) {

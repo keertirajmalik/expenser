@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"runtime"
@@ -64,10 +65,9 @@ func formatDetails(details map[string]interface{}) string {
 		return "{}"
 	}
 
-	var parts []string
-	for k, v := range details {
-		parts = append(parts, fmt.Sprintf("%s:%v", k, v))
+	detailsJSON, err := json.Marshal(details)
+	if err != nil {
+		return "{}"
 	}
-
-	return "{" + strings.Join(parts, " ") + "}"
+	return string(detailsJSON)
 }
