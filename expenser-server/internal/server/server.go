@@ -37,7 +37,7 @@ func NewServer() *http.Server {
 
 	jwtSecret := os.Getenv("JWT_SECRET")
 	if jwtSecret == "" {
-		logger.Error("JWT_SECRET environment variable is not set")
+		logger.Error("JWT_SECRET environment variable is not set", map[string]interface{}{})
 		os.Exit(1)
 	}
 

@@ -32,7 +32,10 @@ func HandleCreateCategory(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err := decoder.Decode(&params)
 		if err != nil {
-			logger.Error("Error while decoding parameters:%s", err)
+			logger.Error("Error while decoding parameters:%s", map[string]interface{}{
+				"error": err,
+				"params": params,
+			})
 			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
 			return
 		}
@@ -74,7 +77,10 @@ func HandleUpdateCategory(data model.Config) http.HandlerFunc {
 
 		id, err := uuid.Parse(idStr)
 		if err != nil {
-			logger.Error("Error while parsing uuid: ", err)
+			logger.Error("Error while parsing uuid", map[string]interface{}{
+				"error": err,
+				"uuid":  idStr,
+			})
 			respondWithError(w, http.StatusBadRequest, "Invalid id")
 			return
 		}
@@ -83,7 +89,10 @@ func HandleUpdateCategory(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err = decoder.Decode(&params)
 		if err != nil {
-			logger.Error("Error while decoding parameters: %v", err)
+			logger.Error("Error while decoding parameters:%s", map[string]interface{}{
+				"error":  err,
+				"params": params,
+			})
 			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
 			return
 		}

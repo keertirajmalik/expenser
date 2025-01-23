@@ -30,10 +30,12 @@ export const useCreateUserMutation = () => {
       showToast("User Created", "User created successfully.");
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["user"] }),
-    onError: (error: Error) => showToast("User Creation Failed", error.message),
+    onError: (error: Error) =>
+      showToast("User Creation Failed", error.message, "destructive"),
   });
   return mutation;
 };
+
 export const useUpdateUserMutation = () => {
   const queryClient = useQueryClient();
 
@@ -51,7 +53,8 @@ export const useUpdateUserMutation = () => {
       showToast("Account Updated", "Account updated successfully.");
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["user"] }),
-    onError: (error) => showToast("Account Update Failed", error.message),
+    onError: (error) =>
+      showToast("Account Update Failed", error.message, "destructive"),
   });
 
   return mutation;

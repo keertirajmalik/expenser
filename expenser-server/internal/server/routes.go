@@ -37,12 +37,16 @@ func (s *Server) healthHandler(w http.ResponseWriter, r *http.Request) {
 	resp, err := json.Marshal(s.db.Health())
 	if err != nil {
 		http.Error(w, "Failed to marshal health check response", http.StatusInternalServerError)
-		logger.Error("failed to marshal health check response: %v", err)
+		logger.Error("failed to marshal health check response", map[string]interface{}{
+			"error": err,
+		})
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	if _, err := w.Write(resp); err != nil {
-		logger.Error("failed to write health check response: %v", err)
+		logger.Error("failed to write health cealth check response", map[string]interface{}{
+			"error": err,
+		})
 	}
 	logger.Info("health check completed successfully")
 }

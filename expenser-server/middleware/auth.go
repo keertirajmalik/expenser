@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/keertirajmalik/expenser/expenser-server/auth"
+	"github.com/keertirajmalik/expenser/expenser-server/logger"
 )
 
 type errorResponse struct {
@@ -30,12 +31,14 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		token, err := auth.GetBearerToken(r.Header)
 		if err != nil {
+			logger.Error("error with token", map[string]interface{}{"error": err})
 			respondWithJson(w, err)
 			return
 		}
 
 		userID, err := auth.ValidateJWT(token, []byte(jwtSecret))
 		if err != nil {
+			logger.Error("error with token", map[string]interface{}{"error": err})
 			respondWithJson(w, err)
 			return
 		}
@@ -51,7 +54,7 @@ func respondWithJson(w http.ResponseWriter, err error) {
 		Error: err.Error(),
 	})
 	if err != nil {
-		log.Printf("Error marshalling JSON: %s", err)
+		logger.Error("Error marshalling JSON", map[string]interface{}{"error": err})
 		w.WriteHeader(500)
 		return
 	}

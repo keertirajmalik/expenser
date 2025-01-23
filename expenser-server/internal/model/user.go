@@ -24,7 +24,9 @@ type User struct {
 func (d Config) GetUsersFromDB(ctx context.Context) ([]User, error) {
 	dbUsers, err := d.Queries.GetUser(ctx)
 	if err != nil {
-		logger.Error("Couldn't get users from DB", err)
+		logger.Error("failed to get user ", map[string]interface{}{
+			"error": err,
+		})
 		return []User{}, err
 	}
 
@@ -40,7 +42,9 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 	})
 
 	if err != nil {
-		logger.Error(fmt.Sprintf("Failed to create user: %v", err))
+		logger.Error("failed to create user ", map[string]interface{}{
+			"error": err,
+		})
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
 			return User{}, &database.ErrDuplicateData{Column: user.Username}
@@ -57,7 +61,7 @@ func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (U
 	dbUser, err := d.Queries.GetUserByUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			logger.Error(fmt.Sprintf("User not found"), map[string]interface{}{"username": username, "error": err})
+			logger.Error("User not found", map[string]interface{}{"username": username, "error": err})
 			return User{}, fmt.Errorf("user not found")
 		}
 		logger.Error(fmt.Sprintf("Failed to get user from DB"), map[string]interface{}{
@@ -114,7 +118,10 @@ func (d Config) UpdateUserInDB(ctx context.Context, user User) (User, error) {
 	})
 
 	if err != nil {
-		logger.Error("Failed to update user in DB: %v", err)
+		logger.Error("failed to update user ", map[string]interface{}{
+			"user_id": user.ID,
+			"error":   err,
+		})
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
 			return User{}, &database.ErrDuplicateData{Column: user.Username}

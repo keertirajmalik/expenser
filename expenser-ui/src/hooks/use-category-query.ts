@@ -31,7 +31,7 @@ export const useCreateCategoryMutation = () => {
     onSettled: () =>
       queryClient.invalidateQueries({ queryKey: ["categories"] }),
     onError: (error: Error) =>
-      showToast("Category Creation Failed", error.message),
+      showToast("Category Creation Failed", error.message, "destructive"),
   });
 
   return mutation;
@@ -59,7 +59,8 @@ export const useUpdateCategoryMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
     },
-    onError: (error) => showToast("Category Update Failed", error.message),
+    onError: (error) =>
+      showToast("Category Update Failed", error.message, "destructive"),
   });
   return mutation;
 };
@@ -80,7 +81,8 @@ export const useDeleteCategoryMutation = () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
     },
-    onError: (error) => showToast("Category Deletion Failed", error.message),
+    onError: (error) =>
+      showToast("Category Deletion Failed", error.message, "destructive"),
   });
   return mutation;
 };

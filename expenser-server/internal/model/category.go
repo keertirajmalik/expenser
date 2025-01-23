@@ -32,7 +32,10 @@ type ResponseCategory struct {
 func (d Config) GetCategoriesFromDB(ctx context.Context, userId uuid.UUID) ([]ResponseCategory, error) {
 	dbCategories, err := d.Queries.GetCategory(ctx, userId)
 	if err != nil {
-		logger.Error("Couldn't get categories from in DB", err)
+		logger.Error("Couldn't get category from DB: %v", map[string]interface{}{
+			"user_id": userId,
+			"error":   err,
+		})
 		return []ResponseCategory{}, err
 	}
 
@@ -58,7 +61,11 @@ func (d Config) GetCategoriesFromDB(ctx context.Context, userId uuid.UUID) ([]Re
 func (d Config) GetCategoryByIdFromDB(ctx context.Context, id, userId uuid.UUID) (ResponseCategory, error) {
 	dbCategory, err := d.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: id, UserID: userId})
 	if err != nil {
-		logger.Error("Couldn't get transaction type from in DB", err)
+		logger.Error("Couldn't get category from DB: %v", map[string]interface{}{
+			"category_id": id,
+			"user_id":     userId,
+			"error":       err,
+		})
 		return ResponseCategory{}, err
 	}
 
@@ -85,7 +92,11 @@ func (d Config) AddCategoryToDB(ctx context.Context, category Category) (Respons
 	})
 
 	if err != nil {
-		logger.Error("Failed to create category %s for user %s: %v", category.ID, category.UserID, err)
+		logger.Error("Failed to create category", map[string]interface{}{
+			"category_id": category.ID,
+			"user_id":     category.UserID,
+			"error":       err,
+		})
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
 			return ResponseCategory{}, &database.ErrDuplicateData{Column: category.Name}
@@ -111,31 +122,35 @@ func (d Config) AddCategoryToDB(ctx context.Context, category Category) (Respons
 func (d Config) DeleteCategoryFromDB(ctx context.Context, id, userID uuid.UUID) error {
 	result, err := d.Queries.DeleteCategory(ctx, repository.DeleteCategoryParams{ID: id, UserID: userID})
 	if err != nil {
-		logger.Error(fmt.Sprintf("Failed to delete category"), map[string]interface{}{
-			"category_id": id,
-			"user_id":     userID,
-			"error":       err,
-			"error_type":  "foreign_key_violation",
-		})
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeForeignKeyViolation {
 			data, _ := d.GetCategoryByIdFromDB(ctx, id, userID)
 			return &database.ErrForeignKeyViolation{Message: fmt.Sprintf("%s category has been used in transaction", data.Name)}
 		}
 		if errors.Is(err, pgx.ErrNoRows) {
-			logger.Error(fmt.Sprintf("Category not found"), map[string]interface{}{
+			logger.Error("Failed to delete category: %v", map[string]interface{}{
 				"category_id": id,
 				"user_id":     userID,
+				"error":       err,
+				"error_type":  "not_found_violation",
 			})
 			return errors.New("Category not found")
 		}
-		logger.Error("Couldn't delete category from DB", err)
+		logger.Error("Couldn't delete category", map[string]interface{}{
+			"category_id": id,
+			"user_id":     userID,
+			"error":       err,
+		})
 		return err
 	}
 
 	rowAffected := result.RowsAffected()
 	if rowAffected == 0 {
-		logger.Error("Failed to delete category %s for user %s: %v", id, userID, err)
+		logger.Error("Failed to delete category", map[string]interface{}{
+			"category_id": id,
+			"user_id":     userID,
+			"error":       "no category found",
+		})
 		return fmt.Errorf("category %s not found for user %s", id, userID)
 	}
 
@@ -152,13 +167,13 @@ func (d Config) UpdateCategoryInDB(ctx context.Context, category Category) (Resp
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			logger.Error(fmt.Sprintf("Category not found during update"), map[string]interface{}{
+			logger.Error("Category not found during update: %v", map[string]interface{}{
 				"category_id": category.ID,
 				"user_id":     category.UserID,
 			})
 			return ResponseCategory{}, errors.New("Category not found")
 		}
-		logger.Error(fmt.Sprintf("Failed to update category"), map[string]interface{}{
+		logger.Error("Failed to update category: %v", map[string]interface{}{
 			"category_id": category.ID,
 			"user_id":     category.UserID,
 			"error":       err,
