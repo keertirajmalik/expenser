@@ -16,6 +16,7 @@ type Category struct {
 	UserID      uuid.UUID          `json:"user_id"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+	Type        string             `json:"type"`
 }
 
 type Transaction struct {

@@ -9,7 +9,7 @@ import (
 	"github.com/keertirajmalik/expenser/expenser-server/logger"
 )
 
-func HandleGetCategory(data model.Config) http.HandlerFunc {
+func HandleCategoryGet(data model.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value("userID").(uuid.UUID)
 		categories, err := data.GetCategoriesFromDB(r.Context(), userID)
@@ -21,9 +21,10 @@ func HandleGetCategory(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleCreateCategory(data model.Config) http.HandlerFunc {
+func HandleCategoryCreate(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Name        string `json:"name"`
+		Type        string `json:"type"`
 		Description string `json:"description"`
 	}
 
@@ -33,7 +34,7 @@ func HandleCreateCategory(data model.Config) http.HandlerFunc {
 		err := decoder.Decode(&params)
 		if err != nil {
 			logger.Error("Error while decoding parameters:%s", map[string]interface{}{
-				"error": err,
+				"error":  err,
 				"params": params,
 			})
 			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
@@ -49,10 +50,21 @@ func HandleCreateCategory(data model.Config) http.HandlerFunc {
 			return
 		}
 
+		if len(params.Type) == 0 {
+			respondWithError(w, http.StatusBadRequest, "Category type cannot be empty")
+			return
+		}
+
+		if !(params.Type == "Expense" || params.Type == "Investment") {
+			respondWithError(w, http.StatusBadRequest, "Category type has to be Expense or Investment")
+			return
+		}
+
 		userID := r.Context().Value("userID").(uuid.UUID)
 		category, err := data.AddCategoryToDB(r.Context(), model.Category{
 			ID:          uuid.New(),
 			Name:        params.Name,
+			Type:        params.Type,
 			Description: params.Description,
 			UserID:      userID,
 		})
@@ -66,9 +78,10 @@ func HandleCreateCategory(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleUpdateCategory(data model.Config) http.HandlerFunc {
+func HandleCategoryUpdate(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Name        string `json:"name"`
+		Type        string `json:"type"`
 		Description string `json:"description"`
 	}
 
@@ -106,10 +119,16 @@ func HandleUpdateCategory(data model.Config) http.HandlerFunc {
 			return
 		}
 
+		if !(params.Type == "Expense" || params.Type == "Investment") {
+			respondWithError(w, http.StatusBadRequest, "Category type has to be Expense or Investment")
+			return
+		}
+
 		userID := r.Context().Value("userID").(uuid.UUID)
 		category, err := data.UpdateCategoryInDB(r.Context(), model.Category{
 			ID:          id,
 			Name:        params.Name,
+			Type:        params.Type,
 			Description: params.Description,
 			UserID:      userID,
 		})
@@ -122,7 +141,7 @@ func HandleUpdateCategory(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleDeleteCategory(data model.Config) http.HandlerFunc {
+func HandleCategoryDelete(data model.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 
