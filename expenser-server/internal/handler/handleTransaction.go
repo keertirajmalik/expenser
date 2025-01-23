@@ -60,6 +60,21 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 			UserID:   userID,
 		}
 
+		dbCategory, err := data.GetCategoryByIdFromDB(r.Context(), transaction.Category, transaction.UserID)
+		if err != nil {
+			respondWithError(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		if dbCategory.Type != "Expense" {
+			logger.Error("Category type should be Expense", map[string]interface{}{
+				"category_name": dbCategory.Name,
+				"category_type": dbCategory.Type,
+			})
+			respondWithError(w, http.StatusBadRequest, "Category type should be Expense")
+			return
+		}
+
 		dbTransaction, err := data.AddTransactionToDB(r.Context(), transaction)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
@@ -113,6 +128,21 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 			Amount:   params.Amount,
 			Date:     params.Date,
 			UserID:   userID,
+		}
+
+		dbCategory, err := data.GetCategoryByIdFromDB(r.Context(), transaction.Category, transaction.UserID)
+		if err != nil {
+			respondWithError(w, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		if dbCategory.Type != "Expense" {
+			logger.Error("Category type should be Expense", map[string]interface{}{
+				"category_name": dbCategory.Name,
+				"category_type": dbCategory.Type,
+			})
+			respondWithError(w, http.StatusBadRequest, "Category type should be Expense")
+			return
 		}
 
 		dbTransaction, err := data.UpdateTransactionInDB(r.Context(), transaction)

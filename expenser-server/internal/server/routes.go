@@ -29,6 +29,7 @@ func (s *Server) RegisterRoutes(config model.Config) http.Handler {
 	mux.HandleFunc("DELETE /cxf/category/{id}", handler.HandleCategoryDelete(config))
 	mux.HandleFunc("PUT /cxf/category/{id}", handler.HandleCategoryUpdate(config))
 
+	mux.HandleFunc("POST /cxf/investment", handler.HandleInvestmentCreate(config))
 	return mux
 }
 
