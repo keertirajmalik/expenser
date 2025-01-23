@@ -2,11 +2,11 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
+	"github.com/keertirajmalik/expenser/expenser-server/logger"
 	"github.com/shopspring/decimal"
 )
 
@@ -15,6 +15,9 @@ func HandleTransactionGet(data model.Config) http.HandlerFunc {
 		userID := r.Context().Value("userID").(uuid.UUID)
 		transactions, err := data.GetTransactionsFromDB(r.Context(), userID)
 		if err != nil {
+			logger.Error("Error while fetching tranasactions", map[string]interface{}{
+				"error": err,
+			})
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -37,7 +40,11 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err := decoder.Decode(&params)
 		if err != nil {
-			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
+			logger.Error("Error while decoding parameters", map[string]interface{}{
+				"params": params,
+				"error":  err,
+			})
+			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -76,7 +83,10 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 
 		id, err := uuid.Parse(idStr)
 		if err != nil {
-			log.Println("Error while parsing uuid: ", err)
+			logger.Error("Error while parsing transaction ID", map[string]interface{}{
+				"error": err,
+				"uuid":  idStr,
+			})
 			respondWithError(w, http.StatusBadRequest, "Invalid id")
 			return
 		}
@@ -85,8 +95,11 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 		params := parameters{}
 		err = decoder.Decode(&params)
 		if err != nil {
-			log.Printf("Error while decoding parameters:%v", err)
-			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
+			logger.Error("Error while decoding parameters", map[string]interface{}{
+				"error":  err,
+				"params": params,
+			})
+			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -117,6 +130,10 @@ func HandleTransactionDelete(data model.Config) http.HandlerFunc {
 
 		id, err := uuid.Parse(idStr)
 		if err != nil {
+			logger.Error("Error while parsing uuid", map[string]interface{}{
+				"error": err,
+				"uuid":  idStr,
+			})
 			respondWithError(w, http.StatusBadRequest, "Invalid id")
 			return
 		}
@@ -124,7 +141,12 @@ func HandleTransactionDelete(data model.Config) http.HandlerFunc {
 		userID := r.Context().Value("userID").(uuid.UUID)
 		err = data.DeleteTransactionFromDB(r.Context(), id, userID)
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, err.Error())
+			logger.Error("Error while deleting transaction", map[string]interface{}{
+				"transaction_id": id,
+				"user_id":        userID,
+				"error":          err,
+			})
+			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 

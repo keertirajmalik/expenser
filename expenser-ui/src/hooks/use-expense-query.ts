@@ -37,7 +37,7 @@ export const useCreateExpenseMutation = () => {
       showToast("Expense Created", "Expense created successfully."),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["expenses"] }),
     onError: (error: Error) =>
-      showToast("Expense Creation Failed", error.message),
+      showToast("Expense Creation Failed", error.message, "destructive"),
   });
 
   return mutation;
@@ -72,7 +72,8 @@ export const useUpdateExpenseMutation = () => {
       showToast("Expense Updated", "Expense updated successfully.");
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["expenses"] }),
-    onError: (error) => showToast("Expense Update Failed", error.message),
+    onError: (error) =>
+      showToast("Expense Update Failed", error.message, "destructive"),
   });
   return mutation;
 };
@@ -89,7 +90,8 @@ export const useDeleteExpenseQuery = () => {
       showToast("Expense Deleted", "Expense deleted successfully.");
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ["expenses"] }),
-    onError: (error) => showToast("Expense Deletion Failed", error.message),
+    onError: (error) =>
+      showToast("Expense Deletion Failed", error.message, "destructive"),
   });
 
   return mutation;

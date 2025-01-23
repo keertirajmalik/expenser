@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/keertirajmalik/expenser/expenser-server/database"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
+	"github.com/keertirajmalik/expenser/expenser-server/logger"
 )
 
 type User struct {
@@ -24,7 +24,9 @@ type User struct {
 func (d Config) GetUsersFromDB(ctx context.Context) ([]User, error) {
 	dbUsers, err := d.Queries.GetUser(ctx)
 	if err != nil {
-		log.Println("Couldn't get users from DB", err)
+		logger.Error("failed to get user from database", map[string]interface{}{
+			"error": err,
+		})
 		return []User{}, err
 	}
 
@@ -40,7 +42,9 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 	})
 
 	if err != nil {
-		log.Printf("Failed to create user in DB: %v", err)
+		logger.Error("failed to create user in database", map[string]interface{}{
+			"error": err,
+		})
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
 			return User{}, &database.ErrDuplicateData{Column: user.Username}
@@ -56,10 +60,15 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (User, error) {
 	dbUser, err := d.Queries.GetUserByUsername(ctx, username)
 	if err != nil {
-		log.Printf("Failed to get user from DB - username: %s, error: %v", username, err)
-		return User{}, err
+		if errors.Is(err, pgx.ErrNoRows) {
+			logger.Error("User not found", map[string]interface{}{"username": username, "error": err})
+			return User{}, fmt.Errorf("user not found")
+		}
+		logger.Error("Failed to get user from DB", map[string]interface{}{
+			"username": username,
+			"error":    err,
+		})
 	}
-
 	user := convertDBUserToUser([]repository.User{dbUser})
 	return user[0], nil
 }
@@ -67,11 +76,14 @@ func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (U
 func (d Config) GetUserByUserIdFromDB(ctx context.Context, userId uuid.UUID) (User, error) {
 	dbUser, err := d.Queries.GetUserById(ctx, userId)
 	if err != nil {
-		log.Printf("Failed to get user from DB - userId: %s, error: %v", userId, err)
-        if errors.Is(err, pgx.ErrNoRows) {
+		if errors.Is(err, pgx.ErrNoRows) {
+			logger.Error("User not found", map[string]interface{}{"userId": userId})
 			return User{}, fmt.Errorf("user not found")
 		}
-		return User{}, err
+		logger.Error("Failed to get user from DB", map[string]interface{}{
+			"userId": userId,
+			"error":  err,
+		})
 	}
 
 	user := convertDBUserToUser([]repository.User{dbUser})
@@ -106,7 +118,10 @@ func (d Config) UpdateUserInDB(ctx context.Context, user User) (User, error) {
 	})
 
 	if err != nil {
-		log.Printf("Failed to update user in DB: %v", err)
+		logger.Error("failed to update user in database", map[string]interface{}{
+			"user_id": user.ID,
+			"error":   err,
+		})
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeUniqueViolation {
 			return User{}, &database.ErrDuplicateData{Column: user.Username}

@@ -1,9 +1,11 @@
 package middleware
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/keertirajmalik/expenser/expenser-server/logger"
 )
 
 type wrappedWriter struct {
@@ -26,6 +28,15 @@ func Logging(next http.Handler) http.Handler {
 		}
 
 		next.ServeHTTP(wrapped, r)
-		log.Println(wrapped.statusCode, r.Method, r.URL.Path, time.Since(start))
+
+		duration := time.Since(start)
+		logMessage := fmt.Sprintf("HTTP Request: %d | %s | %s | %s",
+			wrapped.statusCode, // Status code
+			r.Method,           // HTTP method
+			r.URL.Path,         // Request path
+			duration,           // Duration
+		)
+		logger.Info(logMessage)
 	})
 }
+
