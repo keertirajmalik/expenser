@@ -6,7 +6,8 @@ export const ROUTES = {
   },
   MAIN: {
     DASHBOARD: "/dashboard",
-    EXPENSE: "/expense",
     CATEGORY: "/category",
+    EXPENSE: "/expense",
+    INVESTMENT: "/investment",
   },
 } as const;

@@ -5,12 +5,14 @@ import { RecentExpenses } from "@/components/chart/recent-expense";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetExpensesQuery } from "@/hooks/use-expense-query";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Dashboard() {
+  const isMobile = useIsMobile();
   const { data = [] } = useGetExpensesQuery();
 
   return (
-    <div className="flex h-96 w-full flex-col gap-2">
+    <div className="flex h-screen w-full flex-col gap-2">
       <header
         className="flex h-16 shrink-0 items-center gap-2 border-b px-4"
         role="banner"
@@ -19,18 +21,22 @@ export default function Dashboard() {
         <Separator orientation="vertical" className="mr-2 h-4" />
         <div className="flex flex-col">
           <h1 className="text-lg font-semibold">Dashboard</h1>
-          <p className="text-sm text-gray-500">
-            Keep Track, Assess, and Enhance Your Financial Performance
-          </p>
+          {!isMobile && (
+            <p className="text-sm text-gray-500">
+              Keep Track, Assess, and Enhance Your Financial Performance
+            </p>
+          )}
         </div>
       </header>
-      <main className="flex flex-col  items-center gap-2" role="main">
-        <div className="flex gap-2">
-          <BarChartComponent data={data} />
-          <LineChartComponent data={data} />
-        </div>
-        <div className="flex gap-2">
+      <main className="flex flex-col items-center gap-2" role="main">
+        <div
+          className={`flex flex-wrap gap-2 justify-center items-center ${
+            isMobile ? "flex-col" : ""
+          }`}
+        >
           <PieChartComponent data={data} />
+          <LineChartComponent data={data} />
+          <BarChartComponent data={data} />
           <RecentExpenses data={data} />
         </div>
       </main>

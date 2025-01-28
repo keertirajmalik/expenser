@@ -1,12 +1,12 @@
-import { columns } from "@/app/category/column";
 import { CreateDialog } from "@/app/create-dialog/create-dialog";
+import { columns } from "@/app/investment/column";
 import { DataTable } from "@/components/data-table/data-table";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { useGetCategoryQuery } from "@/hooks/use-category-query";
+import { useGetInvestmentQuery } from "@/hooks/use-investment-query";
 import { Separator } from "@radix-ui/react-separator";
 
-export default function Category() {
-  const { data } = useGetCategoryQuery();
+export default function Expense() {
+  const { data } = useGetInvestmentQuery();
 
   return (
     <div className="flex h-96 w-full flex-col">
@@ -22,16 +22,14 @@ export default function Category() {
             decorative={true}
           />
           <div className="flex flex-col">
-            <h1 className="text-lg font-semibold">Expense Category</h1>
-            <p className="text-sm text-gray-500">
-              List of Your Expense Categories
-            </p>
+            <h1 className="text-lg font-semibold">Investments</h1>
+            <p className="text-sm text-gray-500">List of Your Investments</p>
           </div>
         </div>
         <CreateDialog
-          creation="Category"
-          title="Create Expense Category"
-          description=" Provide information regarding expense category."
+          creation="Investment"
+          title="Create Investment"
+          description=" Provide information regarding expense."
         />
       </header>
       <main

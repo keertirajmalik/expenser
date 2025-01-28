@@ -1,20 +1,21 @@
 import * as React from "react";
 
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail,
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarRail,
 } from "@/components/ui/sidebar";
 import {
-  ArrowLeftRight,
-  IndianRupee,
-  LayoutDashboard,
-  ListTree,
+    ArrowLeftRight,
+    ChartCandlestick,
+    IndianRupee,
+    LayoutDashboard,
+    ListTree,
 } from "lucide-react";
 
 import { NavMain } from "@/app/sidebar/nav-main";
@@ -30,14 +31,19 @@ const data = {
       icon: LayoutDashboard,
     },
     {
+      name: "Category",
+      url: "/category",
+      icon: ListTree,
+    },
+    {
       name: "Expense",
       url: "/expense",
       icon: ArrowLeftRight,
     },
     {
-      name: "Category",
-      url: "/category",
-      icon: ListTree,
+      name: "Investment",
+      url: "/investment",
+      icon: ChartCandlestick,
     },
   ],
 };

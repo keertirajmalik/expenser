@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -65,6 +66,150 @@ func (q *Queries) CreateInvestment(ctx context.Context, arg CreateInvestmentPara
 		arg.UserID,
 	)
 	var i CreateInvestmentRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Amount,
+		&i.Category,
+		&i.Date,
+		&i.Note,
+		&i.User,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const deleteInvestment = `-- name: DeleteInvestment :execresult
+DELETE FROM investments where id = $1 AND user_id=$2
+`
+
+type DeleteInvestmentParams struct {
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
+}
+
+func (q *Queries) DeleteInvestment(ctx context.Context, arg DeleteInvestmentParams) (pgconn.CommandTag, error) {
+	return q.db.Exec(ctx, deleteInvestment, arg.ID, arg.UserID)
+}
+
+const getInvestment = `-- name: GetInvestment :many
+SELECT investments.id,
+    investments."name",
+    investments.amount,
+    categories."name" AS category,
+    investments."date",
+    investments.note,
+    users."name" AS user,
+    investments.created_at,
+    investments.updated_at
+FROM investments
+INNER JOIN users ON investments.user_id = users.id
+INNER JOIN categories ON investments.category  = categories.id
+WHERE investments.user_id=$1
+ORDER BY investments.date DESC
+`
+
+type GetInvestmentRow struct {
+	ID        uuid.UUID          `json:"id"`
+	Name      string             `json:"name"`
+	Amount    pgtype.Numeric     `json:"amount"`
+	Category  string             `json:"category"`
+	Date      pgtype.Date        `json:"date"`
+	Note      *string            `json:"note"`
+	User      string             `json:"user"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+func (q *Queries) GetInvestment(ctx context.Context, userID uuid.UUID) ([]GetInvestmentRow, error) {
+	rows, err := q.db.Query(ctx, getInvestment, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetInvestmentRow
+	for rows.Next() {
+		var i GetInvestmentRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Amount,
+			&i.Category,
+			&i.Date,
+			&i.Note,
+			&i.User,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateInvestment = `-- name: UpdateInvestment :one
+WITH updated AS (
+    UPDATE investments
+    SET name = $2,
+        amount = $3,
+        category =  $4,
+        date = $5,
+        note = $6
+    WHERE investments.id = $1 AND investments.user_id=$7
+    RETURNING id, name, amount, category, date, note, user_id, created_at, updated_at
+)
+SELECT updated.id,
+    updated."name",
+    updated.amount,
+    categories."name" AS category,
+    updated."date",
+    updated.note,
+    users."name" AS user,
+    updated.created_at,
+    updated.updated_at
+FROM updated
+INNER JOIN users ON updated.user_id = users.id
+INNER JOIN categories ON updated."category" = categories.id
+`
+
+type UpdateInvestmentParams struct {
+	ID       uuid.UUID      `json:"id"`
+	Name     string         `json:"name"`
+	Amount   pgtype.Numeric `json:"amount"`
+	Category uuid.UUID      `json:"category"`
+	Date     pgtype.Date    `json:"date"`
+	Note     *string        `json:"note"`
+	UserID   uuid.UUID      `json:"user_id"`
+}
+
+type UpdateInvestmentRow struct {
+	ID        uuid.UUID          `json:"id"`
+	Name      string             `json:"name"`
+	Amount    pgtype.Numeric     `json:"amount"`
+	Category  string             `json:"category"`
+	Date      pgtype.Date        `json:"date"`
+	Note      *string            `json:"note"`
+	User      string             `json:"user"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+func (q *Queries) UpdateInvestment(ctx context.Context, arg UpdateInvestmentParams) (UpdateInvestmentRow, error) {
+	row := q.db.QueryRow(ctx, updateInvestment,
+		arg.ID,
+		arg.Name,
+		arg.Amount,
+		arg.Category,
+		arg.Date,
+		arg.Note,
+		arg.UserID,
+	)
+	var i UpdateInvestmentRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
