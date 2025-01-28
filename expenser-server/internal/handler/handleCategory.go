@@ -41,25 +41,6 @@ func HandleCategoryCreate(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		if len(params.Name) == 0 {
-			respondWithError(w, http.StatusBadRequest, "Category name cannot be empty")
-			return
-		}
-		if len(params.Name) > 50 {
-			respondWithError(w, http.StatusBadRequest, "Category name too long")
-			return
-		}
-
-		if len(params.Type) == 0 {
-			respondWithError(w, http.StatusBadRequest, "Category type cannot be empty")
-			return
-		}
-
-		if !(params.Type == "Expense" || params.Type == "Investment") {
-			respondWithError(w, http.StatusBadRequest, "Category type has to be Expense or Investment")
-			return
-		}
-
 		userID := r.Context().Value("userID").(uuid.UUID)
 		category, err := data.AddCategoryToDB(r.Context(), model.Category{
 			ID:          uuid.New(),
@@ -103,24 +84,11 @@ func HandleCategoryUpdate(data model.Config) http.HandlerFunc {
 		err = decoder.Decode(&params)
 		if err != nil {
 			logger.Error("Error while decoding parameters:%s", map[string]interface{}{
-				"error":  err,
-				"params": params,
+				"error":     err,
+				"params":    params,
+				"errorType": "decode_error",
 			})
 			respondWithError(w, http.StatusBadRequest, "Couldn't decode parameters")
-			return
-		}
-
-		if len(params.Name) == 0 {
-			respondWithError(w, http.StatusBadRequest, "Category name cannot be empty")
-			return
-		}
-		if len(params.Name) > 50 {
-			respondWithError(w, http.StatusBadRequest, "Category name too long")
-			return
-		}
-
-		if !(params.Type == "Expense" || params.Type == "Investment") {
-			respondWithError(w, http.StatusBadRequest, "Category type has to be Expense or Investment")
 			return
 		}
 

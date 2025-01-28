@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
+	"slices"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -29,6 +32,37 @@ type ResponseCategory struct {
 	Description string    `json:"description"`
 	User        string    `json:"user"`
 	CreatedAt   time.Time `json:"created_at"`
+}
+
+const (
+	CategoryTypeExpense    = "Expense"
+	CategoryTypeInvestment = "Investment"
+)
+
+var ValidCategoryTypes = map[string]bool{
+	CategoryTypeExpense:    true,
+	CategoryTypeInvestment: true,
+}
+
+func (c Category) Validate() error {
+	if len(strings.TrimSpace(c.Name)) == 0 {
+		return fmt.Errorf("category name cannot be empty")
+	}
+
+	if len(c.Name) > 50 {
+		return fmt.Errorf("category name too long")
+	}
+
+	if len(strings.TrimSpace(c.Type)) == 0 {
+		return fmt.Errorf("category type cannot be empty")
+	}
+
+	if !ValidCategoryTypes[c.Type] {
+		validTypes := strings.Join(slices.Collect(maps.Keys(ValidCategoryTypes)), " or ")
+		return fmt.Errorf("invalid category type: %q (must be %s)", c.Type, validTypes)
+	}
+
+	return nil
 }
 
 func (d Config) GetCategoriesFromDB(ctx context.Context, userId uuid.UUID) ([]ResponseCategory, error) {
@@ -88,6 +122,13 @@ func (d Config) GetCategoryByIdFromDB(ctx context.Context, id, userId uuid.UUID)
 }
 
 func (d Config) AddCategoryToDB(ctx context.Context, category Category) (ResponseCategory, error) {
+	if err := category.Validate(); err != nil {
+		logger.Error("Provided category is not valid", map[string]interface{}{
+			"category": category,
+		})
+		return ResponseCategory{}, err
+	}
+
 	dbCategory, err := d.Queries.CreateCategory(ctx, repository.CreateCategoryParams{
 		ID:          uuid.New(),
 		Name:        category.Name,
@@ -170,6 +211,13 @@ func (d Config) DeleteCategoryFromDB(ctx context.Context, id, userID uuid.UUID) 
 }
 
 func (d Config) UpdateCategoryInDB(ctx context.Context, category Category) (ResponseCategory, error) {
+	if err := category.Validate(); err != nil {
+		logger.Error("Provided category is not valid", map[string]interface{}{
+			"category": category,
+		})
+		return ResponseCategory{}, err
+	}
+
 	dbCategory, err := d.Queries.UpdateCategory(ctx, repository.UpdateCategoryParams{
 		ID:          category.ID,
 		Name:        category.Name,

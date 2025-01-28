@@ -24,9 +24,13 @@ export const CategoryFormSchema = z.object({
   name: z.string().nonempty({
     message: "Expense category name is required.",
   }),
-  type: z.string({
-    required_error: "Please select a category type",
-  }),
+  type: z
+    .string({
+      required_error: "Please select a category type",
+    })
+    .refine((val) => ["Expense", "Investment"].includes(val), {
+      message: "Type must be either 'Expense' or 'Investment'",
+    }),
   description: z.string(),
 });
 
@@ -57,7 +61,9 @@ export function CategoryForm({ onSubmit, initialData }: CategoryFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category Name</FormLabel>
+              <FormLabel>
+                Category Name<span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
                 <Input placeholder="Name of your expense category" {...field} />
               </FormControl>
@@ -70,15 +76,13 @@ export function CategoryForm({ onSubmit, initialData }: CategoryFormProps) {
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category Type</FormLabel>
+              <FormLabel>
+                Category Type <span className="text-red-500">*</span>
+              </FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        field.value ? field.value : "Select a category type"
-                      }
-                    />
+                    <SelectValue placeholder="Select a category type" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
