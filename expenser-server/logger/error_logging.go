@@ -50,7 +50,7 @@ func GetStackTrace(skip int) string {
 			frame.Line,
 			frame.Function,
 		)
-		stackTrace = append(stackTrace, stackEntry)
+		stackTrace = append(stackTrace, "           "+stackEntry)
 
 		if !more {
 			break

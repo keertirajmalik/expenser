@@ -1,5 +1,5 @@
-import { ExpenseFormSchema } from "@/app/create-dialog/expense-form";
-import { EditExpenseSheet } from "@/app/expense/editsheet";
+import { InvestmentFormSchema } from "@/app/create-dialog/investment-form";
+import { EditInvestmentSheet } from "@/app/investment/editsheet";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
 import { DeleteDialog } from "@/components/data-table/row-action";
 import { badgeVariants } from "@/components/ui/badge";
@@ -12,17 +12,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  useDeleteExpenseMutation,
-  useUpdateExpenseMutation,
-} from "@/hooks/use-expense-query";
-import { Expense } from "@/types/expense";
+  useDeleteInvestmentMutation,
+  useUpdateInvestmentMutation,
+} from "@/hooks/use-investment-query";
+import { Investment } from "@/types/investment";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router";
 import { z } from "zod";
 
-export const columns: ColumnDef<Expense>[] = [
+export const columns: ColumnDef<Investment>[] = [
   {
     id: "id",
   },
@@ -52,7 +52,7 @@ export const columns: ColumnDef<Expense>[] = [
     },
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formatted = new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
       }).format(amount);
@@ -77,18 +77,19 @@ export const columns: ColumnDef<Expense>[] = [
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-      const editExpenseMutation = useUpdateExpenseMutation();
-      const onSubmit = (data: z.infer<typeof ExpenseFormSchema>) => {
-        editExpenseMutation.mutate(
-          { expense: data, id: row.original.id },
+      const editInvestmentMutation = useUpdateInvestmentMutation();
+      const onSubmit = (data: z.infer<typeof InvestmentFormSchema>) => {
+        editInvestmentMutation.mutate(
+          { investment: data, id: row.original.id },
           {
             onSuccess: () => setEditSheetOpen(false),
           },
         );
       };
 
-      const deleteExpenseMutation = useDeleteExpenseMutation();
-      const onDeleteClick = () => deleteExpenseMutation.mutate(row.original.id);
+      const deleteInvestmentMutation = useDeleteInvestmentMutation();
+      const onDeleteClick = () =>
+        deleteInvestmentMutation.mutate(row.original.id);
 
       return (
         <>
@@ -115,11 +116,11 @@ export const columns: ColumnDef<Expense>[] = [
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem>View expense history</DropdownMenuItem>
+                <DropdownMenuItem>View Investment history</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <EditExpenseSheet
+          <EditInvestmentSheet
             editSheetOpen={editSheetOpen}
             setEditSheetOpen={setEditSheetOpen}
             onSubmit={onSubmit}

@@ -1,12 +1,13 @@
-import Expense from "@/app/expense/expense";
-import Dashboard from "@/app/dashboard";
 import { LoginPage } from "@/app/auth/login";
 import { SignupPage } from "@/app/auth/signup";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { Routes, Route, Navigate } from "react-router";
-import { ROUTES } from "@/types/routes";
 import Category from "@/app/category/category";
+import Dashboard from "@/app/dashboard";
+import Expense from "@/app/expense/expense";
+import Investment from "@/app/investment/investment";
 import { AppSidebar } from "@/app/sidebar/app-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { ROUTES } from "@/types/routes";
+import { Navigate, Route, Routes } from "react-router";
 
 export function App() {
   return (
@@ -35,8 +36,9 @@ function MainRoutes() {
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <Routes>
             <Route path={ROUTES.MAIN.DASHBOARD} element={<Dashboard />} />
-            <Route path={ROUTES.MAIN.EXPENSE} element={<Expense />} />
             <Route path={ROUTES.MAIN.CATEGORY} element={<Category />} />
+            <Route path={ROUTES.MAIN.EXPENSE} element={<Expense />} />
+            <Route path={ROUTES.MAIN.INVESTMENT} element={<Investment />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

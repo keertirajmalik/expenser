@@ -78,7 +78,7 @@ export const useUpdateExpenseMutation = () => {
   return mutation;
 };
 
-export const useDeleteExpenseQuery = () => {
+export const useDeleteExpenseMutation = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (id: string) => {

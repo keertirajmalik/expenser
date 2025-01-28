@@ -33,8 +33,8 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-interface ExpenseFormProps {
-  onSubmit: (data: z.infer<typeof ExpenseFormSchema>) => void;
+interface InvestmentFormProps {
+  onSubmit: (data: z.infer<typeof InvestmentFormSchema>) => void;
   initialData?: {
     name: string;
     category: string;
@@ -44,16 +44,16 @@ interface ExpenseFormProps {
   };
 }
 
-export const ExpenseFormSchema = z.object({
+export const InvestmentFormSchema = z.object({
   name: z.string().nonempty({
-    message: "Expense name is required.",
+    message: "Investment name is required.",
   }),
   category: z.string().nonempty({
-    message: "Expense category is required.",
+    message: "Investment category is required.",
   }),
   amount: z
     .string()
-    .nonempty({ message: "Expense amount is required." })
+    .nonempty({ message: "Investment amount is required." })
     .regex(/^(?:\d{1,15}|\d{1,15}\.\d{1,4})$/, {
       message:
         "Amount must be a positive number with up to 4 decimal places (max 15 digits).",
@@ -62,19 +62,19 @@ export const ExpenseFormSchema = z.object({
       message: "Amount must be greater than 0.",
     }),
   date: z.date({
-    required_error: "Expense date is required.",
+    required_error: "Investment date is required.",
   }),
   note: z.string(),
 });
 
-export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
+export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
   const [openCategory, setOpenCategory] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
   const { data: categories, isLoading } = useGetCategoryQuery();
 
-  const form = useForm<z.infer<typeof ExpenseFormSchema>>({
-    resolver: zodResolver(ExpenseFormSchema),
+  const form = useForm<z.infer<typeof InvestmentFormSchema>>({
+    resolver: zodResolver(InvestmentFormSchema),
     defaultValues: initialData || {
       name: "",
       category: "",
@@ -87,7 +87,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
   useEffect(() => {
     if (!isLoading && categories) {
       const filtered = categories.filter(
-        (category: Category) => category.type == CategoryType.Expense,
+        (category: Category) => category.type == CategoryType.Investment,
       );
       setFilteredCategories(filtered);
 
@@ -113,9 +113,9 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Expense Name</FormLabel>
+              <FormLabel>Investment Name</FormLabel>
               <FormControl>
-                <Input placeholder="Name of your expense" {...field} />
+                <Input placeholder="Name of your investment" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -126,7 +126,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="category"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Expense Category</FormLabel>
+              <FormLabel>Investment Category</FormLabel>
               <Popover open={openCategory} onOpenChange={setOpenCategory}>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -142,16 +142,16 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
                         ? filteredCategories?.find(
                             (category) => category.id === field.value,
                           )?.name
-                        : "Select Expense Category"}
+                        : "Select Investment Category"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent className="w-[250px] p-0">
                   <Command>
-                    <CommandInput placeholder="Search expense category..." />
+                    <CommandInput placeholder="Search investment category..." />
                     <CommandList>
-                      <CommandEmpty>No expense category found.</CommandEmpty>
+                      <CommandEmpty>No investment category found.</CommandEmpty>
                       <CommandGroup>
                         {filteredCategories?.map((category) => (
                           <CommandItem
@@ -187,13 +187,13 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Expense Amount</FormLabel>
+              <FormLabel>Investment Amount</FormLabel>
               <FormControl>
                 <Input
                   type="number"
                   step="0.0001"
                   min="0"
-                  placeholder="Expense amount"
+                  placeholder="Investment amount"
                   {...field}
                 />
               </FormControl>
@@ -206,7 +206,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Expense Date</FormLabel>
+              <FormLabel>Investment Date</FormLabel>
               <Popover
                 open={openCalendar}
                 onOpenChange={setOpenCalendar}
@@ -239,9 +239,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
                       form.setValue("date", date);
                       setOpenCalendar(false);
                     }}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
+                    disabled={(date) => date < new Date("1900-01-01")}
                     initialFocus
                   />
                 </PopoverContent>
@@ -258,7 +256,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
               <FormLabel>Note</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Tell us a little bit about expense"
+                  placeholder="Tell us a little bit about investment"
                   className="resize-none"
                   maxLength={100}
                   {...field}

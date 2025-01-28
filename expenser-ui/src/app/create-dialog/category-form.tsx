@@ -104,9 +104,13 @@ export function CategoryForm({ onSubmit, initialData }: CategoryFormProps) {
                 <Textarea
                   placeholder="Tell us a little bit about expense category"
                   className="resize-none"
+                  maxLength={100}
                   {...field}
                 />
               </FormControl>
+              <div className="text-xs text-muted-foreground text-right">
+                {field.value?.length || 0}/100 characters
+              </div>
               <FormMessage />
             </FormItem>
           )}

@@ -5,28 +5,29 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 	"github.com/keertirajmalik/expenser/expenser-server/logger"
 	"github.com/shopspring/decimal"
 )
 
-func HandleTransactionGet(data model.Config) http.HandlerFunc {
+func HandleInvestmentGet(data model.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value("userID").(uuid.UUID)
-		transactions, err := data.GetTransactionsFromDB(r.Context(), userID)
+		investments, err := data.GetInvestmentsFromDB(r.Context(), userID)
 		if err != nil {
-			logger.Error("Error while fetching tranasactions", map[string]interface{}{
+			logger.Error("Error while fetching investments", map[string]interface{}{
 				"error": err,
 			})
 			respondWithError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
-		respondWithJson(w, http.StatusOK, transactions)
+		respondWithJson(w, http.StatusOK, investments)
 	}
 }
 
-func HandleTransactionCreate(data model.Config) http.HandlerFunc {
+func HandleInvestmentCreate(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Name     string          `json:"name"`
 		Amount   decimal.Decimal `json:"amount"`
@@ -50,7 +51,7 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 
 		userID := r.Context().Value("userID").(uuid.UUID)
 
-		transaction := model.InputTransaction{
+		investment := model.InputInvestment{
 			ID:       uuid.New(),
 			Name:     params.Name,
 			Category: params.Category,
@@ -60,31 +61,31 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 			UserID:   userID,
 		}
 
-		dbCategory, err := data.GetCategoryByIdFromDB(r.Context(), transaction.Category, transaction.UserID)
+		dbCategory, err := data.GetCategoryByIdFromDB(r.Context(), investment.Category, investment.UserID)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		if dbCategory.Type != model.CategoryTypeExpense {
-			logger.Error("Category type should be Expense", map[string]interface{}{
+		if dbCategory.Type != model.CategoryTypeInvestment {
+			logger.Error("Category type should be Investment", map[string]interface{}{
 				"category_name": dbCategory.Name,
 				"category_type": dbCategory.Type,
 			})
-			respondWithError(w, http.StatusBadRequest, "Category type should be Expense")
+			respondWithError(w, http.StatusBadRequest, "Category type should be Investment")
 			return
 		}
 
-		dbTransaction, err := data.AddTransactionToDB(r.Context(), transaction)
+		dbInvestment, err := data.AddInvestmentToDB(r.Context(), investment)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		respondWithJson(w, http.StatusOK, dbTransaction)
+		respondWithJson(w, http.StatusCreated, dbInvestment)
 	}
 }
 
-func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
+func HandleInvestmentUpdate(data model.Config) http.HandlerFunc {
 	type parameters struct {
 		Name     string          `json:"name"`
 		Amount   decimal.Decimal `json:"amount"`
@@ -98,7 +99,7 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 
 		id, err := uuid.Parse(idStr)
 		if err != nil {
-			logger.Error("Error while parsing transaction ID", map[string]interface{}{
+			logger.Error("Error while parsing investment ID", map[string]interface{}{
 				"error": err,
 				"uuid":  idStr,
 			})
@@ -120,7 +121,7 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 
 		userID := r.Context().Value("userID").(uuid.UUID)
 
-		transaction := model.InputTransaction{
+		investment := model.InputInvestment{
 			ID:       id,
 			Name:     params.Name,
 			Category: params.Category,
@@ -130,31 +131,31 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 			UserID:   userID,
 		}
 
-		dbCategory, err := data.GetCategoryByIdFromDB(r.Context(), transaction.Category, transaction.UserID)
+		dbCategory, err := data.GetCategoryByIdFromDB(r.Context(), investment.Category, investment.UserID)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		if dbCategory.Type != "Expense" {
-			logger.Error("Category type should be Expense", map[string]interface{}{
+		if dbCategory.Type != model.CategoryTypeInvestment {
+			logger.Error("Category type should be Investment", map[string]interface{}{
 				"category_name": dbCategory.Name,
 				"category_type": dbCategory.Type,
 			})
-			respondWithError(w, http.StatusBadRequest, "Category type should be Expense")
+			respondWithError(w, http.StatusBadRequest, "Category type should be Investment")
 			return
 		}
 
-		dbTransaction, err := data.UpdateTransactionInDB(r.Context(), transaction)
+		dbInvestment, err := data.UpdateInvestmentInDB(r.Context(), investment)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		respondWithJson(w, http.StatusOK, dbTransaction)
+		respondWithJson(w, http.StatusOK, dbInvestment)
 	}
 }
 
-func HandleTransactionDelete(data model.Config) http.HandlerFunc {
+func HandleInvestmentDelete(data model.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 
@@ -169,12 +170,16 @@ func HandleTransactionDelete(data model.Config) http.HandlerFunc {
 		}
 
 		userID := r.Context().Value("userID").(uuid.UUID)
-		err = data.DeleteTransactionFromDB(r.Context(), id, userID)
+		err = data.DeleteInvestmentFromDB(r.Context(), id, userID)
 		if err != nil {
-			logger.Error("Error while deleting transaction", map[string]interface{}{
-				"transaction_id": id,
-				"user_id":        userID,
-				"error":          err,
+			if err == pgx.ErrNoRows {
+				respondWithError(w, http.StatusNotFound, "Investment not found")
+				return
+			}
+			logger.Error("Error while deleting investment", map[string]interface{}{
+				"investmentId": id,
+				"userIDd":       userID,
+				"error":         err,
 			})
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return

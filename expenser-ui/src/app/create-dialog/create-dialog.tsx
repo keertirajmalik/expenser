@@ -1,11 +1,15 @@
 import {
+  CategoryForm,
+  CategoryFormSchema,
+} from "@/app/create-dialog/category-form";
+import {
   ExpenseForm,
   ExpenseFormSchema,
 } from "@/app/create-dialog/expense-form";
 import {
-  CategoryForm,
-  CategoryFormSchema,
-} from "@/app/create-dialog/category-form";
+  InvestmentForm,
+  InvestmentFormSchema,
+} from "@/app/create-dialog/investment-form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,14 +19,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCreateExpenseMutation } from "@/hooks/use-expense-query";
 import { useCreateCategoryMutation } from "@/hooks/use-category-query";
+import { useCreateExpenseMutation } from "@/hooks/use-expense-query";
+import { useCreateInvestmentMutation } from "@/hooks/use-investment-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
 interface CreateDialogProps {
-  creation: "Expense" | "Category";
+  creation: "Expense" | "Category" | "Investment";
   title: string;
   description: string;
 }
@@ -52,6 +57,30 @@ export function CreateDialog({
     });
   };
 
+  const createInvestmentMutation = useCreateInvestmentMutation();
+  const onInvestmentSubmit = (data: z.infer<typeof InvestmentFormSchema>) => {
+    createInvestmentMutation.mutate(data, {
+      onSuccess: () => {
+        setOpen(false);
+      },
+    });
+  };
+
+  let formComponent;
+  switch (creationCategory) {
+    case "Expense":
+      formComponent = <ExpenseForm onSubmit={onExpenseSubmit} />;
+      break;
+    case "Category":
+      formComponent = <CategoryForm onSubmit={onCategorySubmit} />;
+      break;
+    case "Investment":
+      formComponent = <InvestmentForm onSubmit={onInvestmentSubmit} />;
+      break;
+    default:
+      formComponent = null;
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -65,11 +94,7 @@ export function CreateDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        {creationCategory === "Expense" ? (
-          <ExpenseForm onSubmit={onExpenseSubmit} />
-        ) : (
-          <CategoryForm onSubmit={onCategorySubmit} />
-        )}
+        <div>{formComponent}</div>
       </DialogContent>
     </Dialog>
   );

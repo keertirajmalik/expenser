@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/keertirajmalik/expenser/expenser-server/database"
+	"github.com/keertirajmalik/expenser/expenser-server/internal/database"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/repository"
 	"github.com/keertirajmalik/expenser/expenser-server/logger"
