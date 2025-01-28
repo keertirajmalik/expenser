@@ -82,17 +82,13 @@ export const columns: ColumnDef<Expense>[] = [
         editExpenseMutation.mutate(
           { expense: data, id: row.original.id },
           {
-            onSuccess: () => {
-              setEditSheetOpen(false);
-            },
-          },
+            onSuccess: () => setEditSheetOpen(false),
+          }
         );
       };
 
       const deleteExpenseMutation = useDeleteExpenseQuery();
-      const onDeleteClick = () => {
-        deleteExpenseMutation.mutate(row.original.id);
-      };
+      const onDeleteClick = () => deleteExpenseMutation.mutate(row.original.id);
 
       return (
         <>

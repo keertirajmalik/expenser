@@ -15,14 +15,15 @@ import (
 
 const createCategory = `-- name: CreateCategory :one
 WITH inserted AS (
-    INSERT INTO categories(id, name, description, user_id)
-    VALUES ($1, $2, $3, $4)
-    RETURNING id, name, description, user_id, created_at, updated_at
+    INSERT INTO categories(id, name,type, description, user_id)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING id, name, description, user_id, created_at, updated_at, type
 )
 SELECT
     inserted.id,
     inserted.name,
     inserted.description,
+    inserted.type,
     users.name AS user,
     inserted.created_at,
     inserted.updated_at
@@ -33,6 +34,7 @@ INNER JOIN users ON inserted.user_id = users.id
 type CreateCategoryParams struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
+	Type        string    `json:"type"`
 	Description *string   `json:"description"`
 	UserID      uuid.UUID `json:"user_id"`
 }
@@ -41,6 +43,7 @@ type CreateCategoryRow struct {
 	ID          uuid.UUID          `json:"id"`
 	Name        string             `json:"name"`
 	Description *string            `json:"description"`
+	Type        string             `json:"type"`
 	User        string             `json:"user"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
@@ -50,6 +53,7 @@ func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) 
 	row := q.db.QueryRow(ctx, createCategory,
 		arg.ID,
 		arg.Name,
+		arg.Type,
 		arg.Description,
 		arg.UserID,
 	)
@@ -58,6 +62,7 @@ func (q *Queries) CreateCategory(ctx context.Context, arg CreateCategoryParams) 
 		&i.ID,
 		&i.Name,
 		&i.Description,
+		&i.Type,
 		&i.User,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -83,6 +88,7 @@ SELECT
     categories.id,
     categories.name,
     categories.description,
+    categories.type,
     users.name AS user,
     categories.created_at,
     categories.updated_at
@@ -96,6 +102,7 @@ type GetCategoryRow struct {
 	ID          uuid.UUID          `json:"id"`
 	Name        string             `json:"name"`
 	Description *string            `json:"description"`
+	Type        string             `json:"type"`
 	User        string             `json:"user"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
@@ -114,6 +121,7 @@ func (q *Queries) GetCategory(ctx context.Context, userID uuid.UUID) ([]GetCateg
 			&i.ID,
 			&i.Name,
 			&i.Description,
+			&i.Type,
 			&i.User,
 			&i.CreatedAt,
 			&i.UpdatedAt,
@@ -133,6 +141,7 @@ SELECT
     categories.id,
     categories.name,
     categories.description,
+    categories.type,
     users.name AS user,
     categories.created_at,
     categories.updated_at
@@ -151,6 +160,7 @@ type GetCategoryByIdRow struct {
 	ID          uuid.UUID          `json:"id"`
 	Name        string             `json:"name"`
 	Description *string            `json:"description"`
+	Type        string             `json:"type"`
 	User        string             `json:"user"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
@@ -163,6 +173,7 @@ func (q *Queries) GetCategoryById(ctx context.Context, arg GetCategoryByIdParams
 		&i.ID,
 		&i.Name,
 		&i.Description,
+		&i.Type,
 		&i.User,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -174,14 +185,16 @@ const updateCategory = `-- name: UpdateCategory :one
 WITH updated AS (
     UPDATE categories
     SET name = $2,
-    description = $3
-    WHERE categories.id = $1 And categories.user_id=$4
-    RETURNING id, name, description, user_id, created_at, updated_at
+    description = $3,
+    type = $4
+    WHERE categories.id = $1 And categories.user_id=$5
+    RETURNING id, name, description, user_id, created_at, updated_at, type
 )
 SELECT
     updated.id,
     updated.name,
     updated.description,
+    updated.type,
     users.name AS user,
     updated.created_at,
     updated.updated_at
@@ -193,6 +206,7 @@ type UpdateCategoryParams struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
 	Description *string   `json:"description"`
+	Type        string    `json:"type"`
 	UserID      uuid.UUID `json:"user_id"`
 }
 
@@ -200,6 +214,7 @@ type UpdateCategoryRow struct {
 	ID          uuid.UUID          `json:"id"`
 	Name        string             `json:"name"`
 	Description *string            `json:"description"`
+	Type        string             `json:"type"`
 	User        string             `json:"user"`
 	CreatedAt   pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
@@ -210,6 +225,7 @@ func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) 
 		arg.ID,
 		arg.Name,
 		arg.Description,
+		arg.Type,
 		arg.UserID,
 	)
 	var i UpdateCategoryRow
@@ -217,6 +233,7 @@ func (q *Queries) UpdateCategory(ctx context.Context, arg UpdateCategoryParams) 
 		&i.ID,
 		&i.Name,
 		&i.Description,
+		&i.Type,
 		&i.User,
 		&i.CreatedAt,
 		&i.UpdatedAt,

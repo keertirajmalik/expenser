@@ -1,14 +1,14 @@
 import {
-  CategoryFormSchema,
   CategoryForm,
+  CategoryFormSchema,
 } from "@/app/create-dialog/category-form";
 import { Button } from "@/components/ui/button";
 import {
+  Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
-  Sheet,
 } from "@/components/ui/sheet";
 import { Category } from "@/types/category";
 import { Row } from "@tanstack/react-table";
@@ -42,6 +42,7 @@ export function EditCategorySheet({
           onSubmit={onSubmit}
           initialData={{
             name: row.original.name,
+            type: row.original.type,
             description: row.original.description,
           }}
         />
