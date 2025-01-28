@@ -55,7 +55,7 @@ export function BarChartComponent({ data }: BarChartProps) {
       <CardHeader>
         <CardTitle>Daily Expense Chart</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 pb-0.5">
         <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />

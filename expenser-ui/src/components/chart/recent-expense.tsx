@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
@@ -24,7 +24,7 @@ export function RecentExpenses({ data }: RecentExpenseProps) {
         <CardDescription>You spent {total} Rs this month.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2">
+        <div className="space-y-2 min-h-[200px] w-full">
           {data
             .sort((a: Expense, b: Expense) => {
               return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -33,7 +33,6 @@ export function RecentExpenses({ data }: RecentExpenseProps) {
             .map((expense) => (
               <div key={expense.id} className="flex items-center">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src="/avatars/01.png" alt="Avatar" />
                   <AvatarFallback>{expense.category.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="ml-4 space-y-1">

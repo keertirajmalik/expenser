@@ -3,10 +3,12 @@ import { columns } from "@/app/investment/column";
 import { DataTable } from "@/components/data-table/data-table";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetInvestmentQuery } from "@/hooks/use-investment-query";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@radix-ui/react-separator";
 
 export default function Investment() {
   const { data } = useGetInvestmentQuery();
+  const isMobile = useIsMobile();
 
   return (
     <div className="flex h-96 w-full flex-col">
@@ -23,7 +25,9 @@ export default function Investment() {
           />
           <div className="flex flex-col">
             <h1 className="text-lg font-semibold">Investments</h1>
-            <p className="text-sm text-gray-500">List of Your Investments</p>
+            <p className={`text-sm text-gray-500 ${isMobile ? "sr-only" : ""}`}>
+              List of Your Investments
+            </p>
           </div>
         </div>
         <CreateDialog

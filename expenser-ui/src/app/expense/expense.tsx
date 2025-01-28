@@ -3,10 +3,12 @@ import { columns } from "@/app/expense/column";
 import { DataTable } from "@/components/data-table/data-table";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetExpensesQuery } from "@/hooks/use-expense-query";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@radix-ui/react-separator";
 
 export default function Expense() {
   const { data } = useGetExpensesQuery();
+  const isMobile = useIsMobile();
 
   return (
     <div className="flex h-96 w-full flex-col">
@@ -23,7 +25,9 @@ export default function Expense() {
           />
           <div className="flex flex-col">
             <h1 className="text-lg font-semibold">Expense</h1>
-            <p className="text-sm text-gray-500">List of Your Expenses</p>
+            <p className={`text-sm text-gray-500 ${isMobile ? "sr-only" : ""}`}>
+              List of Your Expenses
+            </p>
           </div>
         </div>
         <CreateDialog

@@ -63,13 +63,13 @@ export default function AccountPage({
         onSuccess: () => {
           setOpen(false);
         },
-      },
+      }
     );
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={open} onOpenChange={setOpen} >
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Account</DialogTitle>
           <DialogDescription>
