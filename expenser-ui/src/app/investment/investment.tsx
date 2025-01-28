@@ -5,7 +5,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetInvestmentQuery } from "@/hooks/use-investment-query";
 import { Separator } from "@radix-ui/react-separator";
 
-export default function Expense() {
+export default function Investment() {
   const { data } = useGetInvestmentQuery();
 
   return (
@@ -29,13 +29,10 @@ export default function Expense() {
         <CreateDialog
           creation="Investment"
           title="Create Investment"
-          description=" Provide information regarding expense."
+          description="Provide information regarding your investment."
         />
       </header>
-      <main
-        className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4"
-        role="main"
-      >
+      <main className="flex flex-1 w-full justify-center py-4" role="main">
         <DataTable columns={columns} data={data ?? []} />
       </main>
     </div>

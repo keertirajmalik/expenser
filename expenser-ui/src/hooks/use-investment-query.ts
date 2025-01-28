@@ -80,7 +80,7 @@ export const useUpdateInvestmentMutation = () => {
   return mutation;
 };
 
-export const useDeleteInvestmentQuery = () => {
+export const useDeleteInvestmentMutation = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: async (id: string) => {

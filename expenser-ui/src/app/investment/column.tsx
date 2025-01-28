@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  useDeleteInvestmentQuery,
+  useDeleteInvestmentMutation,
   useUpdateInvestmentMutation,
 } from "@/hooks/use-investment-query";
 import { Investment } from "@/types/investment";
@@ -52,7 +52,7 @@ export const columns: ColumnDef<Investment>[] = [
     },
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formatted = new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
       }).format(amount);
@@ -87,7 +87,7 @@ export const columns: ColumnDef<Investment>[] = [
         );
       };
 
-      const deleteInvestmentMutation = useDeleteInvestmentQuery();
+      const deleteInvestmentMutation = useDeleteInvestmentMutation();
       const onDeleteClick = () =>
         deleteInvestmentMutation.mutate(row.original.id);
 

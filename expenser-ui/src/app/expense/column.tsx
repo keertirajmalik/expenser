@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  useDeleteExpenseQuery,
+  useDeleteExpenseMutation,
   useUpdateExpenseMutation,
 } from "@/hooks/use-expense-query";
 import { Expense } from "@/types/expense";
@@ -83,11 +83,11 @@ export const columns: ColumnDef<Expense>[] = [
           { expense: data, id: row.original.id },
           {
             onSuccess: () => setEditSheetOpen(false),
-          }
+          },
         );
       };
 
-      const deleteExpenseMutation = useDeleteExpenseQuery();
+      const deleteExpenseMutation = useDeleteExpenseMutation();
       const onDeleteClick = () => deleteExpenseMutation.mutate(row.original.id);
 
       return (

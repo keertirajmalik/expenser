@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 	"github.com/keertirajmalik/expenser/expenser-server/logger"
 	"github.com/shopspring/decimal"
@@ -66,7 +67,7 @@ func HandleInvestmentCreate(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		if dbCategory.Type != "Investment" {
+		if dbCategory.Type != model.CategoryTypeInvestment {
 			logger.Error("Category type should be Investment", map[string]interface{}{
 				"category_name": dbCategory.Name,
 				"category_type": dbCategory.Type,
@@ -80,7 +81,7 @@ func HandleInvestmentCreate(data model.Config) http.HandlerFunc {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		respondWithJson(w, http.StatusOK, dbInvestment)
+		respondWithJson(w, http.StatusCreated, dbInvestment)
 	}
 }
 
@@ -141,16 +142,16 @@ func HandleInvestmentUpdate(data model.Config) http.HandlerFunc {
 				"category_name": dbCategory.Name,
 				"category_type": dbCategory.Type,
 			})
-			respondWithError(w, http.StatusBadRequest, "Category type should be Expense")
+			respondWithError(w, http.StatusBadRequest, "Category type should be Investment")
 			return
 		}
 
-		dbInvestement, err := data.UpdateInvestmentInDB(r.Context(), investment)
+		dbInvestment, err := data.UpdateInvestmentInDB(r.Context(), investment)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		respondWithJson(w, http.StatusOK, dbInvestement)
+		respondWithJson(w, http.StatusOK, dbInvestment)
 	}
 }
 
@@ -171,10 +172,14 @@ func HandleInvestmentDelete(data model.Config) http.HandlerFunc {
 		userID := r.Context().Value("userID").(uuid.UUID)
 		err = data.DeleteInvestmentFromDB(r.Context(), id, userID)
 		if err != nil {
+			if err == pgx.ErrNoRows {
+				respondWithError(w, http.StatusNotFound, "Investment not found")
+				return
+			}
 			logger.Error("Error while deleting investment", map[string]interface{}{
-				"investment_id": id,
-				"user_id":        userID,
-				"error":          err,
+				"investmentId": id,
+				"userIDd":       userID,
+				"error":         err,
 			})
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return

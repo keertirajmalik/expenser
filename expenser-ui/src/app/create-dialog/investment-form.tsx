@@ -51,9 +51,16 @@ export const InvestmentFormSchema = z.object({
   category: z.string().nonempty({
     message: "Investment category is required.",
   }),
-  amount: z.string().nonempty({
-    message: "Investment amount is required.",
-  }),
+  amount: z
+    .string()
+    .nonempty({ message: "Investment amount is required." })
+    .regex(/^(?:\d{1,15}|\d{1,15}\.\d{1,4})$/, {
+      message:
+        "Amount must be a positive number with up to 4 decimal places (max 15 digits).",
+    })
+    .refine((val) => parseFloat(val) > 0, {
+      message: "Amount must be greater than 0.",
+    }),
   date: z.date({
     required_error: "Investment date is required.",
   }),
@@ -80,7 +87,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
   useEffect(() => {
     if (!isLoading && categories) {
       const filtered = categories.filter(
-        (category: Category) => category.type == CategoryType.Investment
+        (category: Category) => category.type == CategoryType.Investment,
       );
       setFilteredCategories(filtered);
 
@@ -88,7 +95,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
         form.reset(initialData);
         if (initialData.category) {
           const categoryOption = filtered.find(
-            (category) => category.name === initialData.category
+            (category) => category.name === initialData.category,
           );
           if (categoryOption) {
             form.setValue("category", categoryOption.id);
@@ -128,12 +135,12 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                       role="combobox"
                       className={cn(
                         "justify-between",
-                        !field.value && "text-muted-foreground"
+                        !field.value && "text-muted-foreground",
                       )}
                     >
                       {field.value
                         ? filteredCategories?.find(
-                            (category) => category.id === field.value
+                            (category) => category.id === field.value,
                           )?.name
                         : "Select Investment Category"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -161,7 +168,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                                 "ml-auto",
                                 category.id === field.value
                                   ? "opacity-100"
-                                  : "opacity-0"
+                                  : "opacity-0",
                               )}
                             />
                           </CommandItem>
@@ -182,7 +189,13 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
             <FormItem>
               <FormLabel>Investment Amount</FormLabel>
               <FormControl>
-                <Input placeholder="Investment amount" {...field} />
+                <Input
+                  type="number"
+                  step="0.0001"
+                  min="0"
+                  placeholder="Investment amount"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -205,7 +218,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                       variant={"outline"}
                       className={cn(
                         "pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
+                        !field.value && "text-muted-foreground",
                       )}
                     >
                       {field.value ? (
@@ -226,9 +239,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                       form.setValue("date", date);
                       setOpenCalendar(false);
                     }}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
+                    disabled={(date) => date < new Date("1900-01-01")}
                     initialFocus
                   />
                 </PopoverContent>
@@ -247,9 +258,13 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                 <Textarea
                   placeholder="Tell us a little bit about investment"
                   className="resize-none"
+                  maxLength={100}
                   {...field}
                 />
               </FormControl>
+              <div className="text-xs text-muted-foreground text-right">
+                {field.value?.length || 0}/100 characters
+              </div>
               <FormMessage />
             </FormItem>
           )}

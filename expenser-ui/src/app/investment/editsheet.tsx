@@ -43,13 +43,24 @@ export function EditInvestmentSheet({
             name: row.original.name,
             category: row.original.category,
             amount: row.original.amount.toString(),
-            date: parse(row.original.date.toString(), "dd/MM/yyyy", new Date()),
+            date: (() => {
+              try {
+                return parse(
+                  row.original.date.toString(),
+                  "dd/MM/yyyy",
+                  new Date(),
+                );
+              } catch (error) {
+                console.error("Failed to parse date:", error);
+                return new Date();
+              }
+            })(),
             note: row.original.note,
           }}
           onSubmit={onSubmit}
         />
         <Button
-          type="reset"
+          type="button"
           variant="secondary"
           className="w-full my-4"
           onClick={() => setEditSheetOpen(false)}

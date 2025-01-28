@@ -51,9 +51,16 @@ export const ExpenseFormSchema = z.object({
   category: z.string().nonempty({
     message: "Expense category is required.",
   }),
-  amount: z.string().nonempty({
-    message: "Expense amount is required.",
-  }),
+  amount: z
+    .string()
+    .nonempty({ message: "Expense amount is required." })
+    .regex(/^(?:\d{1,15}|\d{1,15}\.\d{1,4})$/, {
+      message:
+        "Amount must be a positive number with up to 4 decimal places (max 15 digits).",
+    })
+    .refine((val) => parseFloat(val) > 0, {
+      message: "Amount must be greater than 0.",
+    }),
   date: z.date({
     required_error: "Expense date is required.",
   }),
@@ -182,7 +189,13 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
             <FormItem>
               <FormLabel>Expense Amount</FormLabel>
               <FormControl>
-                <Input placeholder="Expense amount" {...field} />
+                <Input
+                  type="number"
+                  step="0.0001"
+                  min="0"
+                  placeholder="Expense amount"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -247,9 +260,13 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
                 <Textarea
                   placeholder="Tell us a little bit about expense"
                   className="resize-none"
+                  maxLength={100}
                   {...field}
                 />
               </FormControl>
+              <div className="text-xs text-muted-foreground text-right">
+                {field.value?.length || 0}/100 characters
+              </div>
               <FormMessage />
             </FormItem>
           )}

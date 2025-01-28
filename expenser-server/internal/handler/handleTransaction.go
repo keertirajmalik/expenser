@@ -66,7 +66,7 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		if dbCategory.Type != "Expense" {
+		if dbCategory.Type != model.CategoryTypeExpense {
 			logger.Error("Category type should be Expense", map[string]interface{}{
 				"category_name": dbCategory.Name,
 				"category_type": dbCategory.Type,
