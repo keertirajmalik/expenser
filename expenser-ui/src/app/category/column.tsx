@@ -1,5 +1,5 @@
-import { CategoryFormSchema } from "@/app/create-dialog/category-form";
 import { EditCategorySheet } from "@/app/category/editsheet";
+import { CategoryFormSchema } from "@/app/create-dialog/category-form";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
 import { DeleteDialog } from "@/components/data-table/row-action";
 import {
@@ -20,6 +20,12 @@ export const columns: ColumnDef<Category>[] = [
     accessorKey: "name",
     header: ({ column }) => {
       return <DataTableColumnHeader column={column} title="Name" />;
+    },
+  },
+  {
+    accessorKey: "type",
+    header: ({ column }) => {
+      return <DataTableColumnHeader column={column} title="Type" />;
     },
   },
   {
