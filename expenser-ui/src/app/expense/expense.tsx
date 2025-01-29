@@ -30,14 +30,16 @@ export default function Expense() {
             </p>
           </div>
         </div>
-        <CreateDialog
-          creation="Expense"
-          title="Create Expense"
-          description=" Provide information regarding expense."
-        />
+        <div className="sticky top-0 right-0">
+          <CreateDialog
+            creation="Expense"
+            title="Create Expense"
+            description=" Provide information regarding expense."
+          />
+        </div>
       </header>
       <main
-        className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4"
+        className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4 relative"
         role="main"
       >
         <DataTable columns={columns} data={data ?? []} />

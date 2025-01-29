@@ -40,7 +40,12 @@ export function RecentExpenses({ data }: RecentExpenseProps) {
                     {expense.name}
                   </p>
                 </div>
-                <div className="ml-auto font-medium">{expense.amount}</div>
+                <div className="ml-auto font-medium">
+                  {new Intl.NumberFormat("en-IN", {
+                    style: "currency",
+                    currency: "INR",
+                  }).format(parseFloat(expense.amount))}
+                </div>
               </div>
             ))}
         </div>

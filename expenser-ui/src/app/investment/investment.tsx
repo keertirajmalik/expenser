@@ -30,11 +30,13 @@ export default function Investment() {
             </p>
           </div>
         </div>
-        <CreateDialog
-          creation="Investment"
-          title="Create Investment"
-          description="Provide information regarding your investment."
-        />
+        <div className="sticky top-0 right-0">
+          <CreateDialog
+            creation="Investment"
+            title="Create Investment"
+            description="Provide information regarding your investment."
+          />
+        </div>
       </header>
       <main className="flex flex-1 w-full justify-center py-4" role="main">
         <DataTable columns={columns} data={data ?? []} />

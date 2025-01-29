@@ -24,17 +24,19 @@ export default function Category() {
             decorative={true}
           />
           <div className="flex flex-col">
-            <h1 className="text-lg font-semibold">Expense Category</h1>
+            <h1 className="text-lg font-semibold">Category</h1>
             <p className={`text-sm text-gray-500 ${isMobile ? "sr-only" : ""}`}>
-              List of Your Expense Categories
+              List of Your Categories
             </p>
           </div>
         </div>
-        <CreateDialog
-          creation="Category"
-          title="Create Expense Category"
-          description=" Provide information regarding expense category."
-        />
+        <div className="sticky top-0 right-0">
+          <CreateDialog
+            creation="Category"
+            title="Create Expense Category"
+            description=" Provide information regarding expense category."
+          />
+        </div>
       </header>
       <main className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4">
         <DataTable columns={columns} data={data ?? []} />
