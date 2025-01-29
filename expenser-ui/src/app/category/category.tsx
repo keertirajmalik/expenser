@@ -23,12 +23,12 @@ export default function Category() {
             className="bg-border w-px mr-2 h-4"
             decorative={true}
           />
-          <div className="flex flex-col">
+          <section className="flex flex-col">
             <h1 className="text-lg font-semibold">Category</h1>
             <p className={`text-sm text-gray-500 ${isMobile ? "sr-only" : ""}`}>
               List of Your Categories
             </p>
-          </div>
+          </section>
         </div>
         <div className="sticky top-0 right-0">
           <CreateDialog

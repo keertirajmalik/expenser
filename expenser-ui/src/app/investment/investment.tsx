@@ -23,12 +23,12 @@ export default function Investment() {
             className="bg-border w-px mr-2 h-4"
             decorative={true}
           />
-          <div className="flex flex-col" aria-label="Investment Section">
+          <section className="flex flex-col">
             <h1 className="text-lg font-semibold">Investments</h1>
             <p className={`text-sm text-gray-500 ${isMobile ? "sr-only" : ""}`}>
               List of Your Investments
             </p>
-          </div>
+          </section>
         </div>
         <div className="sticky top-0 right-0">
           <CreateDialog
