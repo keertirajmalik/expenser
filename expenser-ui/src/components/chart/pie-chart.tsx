@@ -71,7 +71,7 @@ export function PieChartComponent({ data }: PieChartProps) {
       <CardContent className="flex-1 pb-0.5">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square min-h-[200px] w-full"
+          className="mx-auto aspect-square min-h-[180px] sm:min-h-[200px] md:min-h-[250px] w-full"
         >
           <PieChart>
             <ChartTooltip
@@ -119,7 +119,7 @@ export function PieChartComponent({ data }: PieChartProps) {
             </Pie>
             <ChartLegend
               content={<ChartLegendContent nameKey="category" />}
-              className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+              className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/2 sm:[&>*]:basis-1/3 md:[&>*]:basis-1/4 [&>*]:justify-center"
             />
           </PieChart>
         </ChartContainer>
