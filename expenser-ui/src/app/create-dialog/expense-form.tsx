@@ -113,7 +113,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Expense Name</FormLabel>
+              <FormLabel required>Expense Name</FormLabel>
               <FormControl>
                 <Input placeholder="Name of your expense" {...field} />
               </FormControl>
@@ -126,7 +126,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="category"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Expense Category</FormLabel>
+              <FormLabel required>Expense Category</FormLabel>
               <Popover open={openCategory} onOpenChange={setOpenCategory}>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -187,7 +187,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Expense Amount</FormLabel>
+              <FormLabel required>Expense Amount</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -206,7 +206,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Expense Date</FormLabel>
+              <FormLabel required>Expense Date</FormLabel>
               <Popover
                 open={openCalendar}
                 onOpenChange={setOpenCalendar}

@@ -113,7 +113,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Investment Name</FormLabel>
+              <FormLabel required>Investment Name</FormLabel>
               <FormControl>
                 <Input placeholder="Name of your investment" {...field} />
               </FormControl>
@@ -126,7 +126,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
           name="category"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Investment Category</FormLabel>
+              <FormLabel required>Investment Category</FormLabel>
               <Popover open={openCategory} onOpenChange={setOpenCategory}>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -187,7 +187,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Investment Amount</FormLabel>
+              <FormLabel required>Investment Amount</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -206,7 +206,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
           name="date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Investment Date</FormLabel>
+              <FormLabel required>Investment Date</FormLabel>
               <Popover
                 open={openCalendar}
                 onOpenChange={setOpenCalendar}

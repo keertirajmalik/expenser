@@ -61,9 +61,7 @@ export function CategoryForm({ onSubmit, initialData }: CategoryFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Category Name<span className="text-red-500">*</span>
-              </FormLabel>
+              <FormLabel required>Category Name</FormLabel>
               <FormControl>
                 <Input placeholder="Name of your expense category" {...field} />
               </FormControl>
@@ -76,9 +74,7 @@ export function CategoryForm({ onSubmit, initialData }: CategoryFormProps) {
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                Category Type <span className="text-red-500">*</span>
-              </FormLabel>
+              <FormLabel required>Category Type</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
