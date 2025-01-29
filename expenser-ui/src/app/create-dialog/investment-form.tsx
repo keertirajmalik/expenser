@@ -113,7 +113,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Investment Name</FormLabel>
+              <FormLabel required>Investment Name</FormLabel>
               <FormControl>
                 <Input placeholder="Name of your investment" {...field} />
               </FormControl>
@@ -126,7 +126,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
           name="category"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Investment Category</FormLabel>
+              <FormLabel required>Investment Category</FormLabel>
               <Popover open={openCategory} onOpenChange={setOpenCategory}>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -135,12 +135,12 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                       role="combobox"
                       className={cn(
                         "justify-between",
-                        !field.value && "text-muted-foreground",
+                        !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value
                         ? filteredCategories?.find(
-                            (category) => category.id === field.value,
+                            (category) => category.id === field.value
                           )?.name
                         : "Select Investment Category"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -168,7 +168,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                                 "ml-auto",
                                 category.id === field.value
                                   ? "opacity-100"
-                                  : "opacity-0",
+                                  : "opacity-0"
                               )}
                             />
                           </CommandItem>
@@ -187,12 +187,13 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Investment Amount</FormLabel>
+              <FormLabel required>Investment Amount</FormLabel>
               <FormControl>
                 <Input
                   type="number"
                   step="0.0001"
                   min="0"
+                  pattern="^\d{1,15}(\.\d{1,4})?$"
                   placeholder="Investment amount"
                   {...field}
                 />
@@ -206,7 +207,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
           name="date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Investment Date</FormLabel>
+              <FormLabel required>Investment Date</FormLabel>
               <Popover
                 open={openCalendar}
                 onOpenChange={setOpenCalendar}
@@ -218,7 +219,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                       variant={"outline"}
                       className={cn(
                         "pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground",
+                        !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value ? (

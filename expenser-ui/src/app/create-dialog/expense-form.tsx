@@ -113,7 +113,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Expense Name</FormLabel>
+              <FormLabel required>Expense Name</FormLabel>
               <FormControl>
                 <Input placeholder="Name of your expense" {...field} />
               </FormControl>
@@ -126,7 +126,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="category"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Expense Category</FormLabel>
+              <FormLabel required>Expense Category</FormLabel>
               <Popover open={openCategory} onOpenChange={setOpenCategory}>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -135,12 +135,12 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
                       role="combobox"
                       className={cn(
                         "justify-between",
-                        !field.value && "text-muted-foreground",
+                        !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value
                         ? filteredCategories?.find(
-                            (category) => category.id === field.value,
+                            (category) => category.id === field.value
                           )?.name
                         : "Select Expense Category"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -168,7 +168,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
                                 "ml-auto",
                                 category.id === field.value
                                   ? "opacity-100"
-                                  : "opacity-0",
+                                  : "opacity-0"
                               )}
                             />
                           </CommandItem>
@@ -187,12 +187,13 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Expense Amount</FormLabel>
+              <FormLabel required>Expense Amount</FormLabel>
               <FormControl>
                 <Input
                   type="number"
                   step="0.0001"
                   min="0"
+                  pattern="^\d{1,15}(\.\d{1,4})?$"
                   placeholder="Expense amount"
                   {...field}
                 />
@@ -206,7 +207,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
           name="date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Expense Date</FormLabel>
+              <FormLabel required>Expense Date</FormLabel>
               <Popover
                 open={openCalendar}
                 onOpenChange={setOpenCalendar}
@@ -218,7 +219,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
                       variant={"outline"}
                       className={cn(
                         "pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground",
+                        !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value ? (
