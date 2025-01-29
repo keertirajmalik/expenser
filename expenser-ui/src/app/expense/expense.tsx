@@ -31,7 +31,7 @@ export default function Expense() {
             </p>
           </section>
         </div>
-        <div className="sticky top-0 right-0">
+        <div className="sticky top-0 right-2">
           <CreateDialog
             creation="Expense"
             title="Create Expense"

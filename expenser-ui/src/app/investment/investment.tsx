@@ -30,7 +30,7 @@ export default function Investment() {
             </p>
           </section>
         </div>
-        <div className="sticky top-0 right-0">
+        <div className="sticky top-0 right-2">
           <CreateDialog
             creation="Investment"
             title="Create Investment"
