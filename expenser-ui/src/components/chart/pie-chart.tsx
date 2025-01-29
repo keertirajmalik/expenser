@@ -119,7 +119,7 @@ export function PieChartComponent({ data }: PieChartProps) {
             </Pie>
             <ChartLegend
               content={<ChartLegendContent nameKey="category" />}
-              className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 sm:[&>*]:basis-1/4 md:[&>*]:basis-1/4 [&>*]:justify-center"
+              className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
             />
           </PieChart>
         </ChartContainer>

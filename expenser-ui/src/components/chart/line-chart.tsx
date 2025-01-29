@@ -26,7 +26,7 @@ const generateChartData = (expenses: Expense[]): ChartData[] => {
     .reduce((acc: ChartData[], item) => {
       const formattedDate = formatDate(item.date.toString());
       const existingItem = acc.find(
-        (accItem) => accItem.month === formattedDate
+        (accItem) => accItem.month === formattedDate,
       );
       const amount = parseFloat(item.amount);
       if (existingItem) {
@@ -39,8 +39,8 @@ const generateChartData = (expenses: Expense[]): ChartData[] => {
     .sort((a, b) =>
       compareAsc(
         parse(a.month, "MMM/yyyy", new Date()),
-        parse(b.month, "MMM/yyyy", new Date())
-      )
+        parse(b.month, "MMM/yyyy", new Date()),
+      ),
     )
     .map((item) => ({
       ...item,
@@ -64,7 +64,10 @@ export function LineChartComponent({ data }: LineChartProps) {
         <CardTitle>Monthly Expense Chart</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0.5">
-        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+        <ChartContainer
+          config={chartConfig}
+          className="min-h-[180px] sm:min-h-[200px] w-full"
+        >
           <LineChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis

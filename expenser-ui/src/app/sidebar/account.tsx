@@ -63,12 +63,12 @@ export default function AccountPage({
         onSuccess: () => {
           setOpen(false);
         },
-      }
+      },
     );
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen} >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Account</DialogTitle>
@@ -77,7 +77,7 @@ export default function AccountPage({
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-center">
-          <Avatar className="w-24 h-24">
+          <Avatar className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
             <AvatarImage src={avatarSrc} alt="User Avatar" />
             <AvatarFallback>{generateAvatarName(name)}</AvatarFallback>
           </Avatar>

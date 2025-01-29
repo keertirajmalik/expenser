@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
+    ChartConfig,
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Expense } from "@/types/expense";
 import { compareAsc, format, parse } from "date-fns";
@@ -56,7 +56,7 @@ export function BarChartComponent({ data }: BarChartProps) {
         <CardTitle>Daily Expense Chart</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0.5">
-        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+        <ChartContainer config={chartConfig} className="min-h-[180px] sm:min-h-[200px] w-full">
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis

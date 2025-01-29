@@ -34,7 +34,7 @@ export default function Category() {
           <CreateDialog
             creation="Category"
             title="Create Expense Category"
-            description=" Provide information regarding expense category."
+            description="Provide information regarding expense category."
           />
         </div>
       </header>
