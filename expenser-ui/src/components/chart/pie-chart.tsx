@@ -64,14 +64,14 @@ export function PieChartComponent({ data }: PieChartProps) {
   const chartData = generateChartData(data);
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0 ">
+    <Card>
+      <CardHeader className="pb-0 ">
         <CardTitle>Expense By Category Chart</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 pb-0 ">
+      <CardContent className="flex-1 pb-0.5">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square min-h-[250px]"
+          className="mx-auto aspect-square min-h-[180px] sm:min-h-[200px] md:min-h-[250px] w-full"
         >
           <PieChart>
             <ChartTooltip

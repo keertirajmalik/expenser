@@ -94,7 +94,7 @@ export function CreateDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <div>{formComponent}</div>
+        {formComponent}
       </DialogContent>
     </Dialog>
   );

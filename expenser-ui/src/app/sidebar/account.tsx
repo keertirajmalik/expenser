@@ -69,7 +69,7 @@ export default function AccountPage({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Account</DialogTitle>
           <DialogDescription>
@@ -77,7 +77,7 @@ export default function AccountPage({
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-center">
-          <Avatar className="w-24 h-24">
+          <Avatar className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24">
             <AvatarImage src={avatarSrc} alt="User Avatar" />
             <AvatarFallback>{generateAvatarName(name)}</AvatarFallback>
           </Avatar>

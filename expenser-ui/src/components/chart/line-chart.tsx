@@ -63,8 +63,11 @@ export function LineChartComponent({ data }: LineChartProps) {
       <CardHeader>
         <CardTitle>Monthly Expense Chart</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+      <CardContent className="flex-1 pb-0.5">
+        <ChartContainer
+          config={chartConfig}
+          className="min-h-[180px] sm:min-h-[200px] w-full"
+        >
           <LineChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
