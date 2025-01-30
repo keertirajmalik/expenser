@@ -3,15 +3,13 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/keertirajmalik/expenser/expenser-server/auth"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
-	"github.com/keertirajmalik/expenser/expenser-server/logger"
 )
 
-func HandleUserLogin(userService model.UserService) http.HandlerFunc {
+func HandleUserLogin(userService model.UserService, jwtSecret string) http.HandlerFunc {
 	type parameters struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -24,11 +22,6 @@ func HandleUserLogin(userService model.UserService) http.HandlerFunc {
 		Image    string `json:"image"`
 	}
 
-	jwtSecret := os.Getenv("JWT_SECRET")
-	if jwtSecret == "" {
-		logger.Error("JWT_SECRET environment variable is not set", map[string]interface{}{})
-		os.Exit(1)
-	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
 		params := parameters{}

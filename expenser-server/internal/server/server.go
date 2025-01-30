@@ -21,22 +21,26 @@ type Server struct {
 	db database.Service
 }
 
+func LoadConfig() string {
+    jwtSecret := os.Getenv("JWT_SECRET")
+    if jwtSecret == "" {
+        log.Fatal("JWT_SECRET environment variable is not set")
+    }
+
+    return jwtSecret;
+}
+
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	NewServer := &Server{
 		port: port,
-
 		db: database.New(),
 	}
 
-	stack := middleware.CreateStack(
-		middleware.AllowCors,
-		middleware.Logging,
-		middleware.AuthMiddleware,
-	)
 	queries := repository.New(NewServer.db.GetConnection())
 
 	config := model.Config{
+		JWTSecret: LoadConfig(),
 		UserService: model.UserService{
 			Queries: queries,
 		},
@@ -50,6 +54,12 @@ func NewServer() *http.Server {
 			Queries: queries,
 		},
 	}
+
+	stack := middleware.CreateStack(
+		middleware.AllowCors,
+		middleware.Logging,
+		middleware.AuthMiddleware(config.JWTSecret),
+	)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", NewServer.port),

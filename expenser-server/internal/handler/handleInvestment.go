@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -148,10 +149,10 @@ func HandleInvestmentDelete(investmentService model.InvestmentService) http.Hand
 			}
 			logger.Error("Error while deleting investment", map[string]interface{}{
 				"investmentId": id,
-				"userIDd":      userID,
+				"userId":       userID,
 				"error":        err,
 			})
-			respondWithError(w, http.StatusBadRequest, err.Error())
+			respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Failed to delete investment: %v", err))
 			return
 		}
 

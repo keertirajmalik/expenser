@@ -116,23 +116,9 @@ func (t TransactionService) AddTransactionToDB(ctx context.Context, transaction 
 		return ResponseTransaction{}, fmt.Errorf("failed to convert amount type: %w", err)
 	}
 
-	dbCategory, err := t.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: transaction.Category, UserID: transaction.UserID})
+	err = t.validateTransactionCategory(ctx, transaction.Category, transaction.UserID)
 	if err != nil {
-		logger.Error("couldn't get category from DB", map[string]interface{}{
-			"category_id": transaction.ID,
-			"user_id":     transaction.UserID,
-			"error":       err,
-		})
-		return ResponseTransaction{}, fmt.Errorf("Category type not found")
-	}
-
-	if dbCategory.Type != CategoryTypeExpense {
-		logger.Error("Category type should be Expense", map[string]interface{}{
-			"category_name": dbCategory.Name,
-			"category_type": dbCategory.Type,
-		})
-
-		return ResponseTransaction{}, fmt.Errorf("Category type should be Expense")
+		return ResponseTransaction{}, err
 	}
 
 	dbTransaction, err := t.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
@@ -222,23 +208,9 @@ func (t TransactionService) UpdateTransactionInDB(ctx context.Context, transacti
 		return ResponseTransaction{}, fmt.Errorf("failed to convert amount type: %w", err)
 	}
 
-	dbCategory, err := t.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: transaction.Category, UserID: transaction.UserID})
+	err = t.validateTransactionCategory(ctx, transaction.Category, transaction.UserID)
 	if err != nil {
-		logger.Error("couldn't get category from DB", map[string]interface{}{
-			"category_id": transaction.ID,
-			"user_id":     transaction.UserID,
-			"error":       err,
-		})
-		return ResponseTransaction{}, fmt.Errorf("Category type not found")
-	}
-
-	if dbCategory.Type != CategoryTypeExpense {
-		logger.Error("Category type should be Expense", map[string]interface{}{
-			"category_name": dbCategory.Name,
-			"category_type": dbCategory.Type,
-		})
-
-		return ResponseTransaction{}, fmt.Errorf("Category type should be Expense")
+		return ResponseTransaction{}, err
 	}
 
 	dbTransaction, err := t.Queries.UpdateTransaction(ctx, repository.UpdateTransactionParams{
@@ -334,5 +306,28 @@ func (t TransactionService) DeleteTransactionFromDB(ctx context.Context, id, use
 		return errors.New("transaction not found")
 	}
 
+	return nil
+}
+
+func (t TransactionService) validateTransactionCategory(ctx context.Context, categoryID, userID uuid.UUID) error {
+	dbCategory, err := t.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{
+		ID:     categoryID,
+		UserID: userID,
+	})
+	if err != nil {
+		logger.Error("Category not found", map[string]interface{}{
+			"category": categoryID,
+			"user_id":  userID,
+			"error":    err,
+		})
+		return fmt.Errorf("category type not found")
+	}
+	if dbCategory.Type != CategoryTypeExpense {
+		logger.Error("Category type should be Expense", map[string]interface{}{
+			"category_name": dbCategory.Name,
+			"category_type": dbCategory.Type,
+		})
+		return fmt.Errorf("category type should be expense")
+	}
 	return nil
 }

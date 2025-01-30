@@ -13,7 +13,7 @@ func (s *Server) RegisterRoutes(config model.Config) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", s.healthHandler)
 
-	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(config.UserService))
+	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(config.UserService, config.JWTSecret))
 
 	mux.HandleFunc("GET /cxf/user", handler.HandleUserGet(config.UserService))
 	mux.HandleFunc("POST /cxf/user", handler.HandleUserCreate(config.UserService))

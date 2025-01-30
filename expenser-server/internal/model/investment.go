@@ -114,25 +114,11 @@ func (i InvestmentService) AddInvestmentToDB(ctx context.Context, investment Inp
 		return ResponseInvestment{}, fmt.Errorf("failed to convert amount type: %w", err)
 	}
 
-	dbCategory, err := i.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: investment.Category, UserID: investment.UserID})
+	err = i.validateInvestmentCategory(ctx, investment.Category, investment.UserID)
 	if err != nil {
-		logger.Error("couldn't get category from DB", map[string]interface{}{
-			"category_id": investment.ID,
-			"user_id":     investment.UserID,
-			"error":       err,
-		})
-		return ResponseInvestment{}, fmt.Errorf("Category type not found")
+		return ResponseInvestment{}, err
 	}
-
-	if dbCategory.Type != CategoryTypeInvestment {
-		logger.Error("Category type should be Investment", map[string]interface{}{
-			"category_name": dbCategory.Name,
-			"category_type": dbCategory.Type,
-		})
-
-		return ResponseInvestment{}, fmt.Errorf("Category type should be Investment")
-	}
-
+	
 	dbInvestment, err := i.Queries.CreateInvestment(ctx, repository.CreateInvestmentParams{
 		ID:       uuid.New(),
 		Name:     investment.Name,
@@ -220,23 +206,9 @@ func (i InvestmentService) UpdateInvestmentInDB(ctx context.Context, investment 
 		return ResponseInvestment{}, fmt.Errorf("failed to convert amount type: %w", err)
 	}
 
-	dbCategory, err := i.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: investment.Category, UserID: investment.UserID})
+	err = i.validateInvestmentCategory(ctx, investment.Category, investment.UserID)
 	if err != nil {
-		logger.Error("couldn't get category from DB", map[string]interface{}{
-			"category_id": investment.ID,
-			"user_id":     investment.UserID,
-			"error":       err,
-		})
-		return ResponseInvestment{}, fmt.Errorf("Category type not found")
-	}
-
-	if dbCategory.Type != CategoryTypeInvestment {
-		logger.Error("Category type should be Investment", map[string]interface{}{
-			"category_name": dbCategory.Name,
-			"category_type": dbCategory.Type,
-		})
-
-		return ResponseInvestment{}, fmt.Errorf("Category type should be Investment")
+		return ResponseInvestment{}, err
 	}
 
 	dbInvestment, err := i.Queries.UpdateInvestment(ctx, repository.UpdateInvestmentParams{
@@ -332,5 +304,28 @@ func (i InvestmentService) DeleteInvestmentFromDB(ctx context.Context, id, userI
 		return errors.New("investment not found")
 	}
 
+	return nil
+}
+
+func (i InvestmentService) validateInvestmentCategory(ctx context.Context, categoryID, userID uuid.UUID) error {
+	dbCategory, err := i.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{
+		ID:     categoryID,
+		UserID: userID,
+	})
+	if err != nil {
+		logger.Error("Category not found", map[string]interface{}{
+			"category": categoryID,
+			"user_id":  userID,
+			"error":    err,
+		})
+		return fmt.Errorf("category type not found")
+	}
+	if dbCategory.Type != CategoryTypeInvestment {
+		logger.Error("Category type should be Investment", map[string]interface{}{
+			"category_name": dbCategory.Name,
+			"category_type": dbCategory.Type,
+		})
+		return fmt.Errorf("category type should be investment")
+	}
 	return nil
 }
