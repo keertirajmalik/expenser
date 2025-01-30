@@ -44,6 +44,10 @@ var ValidCategoryTypes = map[string]bool{
 	CategoryTypeInvestment: true,
 }
 
+type CategoryService struct {
+    Queries *repository.Queries
+}
+
 func (c Category) Validate() error {
 	if len(strings.TrimSpace(c.Name)) == 0 {
 		return fmt.Errorf("category name cannot be empty")
@@ -65,8 +69,8 @@ func (c Category) Validate() error {
 	return nil
 }
 
-func (d Config) GetCategoriesFromDB(ctx context.Context, userId uuid.UUID) ([]ResponseCategory, error) {
-	dbCategories, err := d.Queries.GetCategory(ctx, userId)
+func (c CategoryService) GetCategoriesFromDB(ctx context.Context, userId uuid.UUID) ([]ResponseCategory, error) {
+	dbCategories, err := c.Queries.GetCategory(ctx, userId)
 	if err != nil {
 		logger.Error("Couldn't get category from DB", map[string]interface{}{
 			"user_id": userId,
@@ -95,8 +99,8 @@ func (d Config) GetCategoriesFromDB(ctx context.Context, userId uuid.UUID) ([]Re
 	return categories, nil
 }
 
-func (d Config) GetCategoryByIdFromDB(ctx context.Context, id, userId uuid.UUID) (ResponseCategory, error) {
-	dbCategory, err := d.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: id, UserID: userId})
+func (c CategoryService) GetCategoryByIdFromDB(ctx context.Context, id, userId uuid.UUID) (ResponseCategory, error) {
+	dbCategory, err := c.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: id, UserID: userId})
 	if err != nil {
 		logger.Error("Couldn't get category from DB", map[string]interface{}{
 			"category_id": id,
@@ -121,7 +125,7 @@ func (d Config) GetCategoryByIdFromDB(ctx context.Context, id, userId uuid.UUID)
 	return category, nil
 }
 
-func (d Config) AddCategoryToDB(ctx context.Context, category Category) (ResponseCategory, error) {
+func (c CategoryService) AddCategoryToDB(ctx context.Context, category Category) (ResponseCategory, error) {
 	if err := category.Validate(); err != nil {
 		logger.Error("Provided category is not valid", map[string]interface{}{
 			"category": category,
@@ -129,7 +133,7 @@ func (d Config) AddCategoryToDB(ctx context.Context, category Category) (Respons
 		return ResponseCategory{}, err
 	}
 
-	dbCategory, err := d.Queries.CreateCategory(ctx, repository.CreateCategoryParams{
+	dbCategory, err := c.Queries.CreateCategory(ctx, repository.CreateCategoryParams{
 		ID:          uuid.New(),
 		Name:        category.Name,
 		Type:        category.Type,
@@ -166,12 +170,12 @@ func (d Config) AddCategoryToDB(ctx context.Context, category Category) (Respons
 	return categoryResponse, nil
 }
 
-func (d Config) DeleteCategoryFromDB(ctx context.Context, id, userID uuid.UUID) error {
-	result, err := d.Queries.DeleteCategory(ctx, repository.DeleteCategoryParams{ID: id, UserID: userID})
+func (c CategoryService) DeleteCategoryFromDB(ctx context.Context, id, userID uuid.UUID) error {
+	result, err := c.Queries.DeleteCategory(ctx, repository.DeleteCategoryParams{ID: id, UserID: userID})
 	if err != nil {
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeForeignKeyViolation {
-			data, _ := d.GetCategoryByIdFromDB(ctx, id, userID)
+			data, _ := c.GetCategoryByIdFromDB(ctx, id, userID)
 			logger.Error("Couldn't delete category", map[string]interface{}{
 				"category_id": id,
 				"user_id":     userID,
@@ -210,7 +214,7 @@ func (d Config) DeleteCategoryFromDB(ctx context.Context, id, userID uuid.UUID) 
 	return nil
 }
 
-func (d Config) UpdateCategoryInDB(ctx context.Context, category Category) (ResponseCategory, error) {
+func (c CategoryService) UpdateCategoryInDB(ctx context.Context, category Category) (ResponseCategory, error) {
 	if err := category.Validate(); err != nil {
 		logger.Error("Provided category is not valid", map[string]interface{}{
 			"category": category,
@@ -218,7 +222,7 @@ func (d Config) UpdateCategoryInDB(ctx context.Context, category Category) (Resp
 		return ResponseCategory{}, err
 	}
 
-	dbCategory, err := d.Queries.UpdateCategory(ctx, repository.UpdateCategoryParams{
+	dbCategory, err := c.Queries.UpdateCategory(ctx, repository.UpdateCategoryParams{
 		ID:          category.ID,
 		Name:        category.Name,
 		Type:        category.Type,
@@ -237,7 +241,7 @@ func (d Config) UpdateCategoryInDB(ctx context.Context, category Category) (Resp
 
 		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == database.ErrCodeForeignKeyViolation {
-			data, _ := d.GetCategoryByIdFromDB(ctx, category.ID, category.UserID)
+			data, _ := c.GetCategoryByIdFromDB(ctx, category.ID, category.UserID)
 			logger.Error("Couldn't update category", map[string]interface{}{
 				"category_id": category.ID,
 				"user_id":     category.UserID,

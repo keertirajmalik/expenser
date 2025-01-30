@@ -9,10 +9,10 @@ import (
 	"github.com/keertirajmalik/expenser/expenser-server/logger"
 )
 
-func HandleCategoryGet(data model.Config) http.HandlerFunc {
+func HandleCategoryGet(categoryService model.CategoryService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value("userID").(uuid.UUID)
-		categories, err := data.GetCategoriesFromDB(r.Context(), userID)
+		categories, err := categoryService.GetCategoriesFromDB(r.Context(), userID)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "Failed to retrieve categories")
 			return
@@ -21,7 +21,7 @@ func HandleCategoryGet(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleCategoryCreate(data model.Config) http.HandlerFunc {
+func HandleCategoryCreate(categoryService model.CategoryService) http.HandlerFunc {
 	type parameters struct {
 		Name        string `json:"name"`
 		Type        string `json:"type"`
@@ -42,7 +42,7 @@ func HandleCategoryCreate(data model.Config) http.HandlerFunc {
 		}
 
 		userID := r.Context().Value("userID").(uuid.UUID)
-		category, err := data.AddCategoryToDB(r.Context(), model.Category{
+		category, err := categoryService.AddCategoryToDB(r.Context(), model.Category{
 			ID:          uuid.New(),
 			Name:        params.Name,
 			Type:        params.Type,
@@ -59,7 +59,7 @@ func HandleCategoryCreate(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleCategoryUpdate(data model.Config) http.HandlerFunc {
+func HandleCategoryUpdate(categoryService model.CategoryService) http.HandlerFunc {
 	type parameters struct {
 		Name        string `json:"name"`
 		Type        string `json:"type"`
@@ -93,7 +93,7 @@ func HandleCategoryUpdate(data model.Config) http.HandlerFunc {
 		}
 
 		userID := r.Context().Value("userID").(uuid.UUID)
-		category, err := data.UpdateCategoryInDB(r.Context(), model.Category{
+		category, err := categoryService.UpdateCategoryInDB(r.Context(), model.Category{
 			ID:          id,
 			Name:        params.Name,
 			Type:        params.Type,
@@ -109,7 +109,7 @@ func HandleCategoryUpdate(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleCategoryDelete(data model.Config) http.HandlerFunc {
+func HandleCategoryDelete(categoryService model.CategoryService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 
@@ -120,7 +120,7 @@ func HandleCategoryDelete(data model.Config) http.HandlerFunc {
 		}
 
 		userID := r.Context().Value("userID").(uuid.UUID)
-		err = data.DeleteCategoryFromDB(r.Context(), id, userID)
+		err = categoryService.DeleteCategoryFromDB(r.Context(), id, userID)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return

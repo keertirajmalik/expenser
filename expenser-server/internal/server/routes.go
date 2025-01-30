@@ -13,26 +13,26 @@ func (s *Server) RegisterRoutes(config model.Config) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", s.healthHandler)
 
-	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(config))
+	mux.HandleFunc("POST /cxf/login", handler.HandleUserLogin(config.UserService, config.JWTSecret))
 
-	mux.HandleFunc("GET /cxf/user", handler.HandleUserGet(config))
-	mux.HandleFunc("POST /cxf/user", handler.HandleUserCreate(config))
-	mux.HandleFunc("PUT /cxf/user", handler.HandleUserUpdate(config))
+	mux.HandleFunc("GET /cxf/user", handler.HandleUserGet(config.UserService))
+	mux.HandleFunc("POST /cxf/user", handler.HandleUserCreate(config.UserService))
+	mux.HandleFunc("PUT /cxf/user", handler.HandleUserUpdate(config.UserService))
 
-	mux.HandleFunc("GET /cxf/transaction", handler.HandleTransactionGet(config))
-	mux.HandleFunc("POST /cxf/transaction", handler.HandleTransactionCreate(config))
-	mux.HandleFunc("DELETE /cxf/transaction/{id}", handler.HandleTransactionDelete(config))
-	mux.HandleFunc("PUT /cxf/transaction/{id}", handler.HandleTransactionUpdate(config))
+	mux.HandleFunc("GET /cxf/transaction", handler.HandleTransactionGet(config.TransactionService))
+	mux.HandleFunc("POST /cxf/transaction", handler.HandleTransactionCreate(config.TransactionService))
+	mux.HandleFunc("DELETE /cxf/transaction/{id}", handler.HandleTransactionDelete(config.TransactionService))
+	mux.HandleFunc("PUT /cxf/transaction/{id}", handler.HandleTransactionUpdate(config.TransactionService))
 
-	mux.HandleFunc("GET /cxf/category", handler.HandleCategoryGet(config))
-	mux.HandleFunc("POST /cxf/category", handler.HandleCategoryCreate(config))
-	mux.HandleFunc("DELETE /cxf/category/{id}", handler.HandleCategoryDelete(config))
-	mux.HandleFunc("PUT /cxf/category/{id}", handler.HandleCategoryUpdate(config))
+	mux.HandleFunc("GET /cxf/category", handler.HandleCategoryGet(config.CategoryService))
+	mux.HandleFunc("POST /cxf/category", handler.HandleCategoryCreate(config.CategoryService))
+	mux.HandleFunc("DELETE /cxf/category/{id}", handler.HandleCategoryDelete(config.CategoryService))
+	mux.HandleFunc("PUT /cxf/category/{id}", handler.HandleCategoryUpdate(config.CategoryService))
 
-	mux.HandleFunc("POST /cxf/investment", handler.HandleInvestmentCreate(config))
-	mux.HandleFunc("GET /cxf/investment", handler.HandleInvestmentGet(config))
-	mux.HandleFunc("PUT /cxf/investment/{id}", handler.HandleInvestmentUpdate(config))
-	mux.HandleFunc("DELETE /cxf/investment/{id}", handler.HandleInvestmentDelete(config))
+	mux.HandleFunc("POST /cxf/investment", handler.HandleInvestmentCreate(config.InvestmentService))
+	mux.HandleFunc("GET /cxf/investment", handler.HandleInvestmentGet(config.InvestmentService))
+	mux.HandleFunc("PUT /cxf/investment/{id}", handler.HandleInvestmentUpdate(config.InvestmentService))
+	mux.HandleFunc("DELETE /cxf/investment/{id}", handler.HandleInvestmentDelete(config.InvestmentService))
 
 	return mux
 }

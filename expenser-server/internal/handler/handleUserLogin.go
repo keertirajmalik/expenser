@@ -9,7 +9,7 @@ import (
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 )
 
-func HandleUserLogin(data model.Config) http.HandlerFunc {
+func HandleUserLogin(userService model.UserService, jwtSecret string) http.HandlerFunc {
 	type parameters struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -31,7 +31,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		user, err := data.GetUserByUsernameFromDB(r.Context(), params.Username)
+		user, err := userService.GetUserByUsernameFromDB(r.Context(), params.Username)
 		if err != nil {
 			respondWithError(w, http.StatusUnauthorized, "Invalid credentials")
 			return
@@ -43,7 +43,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		accessToken, err := auth.MakeJWT(user.ID, data.JWTSecret, time.Hour)
+		accessToken, err := auth.MakeJWT(user.ID, []byte(jwtSecret), time.Hour)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "Couldn't create JWT")
 			return
@@ -53,7 +53,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 			Name:     user.Name,
 			Username: user.Username,
 			Token:    accessToken,
-            Image: user.Image,
+			Image:    user.Image,
 		})
 	}
 
