@@ -36,8 +36,12 @@ type ResponseTransaction struct {
 	User     string          `json:"user"`
 }
 
-func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]ResponseTransaction, error) {
-	dbTransactions, err := d.Queries.GetTransaction(ctx, userID)
+type TransactionService struct {
+	Queries *repository.Queries
+}
+
+func (t TransactionService) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]ResponseTransaction, error) {
+	dbTransactions, err := t.Queries.GetTransaction(ctx, userID)
 	if err != nil {
 		logger.Error("failed to get transactions: %v", map[string]interface{}{
 			"user_id": userID,
@@ -89,7 +93,7 @@ func (d Config) GetTransactionsFromDB(ctx context.Context, userID uuid.UUID) ([]
 	return transactions, nil
 }
 
-func (d Config) AddTransactionToDB(ctx context.Context, transaction InputTransaction) (ResponseTransaction, error) {
+func (t TransactionService) AddTransactionToDB(ctx context.Context, transaction InputTransaction) (ResponseTransaction, error) {
 	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
 	if err != nil {
 		logger.Error("failed to parse date", map[string]interface{}{
@@ -109,10 +113,29 @@ func (d Config) AddTransactionToDB(ctx context.Context, transaction InputTransac
 			"error":  err,
 		})
 
-		return ResponseTransaction{}, fmt.Errorf("Failed to convert amount type: %w", err)
+		return ResponseTransaction{}, fmt.Errorf("failed to convert amount type: %w", err)
 	}
 
-	dbTransaction, err := d.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
+	dbCategory, err := t.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: transaction.Category, UserID: transaction.UserID})
+	if err != nil {
+		logger.Error("couldn't get category from DB", map[string]interface{}{
+			"category_id": transaction.ID,
+			"user_id":     transaction.UserID,
+			"error":       err,
+		})
+		return ResponseTransaction{}, fmt.Errorf("Category type not found")
+	}
+
+	if dbCategory.Type != CategoryTypeExpense {
+		logger.Error("Category type should be Expense", map[string]interface{}{
+			"category_name": dbCategory.Name,
+			"category_type": dbCategory.Type,
+		})
+
+		return ResponseTransaction{}, fmt.Errorf("Category type should be Expense")
+	}
+
+	dbTransaction, err := t.Queries.CreateTransaction(ctx, repository.CreateTransactionParams{
 		ID:       uuid.New(),
 		Name:     transaction.Name,
 		Category: transaction.Category,
@@ -177,7 +200,7 @@ func (d Config) AddTransactionToDB(ctx context.Context, transaction InputTransac
 	return transactionResponse, nil
 }
 
-func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTransaction) (ResponseTransaction, error) {
+func (t TransactionService) UpdateTransactionInDB(ctx context.Context, transaction InputTransaction) (ResponseTransaction, error) {
 	parsedDate, err := time.Parse("02/01/2006", transaction.Date)
 	if err != nil {
 		logger.Error("failed to parse date", map[string]interface{}{
@@ -196,10 +219,29 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTra
 			"amount":         transaction.Amount,
 			"error":          err,
 		})
-		return ResponseTransaction{}, fmt.Errorf("Failed to convert amount type: %w", err)
+		return ResponseTransaction{}, fmt.Errorf("failed to convert amount type: %w", err)
 	}
 
-	dbTransaction, err := d.Queries.UpdateTransaction(ctx, repository.UpdateTransactionParams{
+	dbCategory, err := t.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: transaction.Category, UserID: transaction.UserID})
+	if err != nil {
+		logger.Error("couldn't get category from DB", map[string]interface{}{
+			"category_id": transaction.ID,
+			"user_id":     transaction.UserID,
+			"error":       err,
+		})
+		return ResponseTransaction{}, fmt.Errorf("Category type not found")
+	}
+
+	if dbCategory.Type != CategoryTypeExpense {
+		logger.Error("Category type should be Expense", map[string]interface{}{
+			"category_name": dbCategory.Name,
+			"category_type": dbCategory.Type,
+		})
+
+		return ResponseTransaction{}, fmt.Errorf("Category type should be Expense")
+	}
+
+	dbTransaction, err := t.Queries.UpdateTransaction(ctx, repository.UpdateTransactionParams{
 		ID:       transaction.ID,
 		Name:     transaction.Name,
 		Category: transaction.Category,
@@ -220,7 +262,7 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTra
 		}
 		if errors.Is(err, pgx.ErrNoRows) {
 			logger.Warn(fmt.Sprintf("transaction %s not found for user %s", transaction.ID, transaction.UserID))
-			return ResponseTransaction{}, errors.New("Transaction not found")
+			return ResponseTransaction{}, errors.New("transaction not found")
 		}
 		logger.Error("failed to update transaction: %v", map[string]interface{}{
 			"user_id":        transaction.UserID,
@@ -268,8 +310,8 @@ func (d *Config) UpdateTransactionInDB(ctx context.Context, transaction InputTra
 	return transactionResponse, nil
 }
 
-func (d Config) DeleteTransactionFromDB(ctx context.Context, id, userID uuid.UUID) error {
-	result, err := d.Queries.DeleteTransaction(ctx, repository.DeleteTransactionParams{
+func (t TransactionService) DeleteTransactionFromDB(ctx context.Context, id, userID uuid.UUID) error {
+	result, err := t.Queries.DeleteTransaction(ctx, repository.DeleteTransactionParams{
 		ID:     id,
 		UserID: userID,
 	})

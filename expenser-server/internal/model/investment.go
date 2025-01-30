@@ -36,8 +36,12 @@ type ResponseInvestment struct {
 	User     string          `json:"user"`
 }
 
-func (d Config) GetInvestmentsFromDB(ctx context.Context, userID uuid.UUID) ([]ResponseInvestment, error) {
-	dbInvestments, err := d.Queries.GetInvestment(ctx, userID)
+type InvestmentService struct {
+	Queries *repository.Queries
+}
+
+func (i InvestmentService) GetInvestmentsFromDB(ctx context.Context, userID uuid.UUID) ([]ResponseInvestment, error) {
+	dbInvestments, err := i.Queries.GetInvestment(ctx, userID)
 	if err != nil {
 		logger.Error("failed to get investments: %v", map[string]interface{}{
 			"user_id": userID,
@@ -89,7 +93,7 @@ func (d Config) GetInvestmentsFromDB(ctx context.Context, userID uuid.UUID) ([]R
 	return investments, nil
 }
 
-func (d Config) AddInvestmentToDB(ctx context.Context, investment InputInvestment) (ResponseInvestment, error) {
+func (i InvestmentService) AddInvestmentToDB(ctx context.Context, investment InputInvestment) (ResponseInvestment, error) {
 	parsedDate, err := time.Parse("02/01/2006", investment.Date)
 	if err != nil {
 		logger.Error("failed to parse date", map[string]interface{}{
@@ -107,10 +111,29 @@ func (d Config) AddInvestmentToDB(ctx context.Context, investment InputInvestmen
 			"error":  err,
 		})
 
-		return ResponseInvestment{}, fmt.Errorf("Failed to convert amount type: %w", err)
+		return ResponseInvestment{}, fmt.Errorf("failed to convert amount type: %w", err)
 	}
 
-	dbInvestment, err := d.Queries.CreateInvestment(ctx, repository.CreateInvestmentParams{
+	dbCategory, err := i.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: investment.Category, UserID: investment.UserID})
+	if err != nil {
+		logger.Error("couldn't get category from DB", map[string]interface{}{
+			"category_id": investment.ID,
+			"user_id":     investment.UserID,
+			"error":       err,
+		})
+		return ResponseInvestment{}, fmt.Errorf("Category type not found")
+	}
+
+	if dbCategory.Type != CategoryTypeInvestment {
+		logger.Error("Category type should be Investment", map[string]interface{}{
+			"category_name": dbCategory.Name,
+			"category_type": dbCategory.Type,
+		})
+
+		return ResponseInvestment{}, fmt.Errorf("Category type should be Investment")
+	}
+
+	dbInvestment, err := i.Queries.CreateInvestment(ctx, repository.CreateInvestmentParams{
 		ID:       uuid.New(),
 		Name:     investment.Name,
 		Category: investment.Category,
@@ -175,13 +198,13 @@ func (d Config) AddInvestmentToDB(ctx context.Context, investment InputInvestmen
 	return investmentResponse, nil
 }
 
-func (d *Config) UpdateInvestmentInDB(ctx context.Context, investment InputInvestment) (ResponseInvestment, error) {
+func (i InvestmentService) UpdateInvestmentInDB(ctx context.Context, investment InputInvestment) (ResponseInvestment, error) {
 	parsedDate, err := time.Parse("02/01/2006", investment.Date)
 	if err != nil {
 		logger.Error("failed to parse date", map[string]interface{}{
 			"investment_id": investment.ID,
-			"date":           investment.Date,
-			"error":          err,
+			"date":          investment.Date,
+			"error":         err,
 		})
 		return ResponseInvestment{}, fmt.Errorf("invalid date format: %s", investment.Date)
 	}
@@ -191,13 +214,32 @@ func (d *Config) UpdateInvestmentInDB(ctx context.Context, investment InputInves
 	if err != nil {
 		logger.Error("failed to convert amount to numeric: %v", map[string]interface{}{
 			"investment_id": investment.ID,
-			"amount":         investment.Amount,
-			"error":          err,
+			"amount":        investment.Amount,
+			"error":         err,
 		})
-		return ResponseInvestment{}, fmt.Errorf("Failed to convert amount type: %w", err)
+		return ResponseInvestment{}, fmt.Errorf("failed to convert amount type: %w", err)
 	}
 
-	dbInvestment, err := d.Queries.UpdateInvestment(ctx, repository.UpdateInvestmentParams{
+	dbCategory, err := i.Queries.GetCategoryById(ctx, repository.GetCategoryByIdParams{ID: investment.Category, UserID: investment.UserID})
+	if err != nil {
+		logger.Error("couldn't get category from DB", map[string]interface{}{
+			"category_id": investment.ID,
+			"user_id":     investment.UserID,
+			"error":       err,
+		})
+		return ResponseInvestment{}, fmt.Errorf("Category type not found")
+	}
+
+	if dbCategory.Type != CategoryTypeInvestment {
+		logger.Error("Category type should be Investment", map[string]interface{}{
+			"category_name": dbCategory.Name,
+			"category_type": dbCategory.Type,
+		})
+
+		return ResponseInvestment{}, fmt.Errorf("Category type should be Investment")
+	}
+
+	dbInvestment, err := i.Queries.UpdateInvestment(ctx, repository.UpdateInvestmentParams{
 		ID:       investment.ID,
 		Name:     investment.Name,
 		Category: investment.Category,
@@ -218,12 +260,12 @@ func (d *Config) UpdateInvestmentInDB(ctx context.Context, investment InputInves
 		}
 		if errors.Is(err, pgx.ErrNoRows) {
 			logger.Warn(fmt.Sprintf("investment %s not found for user %s", investment.ID, investment.UserID))
-			return ResponseInvestment{}, errors.New("Investment not found")
+			return ResponseInvestment{}, errors.New("investment not found")
 		}
 		logger.Error("failed to update investment: %v", map[string]interface{}{
-			"user_id":        investment.UserID,
+			"user_id":       investment.UserID,
 			"investment_id": investment.ID,
-			"error":          err,
+			"error":         err,
 		})
 
 		return ResponseInvestment{}, err
@@ -266,8 +308,8 @@ func (d *Config) UpdateInvestmentInDB(ctx context.Context, investment InputInves
 	return investmentResponse, nil
 }
 
-func (d Config) DeleteInvestmentFromDB(ctx context.Context, id, userID uuid.UUID) error {
-	result, err := d.Queries.DeleteInvestment(ctx, repository.DeleteInvestmentParams{
+func (i InvestmentService) DeleteInvestmentFromDB(ctx context.Context, id, userID uuid.UUID) error {
+	result, err := i.Queries.DeleteInvestment(ctx, repository.DeleteInvestmentParams{
 		ID:     id,
 		UserID: userID,
 	})
@@ -278,8 +320,8 @@ func (d Config) DeleteInvestmentFromDB(ctx context.Context, id, userID uuid.UUID
 		}
 		logger.Error("failed to delete investment", map[string]interface{}{
 			"investment_id": id,
-			"user_id":        userID,
-			"error":          err,
+			"user_id":       userID,
+			"error":         err,
 		})
 		return err
 	}

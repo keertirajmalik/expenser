@@ -9,7 +9,7 @@ import (
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 )
 
-func HandleUserGet(data model.Config) http.HandlerFunc {
+func HandleUserGet(userService model.UserService) http.HandlerFunc {
 	type response struct {
 		Name     string `json:"name"`
 		Username string `json:"username"`
@@ -19,7 +19,7 @@ func HandleUserGet(data model.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value("userID").(uuid.UUID)
 
-		user, err := data.GetUserByUserIdFromDB(r.Context(), userID)
+		user, err := userService.GetUserByUserIdFromDB(r.Context(), userID)
 		if err != nil {
 			respondWithError(w, http.StatusUnauthorized, err.Error())
 			return
@@ -33,7 +33,7 @@ func HandleUserGet(data model.Config) http.HandlerFunc {
 	}
 
 }
-func HandleUserCreate(data model.Config) http.HandlerFunc {
+func HandleUserCreate(userService model.UserService) http.HandlerFunc {
 	type parameters struct {
 		Name     string `json:"name"`
 		Username string `json:"username"`
@@ -60,7 +60,7 @@ func HandleUserCreate(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		user, err := data.AddUserToDB(r.Context(), model.User{ID: uuid.New(), Name: params.Name, Username: params.Username, HashedPassword: hashedPassword})
+		user, err := userService.AddUserToDB(r.Context(), model.User{ID: uuid.New(), Name: params.Name, Username: params.Username, HashedPassword: hashedPassword})
 
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -75,7 +75,7 @@ func HandleUserCreate(data model.Config) http.HandlerFunc {
 
 }
 
-func HandleUserUpdate(data model.Config) http.HandlerFunc {
+func HandleUserUpdate(userService model.UserService) http.HandlerFunc {
 	type parameters struct {
 		Name  string `json:"name"`
 		Image string `json:"image"`
@@ -92,7 +92,7 @@ func HandleUserUpdate(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		user, err := data.UpdateUserInDB(r.Context(), model.User{
+		user, err := userService.UpdateUserInDB(r.Context(), model.User{
 			ID:    userID,
 			Name:  params.Name,
 			Image: params.Image,

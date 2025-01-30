@@ -34,16 +34,21 @@ func NewServer() *http.Server {
 		middleware.Logging,
 		middleware.AuthMiddleware,
 	)
-
-	jwtSecret := os.Getenv("JWT_SECRET")
-	if jwtSecret == "" {
-		logger.Error("JWT_SECRET environment variable is not set", map[string]interface{}{})
-		os.Exit(1)
-	}
+	queries := repository.New(NewServer.db.GetConnection())
 
 	config := model.Config{
-		Queries:   repository.New(NewServer.db.GetConnection()),
-		JWTSecret: []byte(jwtSecret),
+		UserService: model.UserService{
+			Queries: queries,
+		},
+		TransactionService: model.TransactionService{
+			Queries: queries,
+		},
+		CategoryService: model.CategoryService{
+			Queries: queries,
+		},
+		InvestmentService: model.InvestmentService{
+			Queries: queries,
+		},
 	}
 
 	server := &http.Server{

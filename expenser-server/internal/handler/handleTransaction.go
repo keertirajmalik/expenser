@@ -10,10 +10,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func HandleTransactionGet(data model.Config) http.HandlerFunc {
+func HandleTransactionGet(transactionService model.TransactionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value("userID").(uuid.UUID)
-		transactions, err := data.GetTransactionsFromDB(r.Context(), userID)
+		transactions, err := transactionService.GetTransactionsFromDB(r.Context(), userID)
 		if err != nil {
 			logger.Error("Error while fetching tranasactions", map[string]interface{}{
 				"error": err,
@@ -26,7 +26,7 @@ func HandleTransactionGet(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleTransactionCreate(data model.Config) http.HandlerFunc {
+func HandleTransactionCreate(transactionService model.TransactionService) http.HandlerFunc {
 	type parameters struct {
 		Name     string          `json:"name"`
 		Amount   decimal.Decimal `json:"amount"`
@@ -60,22 +60,7 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 			UserID:   userID,
 		}
 
-		dbCategory, err := data.GetCategoryByIdFromDB(r.Context(), transaction.Category, transaction.UserID)
-		if err != nil {
-			respondWithError(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		if dbCategory.Type != model.CategoryTypeExpense {
-			logger.Error("Category type should be Expense", map[string]interface{}{
-				"category_name": dbCategory.Name,
-				"category_type": dbCategory.Type,
-			})
-			respondWithError(w, http.StatusBadRequest, "Category type should be Expense")
-			return
-		}
-
-		dbTransaction, err := data.AddTransactionToDB(r.Context(), transaction)
+		dbTransaction, err := transactionService.AddTransactionToDB(r.Context(), transaction)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
@@ -84,7 +69,7 @@ func HandleTransactionCreate(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
+func HandleTransactionUpdate(transactionService model.TransactionService) http.HandlerFunc {
 	type parameters struct {
 		Name     string          `json:"name"`
 		Amount   decimal.Decimal `json:"amount"`
@@ -130,22 +115,7 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 			UserID:   userID,
 		}
 
-		dbCategory, err := data.GetCategoryByIdFromDB(r.Context(), transaction.Category, transaction.UserID)
-		if err != nil {
-			respondWithError(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		if dbCategory.Type != "Expense" {
-			logger.Error("Category type should be Expense", map[string]interface{}{
-				"category_name": dbCategory.Name,
-				"category_type": dbCategory.Type,
-			})
-			respondWithError(w, http.StatusBadRequest, "Category type should be Expense")
-			return
-		}
-
-		dbTransaction, err := data.UpdateTransactionInDB(r.Context(), transaction)
+		dbTransaction, err := transactionService.UpdateTransactionInDB(r.Context(), transaction)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
@@ -154,7 +124,7 @@ func HandleTransactionUpdate(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleTransactionDelete(data model.Config) http.HandlerFunc {
+func HandleTransactionDelete(transactionService model.TransactionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 
@@ -169,7 +139,7 @@ func HandleTransactionDelete(data model.Config) http.HandlerFunc {
 		}
 
 		userID := r.Context().Value("userID").(uuid.UUID)
-		err = data.DeleteTransactionFromDB(r.Context(), id, userID)
+		err = transactionService.DeleteTransactionFromDB(r.Context(), id, userID)
 		if err != nil {
 			logger.Error("Error while deleting transaction", map[string]interface{}{
 				"transaction_id": id,

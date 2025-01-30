@@ -3,13 +3,15 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/keertirajmalik/expenser/expenser-server/auth"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
+	"github.com/keertirajmalik/expenser/expenser-server/logger"
 )
 
-func HandleUserLogin(data model.Config) http.HandlerFunc {
+func HandleUserLogin(userService model.UserService) http.HandlerFunc {
 	type parameters struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -22,6 +24,11 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 		Image    string `json:"image"`
 	}
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		logger.Error("JWT_SECRET environment variable is not set", map[string]interface{}{})
+		os.Exit(1)
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		decoder := json.NewDecoder(r.Body)
 		params := parameters{}
@@ -31,7 +38,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		user, err := data.GetUserByUsernameFromDB(r.Context(), params.Username)
+		user, err := userService.GetUserByUsernameFromDB(r.Context(), params.Username)
 		if err != nil {
 			respondWithError(w, http.StatusUnauthorized, "Invalid credentials")
 			return
@@ -43,7 +50,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 			return
 		}
 
-		accessToken, err := auth.MakeJWT(user.ID, data.JWTSecret, time.Hour)
+		accessToken, err := auth.MakeJWT(user.ID, []byte(jwtSecret), time.Hour)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "Couldn't create JWT")
 			return
@@ -53,7 +60,7 @@ func HandleUserLogin(data model.Config) http.HandlerFunc {
 			Name:     user.Name,
 			Username: user.Username,
 			Token:    accessToken,
-            Image: user.Image,
+			Image:    user.Image,
 		})
 	}
 

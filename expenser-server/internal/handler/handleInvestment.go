@@ -11,10 +11,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-func HandleInvestmentGet(data model.Config) http.HandlerFunc {
+func HandleInvestmentGet(investmentService model.InvestmentService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Context().Value("userID").(uuid.UUID)
-		investments, err := data.GetInvestmentsFromDB(r.Context(), userID)
+		investments, err := investmentService.GetInvestmentsFromDB(r.Context(), userID)
 		if err != nil {
 			logger.Error("Error while fetching investments", map[string]interface{}{
 				"error": err,
@@ -27,7 +27,7 @@ func HandleInvestmentGet(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleInvestmentCreate(data model.Config) http.HandlerFunc {
+func HandleInvestmentCreate(investmentService model.InvestmentService) http.HandlerFunc {
 	type parameters struct {
 		Name     string          `json:"name"`
 		Amount   decimal.Decimal `json:"amount"`
@@ -61,22 +61,7 @@ func HandleInvestmentCreate(data model.Config) http.HandlerFunc {
 			UserID:   userID,
 		}
 
-		dbCategory, err := data.GetCategoryByIdFromDB(r.Context(), investment.Category, investment.UserID)
-		if err != nil {
-			respondWithError(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		if dbCategory.Type != model.CategoryTypeInvestment {
-			logger.Error("Category type should be Investment", map[string]interface{}{
-				"category_name": dbCategory.Name,
-				"category_type": dbCategory.Type,
-			})
-			respondWithError(w, http.StatusBadRequest, "Category type should be Investment")
-			return
-		}
-
-		dbInvestment, err := data.AddInvestmentToDB(r.Context(), investment)
+		dbInvestment, err := investmentService.AddInvestmentToDB(r.Context(), investment)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
@@ -85,7 +70,7 @@ func HandleInvestmentCreate(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleInvestmentUpdate(data model.Config) http.HandlerFunc {
+func HandleInvestmentUpdate(investmentService model.InvestmentService) http.HandlerFunc {
 	type parameters struct {
 		Name     string          `json:"name"`
 		Amount   decimal.Decimal `json:"amount"`
@@ -131,22 +116,7 @@ func HandleInvestmentUpdate(data model.Config) http.HandlerFunc {
 			UserID:   userID,
 		}
 
-		dbCategory, err := data.GetCategoryByIdFromDB(r.Context(), investment.Category, investment.UserID)
-		if err != nil {
-			respondWithError(w, http.StatusBadRequest, err.Error())
-			return
-		}
-
-		if dbCategory.Type != model.CategoryTypeInvestment {
-			logger.Error("Category type should be Investment", map[string]interface{}{
-				"category_name": dbCategory.Name,
-				"category_type": dbCategory.Type,
-			})
-			respondWithError(w, http.StatusBadRequest, "Category type should be Investment")
-			return
-		}
-
-		dbInvestment, err := data.UpdateInvestmentInDB(r.Context(), investment)
+		dbInvestment, err := investmentService.UpdateInvestmentInDB(r.Context(), investment)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
@@ -155,7 +125,7 @@ func HandleInvestmentUpdate(data model.Config) http.HandlerFunc {
 	}
 }
 
-func HandleInvestmentDelete(data model.Config) http.HandlerFunc {
+func HandleInvestmentDelete(investmentService model.InvestmentService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 
@@ -170,7 +140,7 @@ func HandleInvestmentDelete(data model.Config) http.HandlerFunc {
 		}
 
 		userID := r.Context().Value("userID").(uuid.UUID)
-		err = data.DeleteInvestmentFromDB(r.Context(), id, userID)
+		err = investmentService.DeleteInvestmentFromDB(r.Context(), id, userID)
 		if err != nil {
 			if err == pgx.ErrNoRows {
 				respondWithError(w, http.StatusNotFound, "Investment not found")
@@ -178,8 +148,8 @@ func HandleInvestmentDelete(data model.Config) http.HandlerFunc {
 			}
 			logger.Error("Error while deleting investment", map[string]interface{}{
 				"investmentId": id,
-				"userIDd":       userID,
-				"error":         err,
+				"userIDd":      userID,
+				"error":        err,
 			})
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return

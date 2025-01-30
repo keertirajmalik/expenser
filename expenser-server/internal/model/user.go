@@ -21,8 +21,12 @@ type User struct {
 	Image          string    `json:"image"`
 }
 
-func (d Config) GetUsersFromDB(ctx context.Context) ([]User, error) {
-	dbUsers, err := d.Queries.GetUser(ctx)
+type UserService struct {
+    Queries *repository.Queries
+}
+
+func (s UserService) GetUsersFromDB(ctx context.Context) ([]User, error) {
+	dbUsers, err := s.Queries.GetUser(ctx)
 	if err != nil {
 		logger.Error("failed to get user from database", map[string]interface{}{
 			"error": err,
@@ -33,8 +37,8 @@ func (d Config) GetUsersFromDB(ctx context.Context) ([]User, error) {
 	return convertDBUserToUser(dbUsers), nil
 }
 
-func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
-	dbUser, err := d.Queries.CreateUser(ctx, repository.CreateUserParams{
+func (s UserService) AddUserToDB(ctx context.Context, user User) (User, error) {
+	dbUser, err := s.Queries.CreateUser(ctx, repository.CreateUserParams{
 		ID:             user.ID,
 		Name:           user.Name,
 		Username:       user.Username,
@@ -57,8 +61,8 @@ func (d Config) AddUserToDB(ctx context.Context, user User) (User, error) {
 	return users[0], nil
 }
 
-func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (User, error) {
-	dbUser, err := d.Queries.GetUserByUsername(ctx, username)
+func (s UserService) GetUserByUsernameFromDB(ctx context.Context, username string) (User, error) {
+	dbUser, err := s.Queries.GetUserByUsername(ctx, username)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			logger.Error("User not found", map[string]interface{}{"username": username, "error": err})
@@ -73,8 +77,8 @@ func (d Config) GetUserByUsernameFromDB(ctx context.Context, username string) (U
 	return user[0], nil
 }
 
-func (d Config) GetUserByUserIdFromDB(ctx context.Context, userId uuid.UUID) (User, error) {
-	dbUser, err := d.Queries.GetUserById(ctx, userId)
+func (s UserService) GetUserByUserIdFromDB(ctx context.Context, userId uuid.UUID) (User, error) {
+	dbUser, err := s.Queries.GetUserById(ctx, userId)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			logger.Error("User not found", map[string]interface{}{"userId": userId})
@@ -110,8 +114,8 @@ func convertDBUserToUser(dbUsers []repository.User) []User {
 	return users
 }
 
-func (d Config) UpdateUserInDB(ctx context.Context, user User) (User, error) {
-	dbUser, err := d.Queries.UpdateUser(ctx, repository.UpdateUserParams{
+func (s UserService) UpdateUserInDB(ctx context.Context, user User) (User, error) {
+	dbUser, err := s.Queries.UpdateUser(ctx, repository.UpdateUserParams{
 		ID:    user.ID,
 		Name:  user.Name,
 		Image: &user.Image,
