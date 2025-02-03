@@ -53,8 +53,9 @@ export const ExpenseFormSchema = z.object({
   }),
   amount: z
     .string()
-    .nonempty({ message: "Expense amount is required." })
-    .regex(/^(?:\d{1,15}|\d{1,15}\.\d{1,4})$/, {
+    .nonempty({ message: "Income amount is required." })
+    .transform((val) => val.replace(/[^0-9.]/g, "")) // Remove currency formatting
+    .refine((val) => /^(?:\d{1,15}|\d{1,15}\.\d{1,4})$/.test(val), {
       message:
         "Amount must be a positive number with up to 4 decimal places (max 15 digits).",
     })
@@ -71,6 +72,10 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
   const [openCategory, setOpenCategory] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
+    null
+  );
+
   const { data: categories, isLoading } = useGetCategoryQuery();
 
   const form = useForm<z.infer<typeof ExpenseFormSchema>>({
@@ -87,7 +92,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
   useEffect(() => {
     if (!isLoading && categories) {
       const filtered = categories.filter(
-        (category: Category) => category.type == CategoryType.Expense,
+        (category: Category) => category.type == CategoryType.Expense
       );
       setFilteredCategories(filtered);
 
@@ -95,7 +100,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
         form.reset(initialData);
         if (initialData.category) {
           const categoryOption = filtered.find(
-            (category) => category.name === initialData.category,
+            (category) => category.name === initialData.category
           );
           if (categoryOption) {
             form.setValue("category", categoryOption.id);
@@ -190,12 +195,37 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
               <FormLabel required>Expense Amount</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
-                  step="0.0001"
-                  min="0"
-                  pattern="^\d{1,15}(\.\d{1,4})?$"
-                  placeholder="Expense amount"
-                  {...field}
+                  type="text"
+                  placeholder="Income amount"
+                  value={field.value}
+                  onChange={(e) => {
+                    const rawValue = e.target.value.replace(/[^0-9.]/g, "");
+                    field.onChange(rawValue);
+
+                    if (typingTimeout) {
+                      clearTimeout(typingTimeout);
+                    }
+
+                    setTypingTimeout(
+                      setTimeout(() => {
+                        if (rawValue) {
+                          const numericValue = parseFloat(rawValue);
+                          if (!isNaN(numericValue)) {
+                            const hasFraction = rawValue.includes(".");
+                            const formattedValue = new Intl.NumberFormat(
+                              "en-US",
+                              {
+                                style: "currency",
+                                currency: "INR",
+                                maximumFractionDigits: hasFraction ? 2 : 0,
+                              }
+                            ).format(numericValue);
+                            field.onChange(formattedValue);
+                          }
+                        }
+                      }, 1000)
+                    );
+                  }}
                 />
               </FormControl>
               <FormMessage />

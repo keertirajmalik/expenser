@@ -73,6 +73,9 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
   const { data: categories, isLoading } = useGetCategoryQuery();
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
+    null
+  );
 
   const form = useForm<z.infer<typeof IncomeFormSchema>>({
     resolver: zodResolver(IncomeFormSchema),
@@ -207,26 +210,32 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
                   placeholder="Income amount"
                   value={field.value}
                   onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9.]/g, "");
-                    if (value) {
-                      field.onChange(value);
-                    } else {
-                      field.onChange("");
+                    const rawValue = e.target.value.replace(/[^0-9.]/g, "");
+                    field.onChange(rawValue);
+
+                    if (typingTimeout) {
+                      clearTimeout(typingTimeout);
                     }
-                  }}
-                  onBlur={(e) => {
-                    const value = e.target.value.replace(/[^0-9.]/g, "");
-                    if (value) {
-                      const numericValue = parseFloat(value);
-                      if (!isNaN(numericValue) && numericValue > 0) {
-                        const formattedValue = new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: "INR",
-                        
-                        }).format(numericValue);
-                        field.onChange(formattedValue);
-                      }
-                    }
+
+                    setTypingTimeout(
+                      setTimeout(() => {
+                        if (rawValue) {
+                          const numericValue = parseFloat(rawValue);
+                          if (!isNaN(numericValue)) {
+                            const hasFraction = rawValue.includes(".");
+                            const formattedValue = new Intl.NumberFormat(
+                              "en-US",
+                              {
+                                style: "currency",
+                                currency: "INR",
+                                maximumFractionDigits: hasFraction ? 2 : 0,
+                              }
+                            ).format(numericValue);
+                            field.onChange(formattedValue);
+                          }
+                        }
+                      }, 1000)
+                    );
                   }}
                 />
               </FormControl>
