@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetCategoryQuery } from "@/hooks/use-category-query";
+import { useCurrencyFormat } from "@/hooks/use-currency-format";
 import { cn } from "@/lib/utils";
 import { Category, CategoryType } from "@/types/category";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -54,7 +55,8 @@ export const InvestmentFormSchema = z.object({
   amount: z
     .string()
     .nonempty({ message: "Investment amount is required." })
-    .regex(/^(?:\d{1,15}|\d{1,15}\.\d{1,4})$/, {
+    .transform((val) => val.replace(/[^0-9.]/g, "")) // Remove currency formatting
+    .refine((val) => /^(?:\d{1,15}|\d{1,15}\.\d{1,4})$/.test(val), {
       message:
         "Amount must be a positive number with up to 4 decimal places (max 15 digits).",
     })
@@ -71,7 +73,6 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
   const [openCategory, setOpenCategory] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
-  const { data: categories, isLoading } = useGetCategoryQuery();
 
   const form = useForm<z.infer<typeof InvestmentFormSchema>>({
     resolver: zodResolver(InvestmentFormSchema),
@@ -84,10 +85,15 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
     },
   });
 
+  const { data: categories, isLoading } = useGetCategoryQuery();
+  const handleCurrencyChange = useCurrencyFormat((value) =>
+    form.setValue("amount", value)
+  );
+
   useEffect(() => {
     if (!isLoading && categories) {
       const filtered = categories.filter(
-        (category: Category) => category.type == CategoryType.Investment,
+        (category: Category) => category.type == CategoryType.Investment
       );
       setFilteredCategories(filtered);
 
@@ -95,10 +101,16 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
         form.reset(initialData);
         if (initialData.category) {
           const categoryOption = filtered.find(
-            (category) => category.name === initialData.category,
+            (category) => category.name === initialData.category
           );
           if (categoryOption) {
             form.setValue("category", categoryOption.id);
+          }
+        }
+        if (initialData.amount) {
+          const numericValue = parseFloat(initialData.amount);
+          if (!Number.isNaN(numericValue) && numericValue > 0) {
+            handleCurrencyChange(numericValue.toString());
           }
         }
       }
@@ -190,12 +202,10 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
               <FormLabel required>Investment Amount</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
-                  step="0.0001"
-                  min="0"
-                  pattern="^\d{1,15}(\.\d{1,4})?$"
+                  type="text"
                   placeholder="Investment amount"
-                  {...field}
+                  value={field.value}
+                  onChange={(e) => handleCurrencyChange(e.target.value)}
                 />
               </FormControl>
               <FormMessage />
@@ -240,7 +250,9 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                       form.setValue("date", date);
                       setOpenCalendar(false);
                     }}
-                    disabled={(date) => date < new Date("1900-01-01")}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
                     initialFocus
                   />
                 </PopoverContent>

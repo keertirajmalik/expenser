@@ -1,0 +1,46 @@
+import { CreateDialog } from "@/app/create-dialog/create-dialog";
+import { columns } from "@/app/income/column";
+import { DataTable } from "@/components/data-table/data-table";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useGetIncomeQuery } from "@/hooks/use-income-query";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Separator } from "@radix-ui/react-separator";
+
+export default function Income() {
+  const { data } = useGetIncomeQuery();
+  const isMobile = useIsMobile();
+
+  return (
+    <div className="flex h-96 w-full flex-col">
+      <header
+        className="flex h-16 shrink-0 justify-between items-center gap-2 border-b px-4"
+        role="banner"
+      >
+        <div className="flex items-center gap-2">
+          <SidebarTrigger className="-ml-1" aria-label="Toggle sidebar" />
+          <Separator
+            orientation="vertical"
+            className="bg-border w-px mr-2 h-4"
+            decorative={true}
+          />
+          <section className="flex flex-col">
+            <h1 className="text-lg font-semibold">Incomes</h1>
+            <p className={`text-sm text-gray-500 ${isMobile ? "sr-only" : ""}`}>
+              List of Your Incomes
+            </p>
+          </section>
+        </div>
+        <div className="sticky top-0 right-2">
+          <CreateDialog
+            creation="Income"
+            title="Create Income"
+            description="Provide information regarding your income."
+          />
+        </div>
+      </header>
+      <main className="flex flex-1 w-full justify-center py-4" role="main">
+        <DataTable columns={columns} data={data ?? []} />
+      </main>
+    </div>
+  );
+}

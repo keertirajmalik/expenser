@@ -22,19 +22,19 @@ type Server struct {
 }
 
 func LoadConfig() string {
-    jwtSecret := os.Getenv("JWT_SECRET")
-    if jwtSecret == "" {
-        log.Fatal("JWT_SECRET environment variable is not set")
-    }
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET environment variable is not set")
+	}
 
-    return jwtSecret;
+	return jwtSecret
 }
 
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	NewServer := &Server{
 		port: port,
-		db: database.New(),
+		db:   database.New(),
 	}
 
 	queries := repository.New(NewServer.db.GetConnection())
@@ -51,6 +51,9 @@ func NewServer() *http.Server {
 			Queries: queries,
 		},
 		InvestmentService: model.InvestmentService{
+			Queries: queries,
+		},
+		IncomeService: model.IncomeService{
 			Queries: queries,
 		},
 	}

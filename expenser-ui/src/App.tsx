@@ -3,6 +3,7 @@ import { SignupPage } from "@/app/auth/signup";
 import Category from "@/app/category/category";
 import Dashboard from "@/app/dashboard";
 import Expense from "@/app/expense/expense";
+import Income from "@/app/income/income";
 import Investment from "@/app/investment/investment";
 import { AppSidebar } from "@/app/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -39,6 +40,7 @@ function MainRoutes() {
             <Route path={ROUTES.MAIN.CATEGORY} element={<Category />} />
             <Route path={ROUTES.MAIN.EXPENSE} element={<Expense />} />
             <Route path={ROUTES.MAIN.INVESTMENT} element={<Investment />} />
+            <Route path={ROUTES.MAIN.INCOME} element={<Income />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

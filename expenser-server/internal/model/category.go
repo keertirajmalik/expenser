@@ -37,15 +37,17 @@ type ResponseCategory struct {
 const (
 	CategoryTypeExpense    = "Expense"
 	CategoryTypeInvestment = "Investment"
+	CategoryTypeIncome     = "Income"
 )
 
 var ValidCategoryTypes = map[string]bool{
 	CategoryTypeExpense:    true,
 	CategoryTypeInvestment: true,
+	CategoryTypeIncome:     true,
 }
 
 type CategoryService struct {
-    Queries *repository.Queries
+	Queries *repository.Queries
 }
 
 func (c Category) Validate() error {
