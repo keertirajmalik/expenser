@@ -38,7 +38,7 @@ interface CategoryFormProps {
   onSubmit: (data: z.infer<typeof CategoryFormSchema>) => void;
   initialData?: {
     name: string;
-    type: "Investment" | "Expense";
+    type: "Investment" | "Expense" | "Income";
     description: string;
   };
 }
