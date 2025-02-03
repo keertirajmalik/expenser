@@ -6,4 +6,5 @@ type Config struct {
 	CategoryService    CategoryService
 	TransactionService TransactionService
 	InvestmentService  InvestmentService
+    IncomeService IncomeService
 }
