@@ -7,9 +7,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { parseDate } from "@/lib/dateUtil";
 import { Income } from "@/types/income";
 import { Row } from "@tanstack/react-table";
-import { parse } from "date-fns";
 import { z } from "zod";
 
 interface EditIncomeSheetProps {
@@ -40,18 +40,7 @@ export function EditIncomeSheet({
             name: row.original.name,
             category: row.original.category,
             amount: row.original.amount.toString(),
-            date: (() => {
-              try {
-                return parse(
-                  row.original.date.toString(),
-                  "dd/MM/yyyy",
-                  new Date(),
-                );
-              } catch (error) {
-                console.error("Failed to parse date:", error);
-                return new Date();
-              }
-            })(),
+            date: parseDate(row.original.date.toString()),
             note: row.original.note,
           }}
           onSubmit={onSubmit}

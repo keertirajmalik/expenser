@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetCategoryQuery } from "@/hooks/use-category-query";
+import { useCurrencyFormat } from "@/hooks/use-currency-format";
 import { cn } from "@/lib/utils";
 import { Category, CategoryType } from "@/types/category";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -53,7 +54,7 @@ export const InvestmentFormSchema = z.object({
   }),
   amount: z
     .string()
-    .nonempty({ message: "Income amount is required." })
+    .nonempty({ message: "Investment amount is required." })
     .transform((val) => val.replace(/[^0-9.]/g, "")) // Remove currency formatting
     .refine((val) => /^(?:\d{1,15}|\d{1,15}\.\d{1,4})$/.test(val), {
       message:
@@ -72,11 +73,6 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
   const [openCategory, setOpenCategory] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
-    null
-  );
-
-  const { data: categories, isLoading } = useGetCategoryQuery();
 
   const form = useForm<z.infer<typeof InvestmentFormSchema>>({
     resolver: zodResolver(InvestmentFormSchema),
@@ -88,6 +84,11 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
       note: "",
     },
   });
+
+  const { data: categories, isLoading } = useGetCategoryQuery();
+  const handleCurrencyChange = useCurrencyFormat((value) =>
+    form.setValue("amount", value)
+  );
 
   useEffect(() => {
     if (!isLoading && categories) {
@@ -104,6 +105,12 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
           );
           if (categoryOption) {
             form.setValue("category", categoryOption.id);
+          }
+        }
+        if (initialData.amount) {
+          const numericValue = parseFloat(initialData.amount);
+          if (!Number.isNaN(numericValue) && numericValue > 0) {
+            handleCurrencyChange(numericValue.toString());
           }
         }
       }
@@ -198,34 +205,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                   type="text"
                   placeholder="Investment amount"
                   value={field.value}
-                  onChange={(e) => {
-                    const rawValue = e.target.value.replace(/[^0-9.]/g, "");
-                    field.onChange(rawValue);
-
-                    if (typingTimeout) {
-                      clearTimeout(typingTimeout);
-                    }
-
-                    setTypingTimeout(
-                      setTimeout(() => {
-                        if (rawValue) {
-                          const numericValue = parseFloat(rawValue);
-                          if (!isNaN(numericValue)) {
-                            const hasFraction = rawValue.includes(".");
-                            const formattedValue = new Intl.NumberFormat(
-                              "en-US",
-                              {
-                                style: "currency",
-                                currency: "INR",
-                                maximumFractionDigits: hasFraction ? 2 : 0,
-                              }
-                            ).format(numericValue);
-                            field.onChange(formattedValue);
-                          }
-                        }
-                      }, 1000)
-                    );
-                  }}
+                  onChange={(e) => handleCurrencyChange(e.target.value)}
                 />
               </FormControl>
               <FormMessage />
@@ -270,7 +250,9 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                       form.setValue("date", date);
                       setOpenCalendar(false);
                     }}
-                    disabled={(date) => date < new Date("1900-01-01")}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
                     initialFocus
                   />
                 </PopoverContent>

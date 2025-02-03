@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetCategoryQuery } from "@/hooks/use-category-query";
+import { useCurrencyFormat } from "@/hooks/use-currency-format";
 import { cn } from "@/lib/utils";
 import { Category, CategoryType } from "@/types/category";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -72,10 +73,6 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
   const [openCategory, setOpenCategory] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
-  const { data: categories, isLoading } = useGetCategoryQuery();
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
-    null
-  );
 
   const form = useForm<z.infer<typeof IncomeFormSchema>>({
     resolver: zodResolver(IncomeFormSchema),
@@ -88,10 +85,15 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
     },
   });
 
+  const { data: categories, isLoading } = useGetCategoryQuery();
+  const handleCurrencyChange = useCurrencyFormat((value) => {
+    form.setValue("amount", value);
+  });
+
   useEffect(() => {
     if (!isLoading && categories) {
       const filtered = categories.filter(
-        (category: Category) => category.type == CategoryType.Income
+        (category: Category) => category.type == CategoryType.Income,
       );
       setFilteredCategories(filtered);
 
@@ -99,22 +101,16 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
         form.reset(initialData);
         if (initialData.category) {
           const categoryOption = filtered.find(
-            (category) => category.name === initialData.category
+            (category) => category.name === initialData.category,
           );
           if (categoryOption) {
             form.setValue("category", categoryOption.id);
           }
-
-          if (initialData.amount) {
-            const numericValue = parseFloat(initialData.amount);
-            if (!isNaN(numericValue) && numericValue > 0) {
-              const formattedValue = new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "INR",
-                maximumFractionDigits: 2,
-              }).format(numericValue);
-              form.setValue("amount", formattedValue);
-            }
+        }
+        if (initialData.amount) {
+          const numericValue = parseFloat(initialData.amount);
+          if (!Number.isNaN(numericValue) && numericValue > 0) {
+            handleCurrencyChange(numericValue.toString());
           }
         }
       }
@@ -151,12 +147,12 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
                       role="combobox"
                       className={cn(
                         "justify-between",
-                        !field.value && "text-muted-foreground"
+                        !field.value && "text-muted-foreground",
                       )}
                     >
                       {field.value
                         ? filteredCategories?.find(
-                            (category) => category.id === field.value
+                            (category) => category.id === field.value,
                           )?.name
                         : "Select Income Category"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -184,7 +180,7 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
                                 "ml-auto",
                                 category.id === field.value
                                   ? "opacity-100"
-                                  : "opacity-0"
+                                  : "opacity-0",
                               )}
                             />
                           </CommandItem>
@@ -209,34 +205,7 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
                   type="text"
                   placeholder="Income amount"
                   value={field.value}
-                  onChange={(e) => {
-                    const rawValue = e.target.value.replace(/[^0-9.]/g, "");
-                    field.onChange(rawValue);
-
-                    if (typingTimeout) {
-                      clearTimeout(typingTimeout);
-                    }
-
-                    setTypingTimeout(
-                      setTimeout(() => {
-                        if (rawValue) {
-                          const numericValue = parseFloat(rawValue);
-                          if (!isNaN(numericValue)) {
-                            const hasFraction = rawValue.includes(".");
-                            const formattedValue = new Intl.NumberFormat(
-                              "en-US",
-                              {
-                                style: "currency",
-                                currency: "INR",
-                                maximumFractionDigits: hasFraction ? 2 : 0,
-                              }
-                            ).format(numericValue);
-                            field.onChange(formattedValue);
-                          }
-                        }
-                      }, 1000)
-                    );
-                  }}
+                  onChange={(e) => handleCurrencyChange(e.target.value)}
                 />
               </FormControl>
               <FormMessage />
@@ -260,7 +229,7 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
                       variant={"outline"}
                       className={cn(
                         "pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
+                        !field.value && "text-muted-foreground",
                       )}
                     >
                       {field.value ? (
@@ -281,7 +250,9 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
                       form.setValue("date", date);
                       setOpenCalendar(false);
                     }}
-                    disabled={(date) => date < new Date("1900-01-01")}
+                    disabled={(date) =>
+                      date > new Date() || date < new Date("1900-01-01")
+                    }
                     initialFocus
                   />
                 </PopoverContent>

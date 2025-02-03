@@ -11,12 +11,12 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {
-  ArrowLeftRight,
   ChartCandlestick,
   HandCoins,
   IndianRupee,
   LayoutDashboard,
   ListTree,
+  Receipt,
 } from "lucide-react";
 
 import { NavMain } from "@/app/sidebar/nav-main";
@@ -40,7 +40,7 @@ const data = {
     {
       name: "Expense",
       url: "/expense",
-      icon: ArrowLeftRight,
+      icon: Receipt,
     },
     {
       name: "Investment",

@@ -1,19 +1,19 @@
 import {
-  ExpenseFormSchema,
   ExpenseForm,
+  ExpenseFormSchema,
 } from "@/app/create-dialog/expense-form";
+import { Button } from "@/components/ui/button";
 import {
+  Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
 } from "@/components/ui/sheet";
+import { parseDate } from "@/lib/dateUtil";
 import { Expense } from "@/types/expense";
 import { Row } from "@tanstack/react-table";
-import { Sheet } from "@/components/ui/sheet";
-import { parse } from "date-fns";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 
 interface EditExpenseSheetProps {
   editSheetOpen: boolean;
@@ -43,7 +43,7 @@ export function EditExpenseSheet({
             name: row.original.name,
             category: row.original.category,
             amount: row.original.amount.toString(),
-            date: parse(row.original.date.toString(), "dd/MM/yyyy", new Date()),
+            date: parseDate(row.original.date.toString()),
             note: row.original.note,
           }}
           onSubmit={onSubmit}
