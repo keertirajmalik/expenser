@@ -9,5 +9,6 @@ export const ROUTES = {
     CATEGORY: "/category",
     EXPENSE: "/expense",
     INVESTMENT: "/investment",
+    INCOME: "/income",
   },
 } as const;

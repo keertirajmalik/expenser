@@ -6,6 +6,7 @@ import {
   ExpenseForm,
   ExpenseFormSchema,
 } from "@/app/create-dialog/expense-form";
+import { IncomeForm, IncomeFormSchema } from "@/app/create-dialog/income-form";
 import {
   InvestmentForm,
   InvestmentFormSchema,
@@ -21,13 +22,14 @@ import {
 } from "@/components/ui/dialog";
 import { useCreateCategoryMutation } from "@/hooks/use-category-query";
 import { useCreateExpenseMutation } from "@/hooks/use-expense-query";
+import { useCreateIncomeMutation } from "@/hooks/use-income-query";
 import { useCreateInvestmentMutation } from "@/hooks/use-investment-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
 interface CreateDialogProps {
-  creation: "Expense" | "Category" | "Investment";
+  creation: "Expense" | "Category" | "Investment" | "Income";
   title: string;
   description: string;
 }
@@ -66,6 +68,15 @@ export function CreateDialog({
     });
   };
 
+  const createIncomeMutation = useCreateIncomeMutation();
+  const onIncomeSubmit = (data: z.infer<typeof IncomeFormSchema>) => {
+    createIncomeMutation.mutate(data, {
+      onSuccess: () => {
+        setOpen(false);
+      },
+    });
+  };
+
   let formComponent;
   switch (creationCategory) {
     case "Expense":
@@ -76,6 +87,9 @@ export function CreateDialog({
       break;
     case "Investment":
       formComponent = <InvestmentForm onSubmit={onInvestmentSubmit} />;
+      break;
+    case "Income":
+      formComponent = <IncomeForm onSubmit={onIncomeSubmit} />;
       break;
     default:
       formComponent = null;
