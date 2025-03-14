@@ -1,15 +1,18 @@
 import { BarChartComponent } from "@/components/chart/bar-chart";
 import { LineChartComponent } from "@/components/chart/line-chart";
 import { PieChartComponent } from "@/components/chart/pie-chart";
-import { RecentExpenses } from "@/components/chart/recent-expense";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetExpensesQuery } from "@/hooks/use-expense-query";
+import { useGetIncomeQuery } from "@/hooks/use-income-query";
+import { useGetInvestmentQuery } from "@/hooks/use-investment-query";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Dashboard() {
   const isMobile = useIsMobile();
-  const { data = [] } = useGetExpensesQuery();
+  const { data: expenseData = [] } = useGetExpensesQuery();
+  const { data: investmentData = [] } = useGetInvestmentQuery();
+  const { data: incomeData = [] } = useGetIncomeQuery();
 
   return (
     <div className="flex min-h-screen w-full flex-col gap-2">
@@ -31,12 +34,16 @@ export default function Dashboard() {
         role="main"
       >
         <div
-          className={`grid gap-2 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}
+          className={`grid gap-2 ${isMobile ? "grid-cols-1" : "grid-cols-3"}`}
         >
-          <PieChartComponent data={data} />
-          <LineChartComponent data={data} />
-          <BarChartComponent data={data} />
-          <RecentExpenses data={data} />
+          <PieChartComponent data={expenseData} title="Expense" />
+          <PieChartComponent data={investmentData} title="Investment" />
+          <PieChartComponent data={incomeData} title="Income" />
+          <LineChartComponent
+            expenseData={expenseData}
+            incomeData={incomeData}
+          />
+          <BarChartComponent data={expenseData} />
         </div>
       </main>
     </div>

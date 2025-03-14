@@ -10,6 +10,8 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Expense } from "@/types/expense";
+import { Income } from "@/types/income";
+import { Investment } from "@/types/investment";
 
 interface ChartData {
   category: string;
@@ -18,7 +20,8 @@ interface ChartData {
 }
 
 interface PieChartProps {
-  data: Expense[];
+  data: Expense[] | Investment[] | Income[];
+  title: string;
 }
 
 const generateColors = (count: number): string[] => {
@@ -31,11 +34,17 @@ const generateColors = (count: number): string[] => {
   });
 };
 
-const getUniqueCategories = (expenses: Expense[]): string[] => {
-  return Array.from(new Set(expenses.map((item: Expense) => item.category)));
+const getUniqueCategories = (
+  data: Expense[] | Investment[] | Income[],
+): string[] => {
+  return Array.from(
+    new Set(data.map((item: Expense | Investment | Income) => item.category)),
+  );
 };
 
-const createChartConfig = (data: Expense[]): ChartConfig => {
+const createChartConfig = (
+  data: Expense[] | Investment[] | Income[],
+): ChartConfig => {
   const uniqueCategories = getUniqueCategories(data);
   const colors = generateColors(uniqueCategories.length);
   return uniqueCategories.reduce<ChartConfig>((acc, category, index) => {
@@ -44,14 +53,17 @@ const createChartConfig = (data: Expense[]): ChartConfig => {
   }, {});
 };
 
-const generateChartData = (expenses: Expense[]): ChartData[] => {
-  const typeMap = expenses.reduce((acc: Record<string, number>, item) => {
+const generateChartData = (
+  data: Expense[] | Investment[] | Income[],
+): ChartData[] => {
+  const typeMap = data.reduce((acc: Record<string, number>, item) => {
     const amount = parseFloat(item.amount);
     acc[item.category] = (acc[item.category] || 0) + amount;
     return acc;
   }, {});
   const uniqueCategorys = Object.keys(typeMap);
   const colors = generateColors(uniqueCategorys.length);
+
   return uniqueCategorys.map((category, index) => ({
     category,
     amount: typeMap[category],
@@ -59,14 +71,22 @@ const generateChartData = (expenses: Expense[]): ChartData[] => {
   }));
 };
 
-export function PieChartComponent({ data }: PieChartProps) {
+export function PieChartComponent({ data, title }: PieChartProps) {
   const chartConfig = createChartConfig(data);
   const chartData = generateChartData(data);
+
+  const formatter = new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+  });
+  const total = formatter.format(
+    chartData.reduce((acc, curr) => acc + curr.amount, 0),
+  );
 
   return (
     <Card>
       <CardHeader className="pb-0 ">
-        <CardTitle>Expense By Category Chart</CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0.5">
         <ChartContainer
@@ -100,16 +120,14 @@ export function PieChartComponent({ data }: PieChartProps) {
                           y={viewBox.cy}
                           className="fill-foreground text-xl font-bold"
                         >
-                          {chartData
-                            .reduce((acc, curr) => acc + curr.amount, 0)
-                            .toFixed(2)}
+                          {total}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Total Expenses
+                          Total {title}s
                         </tspan>
                       </text>
                     );
