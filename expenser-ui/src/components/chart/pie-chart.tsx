@@ -9,78 +9,26 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Expense } from "@/types/expense";
-import { Income } from "@/types/income";
-import { Investment } from "@/types/investment";
 
-interface ChartData {
+export interface ChartData {
   category: string;
   amount: number;
   fill: string;
 }
 
 interface PieChartProps {
-  data: Expense[] | Investment[] | Income[];
+  config: ChartConfig;
+  data: ChartData[];
   title: string;
 }
 
-const generateColors = (count: number): string[] => {
-  const baseHue = 210;
-  const saturation = 70;
-  const lightness = 50;
-  return Array.from({ length: count }, (_, i) => {
-    const hue = (baseHue + (i * 360) / count) % 360;
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-  });
-};
-
-const getUniqueCategories = (
-  data: Expense[] | Investment[] | Income[],
-): string[] => {
-  return Array.from(
-    new Set(data.map((item: Expense | Investment | Income) => item.category)),
-  );
-};
-
-const createChartConfig = (
-  data: Expense[] | Investment[] | Income[],
-): ChartConfig => {
-  const uniqueCategories = getUniqueCategories(data);
-  const colors = generateColors(uniqueCategories.length);
-  return uniqueCategories.reduce<ChartConfig>((acc, category, index) => {
-    acc[category] = { label: category, color: colors[index] };
-    return acc;
-  }, {});
-};
-
-const generateChartData = (
-  data: Expense[] | Investment[] | Income[],
-): ChartData[] => {
-  const typeMap = data.reduce((acc: Record<string, number>, item) => {
-    const amount = parseFloat(item.amount);
-    acc[item.category] = (acc[item.category] || 0) + amount;
-    return acc;
-  }, {});
-  const uniqueCategorys = Object.keys(typeMap);
-  const colors = generateColors(uniqueCategorys.length);
-
-  return uniqueCategorys.map((category, index) => ({
-    category,
-    amount: typeMap[category],
-    fill: colors[index],
-  }));
-};
-
-export function PieChartComponent({ data, title }: PieChartProps) {
-  const chartConfig = createChartConfig(data);
-  const chartData = generateChartData(data);
-
+export function PieChartComponent({ config, data, title }: PieChartProps) {
   const formatter = new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
   });
   const total = formatter.format(
-    chartData.reduce((acc, curr) => acc + curr.amount, 0),
+    data.reduce((acc, curr) => acc + curr.amount, 0),
   );
 
   return (
@@ -90,7 +38,7 @@ export function PieChartComponent({ data, title }: PieChartProps) {
       </CardHeader>
       <CardContent className="flex-1 pb-0.5">
         <ChartContainer
-          config={chartConfig}
+          config={config}
           className="mx-auto aspect-square min-h-[180px] sm:min-h-[200px] md:min-h-[250px] w-full"
         >
           <PieChart>
@@ -99,7 +47,7 @@ export function PieChartComponent({ data, title }: PieChartProps) {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={chartData}
+              data={data}
               dataKey="amount"
               nameKey="category"
               innerRadius={80}

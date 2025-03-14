@@ -16,20 +16,20 @@ export function CardComponent({ data, title, icon }: CardComponentProps) {
     currency: "INR",
   });
   const total = formatter.format(
-    data.reduce((acc, data) => acc + parseFloat(data.amount), 0)
+    data.reduce((acc, data) => acc + parseFloat(data.amount), 0),
   );
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between w-full">
-          <CardTitle>{title}</CardTitle>
+        <div className="flex items-start justify-start w-full gap-6">
           <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg">
             {icon}
           </div>
+          <CardTitle className="p-2">{title}</CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="space-y-2 min-h-[50px] w-full font-bold">
+      <CardContent className="min-h-[50px] w-full font-bold">
         {total}
       </CardContent>
     </Card>

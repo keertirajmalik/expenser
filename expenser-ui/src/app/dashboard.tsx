@@ -1,13 +1,18 @@
 import { BarChartComponent } from "@/components/chart/bar-chart";
 import { CardComponent } from "@/components/chart/card-component";
 import { LineChartComponent } from "@/components/chart/line-chart";
-import { PieChartComponent } from "@/components/chart/pie-chart";
+import { ChartData, PieChartComponent } from "@/components/chart/pie-chart";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetExpensesQuery } from "@/hooks/use-expense-query";
 import { useGetIncomeQuery } from "@/hooks/use-income-query";
 import { useGetInvestmentQuery } from "@/hooks/use-investment-query";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { createChartConfig, generateColors } from "@/lib/chart-util";
+import { useTheme } from "@/providers/theme-provider";
+import { Expense } from "@/types/expense";
+import { Income } from "@/types/income";
+import { Investment } from "@/types/investment";
 import { DollarSign, TrendingDown, TrendingUp } from "lucide-react";
 
 export default function Dashboard() {
@@ -15,6 +20,11 @@ export default function Dashboard() {
   const { data: expenseData = [] } = useGetExpensesQuery();
   const { data: investmentData = [] } = useGetInvestmentQuery();
   const { data: incomeData = [] } = useGetIncomeQuery();
+  const { theme } = useTheme();
+
+  const dollarSignColor = theme === "dark" ? "#0000ff" : "#3b50ba";
+  const trendingUpColor = theme === "dark" ? "#00ff00" : "#226f06";
+  const trendingDownColor = theme === "dark" ? "#ff0000" : "#d31212";
 
   return (
     <div className="flex min-h-screen w-full flex-col gap-2">
@@ -40,22 +50,34 @@ export default function Dashboard() {
         >
           <CardComponent
             data={incomeData}
-            title="Total Incomes"
-            icon=<DollarSign />
+            title="Total Income"
+            icon={<DollarSign color={dollarSignColor} />}
           />
           <CardComponent
             data={investmentData}
-            title="Total Investments"
-            icon=<TrendingUp />
+            title="Total Investment"
+            icon={<TrendingUp color={trendingUpColor} />}
           />
           <CardComponent
             data={expenseData}
-            title="Total Expenses"
-            icon=<TrendingDown />
+            title="Total Expense"
+            icon={<TrendingDown color={trendingDownColor} />}
           />
-          <PieChartComponent data={incomeData} title="Income" />
-          <PieChartComponent data={investmentData} title="Investment" />
-          <PieChartComponent data={expenseData} title="Expense" />
+          <PieChartComponent
+            config={createChartConfig(incomeData)}
+            data={generateChartData(incomeData)}
+            title="Income"
+          />
+          <PieChartComponent
+            config={createChartConfig(investmentData)}
+            data={generateChartData(investmentData)}
+            title="Investment"
+          />
+          <PieChartComponent
+            config={createChartConfig(expenseData)}
+            data={generateChartData(expenseData)}
+            title="Expense"
+          />
           <LineChartComponent
             expenseData={expenseData}
             incomeData={incomeData}
@@ -67,3 +89,21 @@ export default function Dashboard() {
     </div>
   );
 }
+
+const generateChartData = (
+  data: Expense[] | Investment[] | Income[],
+): ChartData[] => {
+  const typeMap = data.reduce((acc: Record<string, number>, item) => {
+    const amount = parseFloat(item.amount);
+    acc[item.category] = (acc[item.category] || 0) + amount;
+    return acc;
+  }, {});
+  const uniqueCategorys = Object.keys(typeMap);
+  const colors = generateColors(uniqueCategorys.length);
+
+  return uniqueCategorys.map((category, index) => ({
+    category,
+    amount: typeMap[category],
+    fill: colors[index],
+  }));
+};
