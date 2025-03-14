@@ -1,7 +1,10 @@
 import { BarChartComponent } from "@/components/chart/bar-chart";
 import { CardComponent } from "@/components/chart/card-component";
-import { LineChartComponent } from "@/components/chart/line-chart";
-import { ChartData, PieChartComponent } from "@/components/chart/pie-chart";
+import {
+    LineChartComponent,
+    LineChartData,
+} from "@/components/chart/line-chart";
+import { PieChartComponent, PieChartData } from "@/components/chart/pie-chart";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetExpensesQuery } from "@/hooks/use-expense-query";
@@ -13,6 +16,7 @@ import { useTheme } from "@/providers/theme-provider";
 import { Expense } from "@/types/expense";
 import { Income } from "@/types/income";
 import { Investment } from "@/types/investment";
+import { format, parse } from "date-fns";
 import { DollarSign, TrendingDown, TrendingUp } from "lucide-react";
 import { useMemo } from "react";
 
@@ -24,15 +28,15 @@ export default function Dashboard() {
   const { theme } = useTheme();
 
   const incomeChartData = useMemo(
-    () => generateChartData(incomeData),
+    () => generatepieChartData(incomeData),
     [incomeData],
   );
   const investmentChartData = useMemo(
-    () => generateChartData(investmentData),
+    () => generatepieChartData(investmentData),
     [investmentData],
   );
   const expenseChartData = useMemo(
-    () => generateChartData(expenseData),
+    () => generatepieChartData(expenseData),
     [expenseData],
   );
 
@@ -59,9 +63,7 @@ export default function Dashboard() {
         className="grid place-items-center gap-2 container mx-auto px-4"
         role="main"
       >
-        <div
-          className={`grid gap-2 ${isMobile ? "grid-cols-1" : "grid-cols-3"}`}
-        >
+        <div className="grid gap-2 grid-cols-1 md:grid-cols-3">
           <CardComponent
             data={incomeData}
             title="Total Income"
@@ -93,9 +95,11 @@ export default function Dashboard() {
             title="Expense"
           />
           <LineChartComponent
-            expenseData={expenseData}
-            incomeData={incomeData}
-            investmentData={investmentData}
+            data={generateLineChartData(
+              expenseData,
+              incomeData,
+              investmentData,
+            )}
           />
           <BarChartComponent data={expenseData} />
         </div>
@@ -104,9 +108,9 @@ export default function Dashboard() {
   );
 }
 
-const generateChartData = (
+const generatepieChartData = (
   data: Expense[] | Investment[] | Income[],
-): ChartData[] => {
+): PieChartData[] => {
   if (!data || data.length === 0) return [];
 
   const typeMap = data.reduce((acc: Record<string, number>, item) => {
@@ -123,4 +127,33 @@ const generateChartData = (
     amount: typeMap[category],
     fill: colors[index],
   }));
+};
+
+const formatDate = (date: string) =>
+  format(parse(date, "dd/MM/yyyy", new Date()), "MMM/yy");
+
+const generateLineChartData = (
+  expenses: Expense[],
+  incomes: Income[],
+  investments: Investment[],
+): LineChartData[] => {
+  const dataMap: Record<string, LineChartData> = {};
+  // Helper function to process each data array
+    const processData = (items: Array<{date: string | Date, amount: string}>, field: 'expense' | 'income' | 'investment') => {
+      for (const item of items) {
+        const month = formatDate(item.date.toString());
+        const amount = parseFloat(item.amount);
+
+        if (!dataMap[month]) {
+          dataMap[month] = { month, expense: 0, income: 0, investment: 0 };
+        }
+        dataMap[month][field] += amount;
+      }
+    };
+
+    processData(expenses, 'expense');
+    processData(incomes, 'income');
+    processData(investments, 'investment');
+
+  return Object.values(dataMap);
 };

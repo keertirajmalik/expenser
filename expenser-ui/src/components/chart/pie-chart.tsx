@@ -10,7 +10,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-export interface ChartData {
+export interface PieChartData {
   category: string;
   amount: number;
   fill: string;
@@ -18,7 +18,7 @@ export interface ChartData {
 
 interface PieChartProps {
   config: ChartConfig;
-  data: ChartData[];
+  data: PieChartData[];
   title: string;
   currency?: string;
   locale?: string;
@@ -58,7 +58,9 @@ export function PieChartComponent({
               data={data}
               dataKey="amount"
               nameKey="category"
-              innerRadius={80}
+              innerRadius={
+                config.responsive ? Math.min(60, window.innerWidth / 10) : 80
+              }
               strokeWidth={5}
             >
               <Label
