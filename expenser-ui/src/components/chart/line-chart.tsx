@@ -5,71 +5,47 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Expense } from "@/types/expense";
-import { compareAsc, format, parse } from "date-fns";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 
-interface ChartData {
+export interface LineChartData {
   month: string;
-  amount: number;
+  expense: number;
+  income: number;
+  investment: number;
 }
 
 interface LineChartProps {
-  data: Expense[];
+  data: LineChartData[];
 }
 
-const formatDate = (date: string) =>
-  format(parse(date, "dd/MM/yyyy", new Date()), "MMM/yy");
-
-const generateChartData = (expenses: Expense[]): ChartData[] => {
-  return expenses
-    .reduce((acc: ChartData[], item) => {
-      const formattedDate = formatDate(item.date.toString());
-      const existingItem = acc.find(
-        (accItem) => accItem.month === formattedDate,
-      );
-      const amount = parseFloat(item.amount);
-      if (existingItem) {
-        existingItem.amount += amount;
-      } else {
-        acc.push({ month: formattedDate, amount });
-      }
-      return acc;
-    }, [])
-    .sort((a, b) =>
-      compareAsc(
-        parse(a.month, "MMM/yyyy", new Date()),
-        parse(b.month, "MMM/yyyy", new Date()),
-      ),
-    )
-    .map((item) => ({
-      ...item,
-      amount: parseFloat(item.amount.toFixed(2)),
-    }));
-};
-
 const chartConfig = {
-  desktop: {
-    label: "Expenses",
+  income: {
+    label: "Income",
     color: "hsl(var(--chart-1))",
+  },
+  expense: {
+    label: "Expenses",
+    color: "hsl(var(--chart-2))",
+  },
+  investment: {
+    label: "Investment",
+    color: "hsl(var(--chart-3))",
   },
 } satisfies ChartConfig;
 
 export function LineChartComponent({ data }: LineChartProps) {
-  const chartData = generateChartData(data);
-
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Monthly Expense Chart</CardTitle>
+        <CardTitle>Income, Expense & Investment</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0.5">
         <ChartContainer
           config={chartConfig}
           className="min-h-[180px] sm:min-h-[200px] w-full"
         >
-          <LineChart accessibilityLayer data={chartData}>
-            <CartesianGrid vertical={false} />
+          <LineChart accessibilityLayer data={data.reverse()}>
+            <CartesianGrid vertical={false} horizontal={false} />
             <XAxis
               dataKey="month"
               tickLine={false}
@@ -84,9 +60,23 @@ export function LineChartComponent({ data }: LineChartProps) {
               content={<ChartTooltipContent hideLabel />}
             />
             <Line
-              dataKey="amount"
+              dataKey="expense"
               type="monotone"
-              stroke="var(--color-desktop)"
+              stroke="var(--color-expense)"
+              strokeWidth={2}
+              dot={false}
+            />
+            <Line
+              dataKey="income"
+              type="monotone"
+              stroke="var(--color-income)"
+              strokeWidth={2}
+              dot={false}
+            />
+            <Line
+              dataKey="investment"
+              type="monotone"
+              stroke="var(--color-investment)"
               strokeWidth={2}
               dot={false}
             />
@@ -96,5 +86,3 @@ export function LineChartComponent({ data }: LineChartProps) {
     </Card>
   );
 }
-
-//TODO: Add a line for each type to display monthly expenses
