@@ -44,7 +44,7 @@ export function PieChartComponent({
     currency: "INR",
   });
   const total = formatter.format(
-    chartData.reduce((acc, curr) => acc + curr.amount, 0),
+    data.reduce((acc, curr) => acc + curr.amount, 0),
   );
 
   return (
