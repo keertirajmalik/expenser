@@ -39,6 +39,14 @@ export function PieChartComponent({
     data.reduce((acc, curr) => acc + curr.amount, 0),
   );
 
+  const formatter = new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+  });
+  const total = formatter.format(
+    chartData.reduce((acc, curr) => acc + curr.amount, 0),
+  );
+
   return (
     <Card>
       <CardHeader className="pb-0 ">
