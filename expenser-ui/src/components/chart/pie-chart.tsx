@@ -9,68 +9,44 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { Expense } from "@/types/expense";
 
-interface ChartData {
+export interface PieChartData {
   category: string;
   amount: number;
   fill: string;
 }
 
 interface PieChartProps {
-  data: Expense[];
+  config: ChartConfig;
+  data: PieChartData[];
+  title: string;
+  currency?: string;
+  locale?: string;
 }
 
-const generateColors = (count: number): string[] => {
-  const baseHue = 210;
-  const saturation = 70;
-  const lightness = 50;
-  return Array.from({ length: count }, (_, i) => {
-    const hue = (baseHue + (i * 360) / count) % 360;
-    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+export function PieChartComponent({
+  config,
+  data,
+  title,
+  currency = "INR",
+  locale = "en-IN",
+}: PieChartProps) {
+  const formatter = new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency: currency,
   });
-};
-
-const getUniqueCategories = (expenses: Expense[]): string[] => {
-  return Array.from(new Set(expenses.map((item: Expense) => item.category)));
-};
-
-const createChartConfig = (data: Expense[]): ChartConfig => {
-  const uniqueCategories = getUniqueCategories(data);
-  const colors = generateColors(uniqueCategories.length);
-  return uniqueCategories.reduce<ChartConfig>((acc, category, index) => {
-    acc[category] = { label: category, color: colors[index] };
-    return acc;
-  }, {});
-};
-
-const generateChartData = (expenses: Expense[]): ChartData[] => {
-  const typeMap = expenses.reduce((acc: Record<string, number>, item) => {
-    const amount = parseFloat(item.amount);
-    acc[item.category] = (acc[item.category] || 0) + amount;
-    return acc;
-  }, {});
-  const uniqueCategorys = Object.keys(typeMap);
-  const colors = generateColors(uniqueCategorys.length);
-  return uniqueCategorys.map((category, index) => ({
-    category,
-    amount: typeMap[category],
-    fill: colors[index],
-  }));
-};
-
-export function PieChartComponent({ data }: PieChartProps) {
-  const chartConfig = createChartConfig(data);
-  const chartData = generateChartData(data);
+  const total = formatter.format(
+    data.reduce((acc, curr) => acc + curr.amount, 0),
+  );
 
   return (
     <Card>
       <CardHeader className="pb-0 ">
-        <CardTitle>Expense By Category Chart</CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0.5">
         <ChartContainer
-          config={chartConfig}
+          config={config}
           className="mx-auto aspect-square min-h-[180px] sm:min-h-[200px] md:min-h-[250px] w-full"
         >
           <PieChart>
@@ -79,10 +55,12 @@ export function PieChartComponent({ data }: PieChartProps) {
               content={<ChartTooltipContent hideLabel />}
             />
             <Pie
-              data={chartData}
+              data={data}
               dataKey="amount"
               nameKey="category"
-              innerRadius={60}
+              innerRadius={
+                config.responsive ? Math.min(60, window.innerWidth / 10) : 80
+              }
               strokeWidth={5}
             >
               <Label
@@ -98,18 +76,16 @@ export function PieChartComponent({ data }: PieChartProps) {
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-xl font-bold"
+                          className="fill-foreground text-lg font-bold"
                         >
-                          {chartData
-                            .reduce((acc, curr) => acc + curr.amount, 0)
-                            .toFixed(2)}
+                          {total}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Total Expenses
+                          Total {title}
                         </tspan>
                       </text>
                     );

@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Expense } from "@/types/expense";
 import { compareAsc, format, parse } from "date-fns";
@@ -13,7 +13,7 @@ interface BarChartProps {
   data: Expense[];
 }
 
-const generateChartData = (expenses: Expense[]): ChartData[] => {
+const generateChartData = (expenses: Expense[], limit = 6): ChartData[] => {
   return expenses
     .reduce((acc: ChartData[], item) => {
       const existingItem = acc.find((accItem) => accItem.date === item.date);
@@ -26,6 +26,7 @@ const generateChartData = (expenses: Expense[]): ChartData[] => {
       return acc;
     }, [])
     .sort((a, b) => compareAsc(parseDate(a.date), parseDate(b.date)))
+    .splice(-limit)
     .map((item) => ({
       ...item,
       amount: parseFloat(item.amount.toFixed(2)),
@@ -35,7 +36,7 @@ const generateChartData = (expenses: Expense[]): ChartData[] => {
 const chartConfig = {
   expense: {
     label: "Expenses",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(var(--chart-2))",
   },
 } satisfies ChartConfig;
 
@@ -53,10 +54,13 @@ export function BarChartComponent({ data }: BarChartProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Daily Expense Chart</CardTitle>
+        <CardTitle>Daily Expense</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0.5">
-        <ChartContainer config={chartConfig} className="min-h-[180px] sm:min-h-[200px] w-full">
+        <ChartContainer
+          config={chartConfig}
+          className="min-h-[180px] sm:min-h-[200px] w-full"
+        >
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
