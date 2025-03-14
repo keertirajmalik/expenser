@@ -14,6 +14,7 @@ import { Expense } from "@/types/expense";
 import { Income } from "@/types/income";
 import { Investment } from "@/types/investment";
 import { DollarSign, TrendingDown, TrendingUp } from "lucide-react";
+import { useMemo } from "react";
 
 export default function Dashboard() {
   const isMobile = useIsMobile();
@@ -21,6 +22,19 @@ export default function Dashboard() {
   const { data: investmentData = [] } = useGetInvestmentQuery();
   const { data: incomeData = [] } = useGetIncomeQuery();
   const { theme } = useTheme();
+
+  const incomeChartData = useMemo(
+    () => generateChartData(incomeData),
+    [incomeData],
+  );
+  const investmentChartData = useMemo(
+    () => generateChartData(investmentData),
+    [investmentData],
+  );
+  const expenseChartData = useMemo(
+    () => generateChartData(expenseData),
+    [expenseData],
+  );
 
   const dollarSignColor = theme === "dark" ? "#0000ff" : "#3b50ba";
   const trendingUpColor = theme === "dark" ? "#00ff00" : "#226f06";
@@ -65,17 +79,17 @@ export default function Dashboard() {
           />
           <PieChartComponent
             config={createChartConfig(incomeData)}
-            data={generateChartData(incomeData)}
+            data={incomeChartData}
             title="Income"
           />
           <PieChartComponent
             config={createChartConfig(investmentData)}
-            data={generateChartData(investmentData)}
+            data={investmentChartData}
             title="Investment"
           />
           <PieChartComponent
             config={createChartConfig(expenseData)}
-            data={generateChartData(expenseData)}
+            data={expenseChartData}
             title="Expense"
           />
           <LineChartComponent
@@ -93,15 +107,18 @@ export default function Dashboard() {
 const generateChartData = (
   data: Expense[] | Investment[] | Income[],
 ): ChartData[] => {
+  if (!data || data.length === 0) return [];
+
   const typeMap = data.reduce((acc: Record<string, number>, item) => {
     const amount = parseFloat(item.amount);
-    acc[item.category] = (acc[item.category] || 0) + amount;
+    acc[item.category] =
+      (acc[item.category] || 0) + (isNaN(amount) ? 0 : amount);
     return acc;
   }, {});
-  const uniqueCategorys = Object.keys(typeMap);
-  const colors = generateColors(uniqueCategorys.length);
+  const uniqueCategories = Object.keys(typeMap);
+  const colors = generateColors(uniqueCategories.length);
 
-  return uniqueCategorys.map((category, index) => ({
+  return uniqueCategories.map((category, index) => ({
     category,
     amount: typeMap[category],
     fill: colors[index],

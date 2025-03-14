@@ -13,7 +13,7 @@ interface BarChartProps {
   data: Expense[];
 }
 
-const generateChartData = (expenses: Expense[]): ChartData[] => {
+const generateChartData = (expenses: Expense[], limit = 6): ChartData[] => {
   return expenses
     .reduce((acc: ChartData[], item) => {
       const existingItem = acc.find((accItem) => accItem.date === item.date);
@@ -26,7 +26,7 @@ const generateChartData = (expenses: Expense[]): ChartData[] => {
       return acc;
     }, [])
     .sort((a, b) => compareAsc(parseDate(a.date), parseDate(b.date)))
-    .splice(-6)
+    .splice(-limit)
     .map((item) => ({
       ...item,
       amount: parseFloat(item.amount.toFixed(2)),

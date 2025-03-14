@@ -44,7 +44,11 @@ export function CardComponent({
         </div>
       </CardHeader>
       <CardContent className="min-h-[50px] w-full font-bold">
-        {total}
+        {data.length === 0 ? (
+          <span className="text-muted-foreground">No data available</span>
+        ) : (
+          total
+        )}
       </CardContent>
     </Card>
   );

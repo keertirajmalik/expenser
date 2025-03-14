@@ -20,12 +20,20 @@ interface PieChartProps {
   config: ChartConfig;
   data: ChartData[];
   title: string;
+  currency?: string;
+  locale?: string;
 }
 
-export function PieChartComponent({ config, data, title }: PieChartProps) {
-  const formatter = new Intl.NumberFormat("en-IN", {
+export function PieChartComponent({
+  config,
+  data,
+  title,
+  currency = "INR",
+  locale = "en-IN",
+}: PieChartProps) {
+  const formatter = new Intl.NumberFormat(locale, {
     style: "currency",
-    currency: "INR",
+    currency: currency,
   });
   const total = formatter.format(
     data.reduce((acc, curr) => acc + curr.amount, 0),
@@ -75,7 +83,7 @@ export function PieChartComponent({ config, data, title }: PieChartProps) {
                           y={(viewBox.cy || 0) + 24}
                           className="fill-muted-foreground"
                         >
-                          Total {title}s
+                          Total {title}
                         </tspan>
                       </text>
                     );

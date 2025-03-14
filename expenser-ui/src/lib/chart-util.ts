@@ -11,8 +11,8 @@ const getUniqueCategories = (
   );
 };
 
-export const generateColors = (count: number): string[] => {
-  const baseHue = 210;
+export const generateColors = (count: number, seed: number = 210): string[] => {
+  const baseHue = seed;
   const saturation = 70;
   const lightness = 50;
   return Array.from({ length: count }, (_, i) => {
@@ -24,6 +24,9 @@ export const generateColors = (count: number): string[] => {
 export const createChartConfig = (
   data: Expense[] | Investment[] | Income[],
 ): ChartConfig => {
+  if (!data.length) {
+    return {};
+  }
   const uniqueCategories = getUniqueCategories(data);
   const colors = generateColors(uniqueCategories.length);
   return uniqueCategories.reduce<ChartConfig>((acc, category, index) => {

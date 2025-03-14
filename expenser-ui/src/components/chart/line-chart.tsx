@@ -92,7 +92,7 @@ export function LineChartComponent({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Income & Expense</CardTitle>
+        <CardTitle>Income, Expense & Investment</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0.5">
         <ChartContainer
