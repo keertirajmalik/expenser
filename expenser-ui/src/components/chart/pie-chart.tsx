@@ -102,7 +102,7 @@ export function PieChartComponent({ data, title }: PieChartProps) {
               data={chartData}
               dataKey="amount"
               nameKey="category"
-              innerRadius={60}
+              innerRadius={80}
               strokeWidth={5}
             >
               <Label
@@ -118,7 +118,7 @@ export function PieChartComponent({ data, title }: PieChartProps) {
                         <tspan
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-xl font-bold"
+                          className="fill-foreground text-lg font-bold"
                         >
                           {total}
                         </tspan>

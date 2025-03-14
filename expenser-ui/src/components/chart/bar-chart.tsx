@@ -54,7 +54,7 @@ export function BarChartComponent({ data }: BarChartProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Daily Expense Chart</CardTitle>
+        <CardTitle>Daily Expense</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0.5">
         <ChartContainer
