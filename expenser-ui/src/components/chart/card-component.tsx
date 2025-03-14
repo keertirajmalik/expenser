@@ -8,15 +8,29 @@ interface CardComponentProps {
   data: Expense[] | Income[] | Investment[];
   title: string;
   icon: ReactElement;
+  currency?: string;
+  locale?: string;
 }
 
-export function CardComponent({ data, title, icon }: CardComponentProps) {
-  const formatter = new Intl.NumberFormat("en-IN", {
+export function CardComponent({
+  data,
+  title,
+  icon,
+  currency = "INR",
+  locale = "en-IN",
+}: CardComponentProps) {
+  const formatter = new Intl.NumberFormat(locale, {
     style: "currency",
-    currency: "INR",
+    currency,
   });
+
   const total = formatter.format(
-    data.reduce((acc, data) => acc + parseFloat(data.amount), 0),
+    data.length > 0
+      ? data.reduce((acc, item) => {
+          const amount = parseFloat(item.amount);
+          return acc + (isNaN(amount) ? 0 : amount);
+        }, 0)
+      : 0,
   );
 
   return (
