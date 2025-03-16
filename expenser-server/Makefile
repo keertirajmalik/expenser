@@ -36,13 +36,13 @@ docker-run:
 		sleep 2; \
 	done
 	@echo "Running database migrations..."
-	@goose postgres "user=${DB_USERNAME} dbname=${DB_DATABASE} sslmode=disable host=localhost password=${DB_PASSWORD}" -dir database/schema up
+	@goose postgres "user=${DB_USERNAME} dbname=${DB_DATABASE} sslmode=disable host=localhost password=${DB_PASSWORD}" -dir internal/database/schema up
 
 
 # Shutdown DB container
 docker-down:
 	@echo "Running database migrations..."
-	@goose postgres "user=${DB_USERNAME} dbname=${DB_DATABASE} sslmode=disable host=localhost password=${DB_PASSWORD}" -dir database/schema reset
+	@goose postgres "user=${DB_USERNAME} dbname=${DB_DATABASE} sslmode=disable host=localhost password=${DB_PASSWORD}" -dir internal/database/schema reset
 	@if docker compose down db 2>/dev/null; then \
 		: ; \
 	else \
