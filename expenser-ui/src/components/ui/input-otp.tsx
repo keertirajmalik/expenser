@@ -43,7 +43,7 @@ const InputOTPSlot = (
     ...props
   }
 ) => {
-  const inputOTPContext = React.useContext(OTPInputContext)
+  const inputOTPContext = React.use(OTPInputContext)
   const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index]
 
   return (

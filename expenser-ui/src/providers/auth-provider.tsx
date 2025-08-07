@@ -2,7 +2,7 @@ import {
   createContext,
   JSX,
   ReactNode,
-  useContext,
+  use,
   useEffect,
   useState,
 } from "react";
@@ -72,7 +72,7 @@ export const AuthProvider = ({
 };
 
 export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
+  const context = use(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }

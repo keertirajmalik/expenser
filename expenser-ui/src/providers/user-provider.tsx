@@ -2,7 +2,7 @@ import {
   createContext,
   JSX,
   ReactNode,
-  useContext,
+  use,
   useEffect,
   useState,
 } from "react";
@@ -56,7 +56,7 @@ export const UserProvider = ({
 };
 
 export const useUser = (): UserContextType => {
-  const context = useContext(UserContext);
+  const context = use(UserContext);
   if (!context) {
     throw new Error("useUser must be used within a UserProvider");
   }

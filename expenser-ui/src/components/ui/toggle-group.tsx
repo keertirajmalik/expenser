@@ -45,7 +45,7 @@ const ToggleGroupItem = (
     ...props
   }
 ) => {
-  const context = React.useContext(ToggleGroupContext)
+  const context = React.use(ToggleGroupContext)
 
   return (
     <ToggleGroupPrimitive.Item
