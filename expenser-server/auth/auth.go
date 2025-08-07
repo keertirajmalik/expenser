@@ -42,12 +42,12 @@ func GetBearerToken(header http.Header) (string, error) {
 	authHeader := header.Get("Authorization")
 
 	if authHeader == "" {
-		return "", errors.New("No auth header included in request")
+		return "", errors.New("no auth header included in request")
 	}
 
 	splitAuth := strings.Split(authHeader, " ")
 	if len(splitAuth) < 2 || splitAuth[0] != "Bearer" {
-		return "", errors.New("Malformed authorization header")
+		return "", errors.New("malformed authorization header")
 	}
 
 	return splitAuth[1], nil
@@ -75,7 +75,7 @@ func ValidateJWT(tokenString string, tokenSecret []byte) (uuid.UUID, error) {
 
 	issuer, _ := claimStruct.GetIssuer()
 	if issuer != "expenser" {
-		return uuid.Nil, errors.New("Invalid issuer")
+		return uuid.Nil, errors.New("invalid issuer")
 	}
 
 	userUUID, err := uuid.Parse(userId)
