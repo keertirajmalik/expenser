@@ -5,7 +5,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
+import { CartesianGrid, Legend, Line, LineChart, XAxis } from "recharts";
 
 export interface LineChartData {
   month: string;
@@ -21,15 +21,15 @@ interface LineChartProps {
 const chartConfig = {
   income: {
     label: "Income",
-    color: "hsl(var(--chart-1))",
+    color: "var(--color-chart-1)",
   },
   expense: {
     label: "Expenses",
-    color: "hsl(var(--chart-2))",
+    color: "var(--color-chart-2)",
   },
   investment: {
     label: "Investment",
-    color: "hsl(var(--chart-3))",
+    color: "var(--color-chart-3)",
   },
 } satisfies ChartConfig;
 
@@ -59,12 +59,21 @@ export function LineChartComponent({ data }: LineChartProps) {
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              iconType="line"
+              wrapperStyle={{
+                paddingTop: "20px",
+              }}
+            />
             <Line
               dataKey="expense"
               type="monotone"
               stroke="var(--color-expense)"
               strokeWidth={2}
               dot={false}
+              name="Expenses"
             />
             <Line
               dataKey="income"
@@ -72,6 +81,7 @@ export function LineChartComponent({ data }: LineChartProps) {
               stroke="var(--color-income)"
               strokeWidth={2}
               dot={false}
+              name="Income"
             />
             <Line
               dataKey="investment"
@@ -79,6 +89,7 @@ export function LineChartComponent({ data }: LineChartProps) {
               stroke="var(--color-investment)"
               strokeWidth={2}
               dot={false}
+              name="Investment"
             />
           </LineChart>
         </ChartContainer>

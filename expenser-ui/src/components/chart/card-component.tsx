@@ -37,9 +37,7 @@ export function CardComponent({
     <Card>
       <CardHeader>
         <div className="flex items-start justify-start w-full gap-6">
-          <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded-lg shadow-lg">
-            {icon}
-          </div>
+          <div className="p-2 bg-muted rounded-lg shadow-lg">{icon}</div>
           <CardTitle className="p-2">{title}</CardTitle>
         </div>
       </CardHeader>
