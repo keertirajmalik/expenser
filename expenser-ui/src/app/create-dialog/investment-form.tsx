@@ -64,7 +64,7 @@ export const InvestmentFormSchema = z.object({
       message: "Amount must be greater than 0.",
     }),
   date: z.date({
-    required_error: "Investment date is required.",
+    error: "Investment date is required.",
   }),
   note: z.string(),
 });
@@ -87,13 +87,13 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
 
   const { data: categories, isLoading } = useGetCategoryQuery();
   const handleCurrencyChange = useCurrencyFormat((value) =>
-    form.setValue("amount", value)
+    form.setValue("amount", value),
   );
 
   useEffect(() => {
     if (!isLoading && categories) {
       const filtered = categories.filter(
-        (category: Category) => category.type == CategoryType.Investment
+        (category: Category) => category.type == CategoryType.Investment,
       );
       setFilteredCategories(filtered);
 
@@ -101,7 +101,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
         form.reset(initialData);
         if (initialData.category) {
           const categoryOption = filtered.find(
-            (category) => category.name === initialData.category
+            (category) => category.name === initialData.category,
           );
           if (categoryOption) {
             form.setValue("category", categoryOption.id);
@@ -147,12 +147,12 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                       role="combobox"
                       className={cn(
                         "justify-between",
-                        !field.value && "text-muted-foreground"
+                        !field.value && "text-muted-foreground",
                       )}
                     >
                       {field.value
                         ? filteredCategories?.find(
-                            (category) => category.id === field.value
+                            (category) => category.id === field.value,
                           )?.name
                         : "Select Investment Category"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -180,7 +180,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                                 "ml-auto",
                                 category.id === field.value
                                   ? "opacity-100"
-                                  : "opacity-0"
+                                  : "opacity-0",
                               )}
                             />
                           </CommandItem>
@@ -229,7 +229,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
                       variant={"outline"}
                       className={cn(
                         "pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
+                        !field.value && "text-muted-foreground",
                       )}
                     >
                       {field.value ? (

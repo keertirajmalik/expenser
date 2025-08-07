@@ -64,7 +64,7 @@ export const IncomeFormSchema = z.object({
       message: "Amount must be greater than 0.",
     }),
   date: z.date({
-    required_error: "Income date is required.",
+    error: "Income date is required.",
   }),
   note: z.string(),
 });
