@@ -115,7 +115,7 @@ const Carousel = (
   }, [api, onSelect])
 
   return (
-    <CarouselContext.Provider
+    (<CarouselContext
       value={{
         carouselRef,
         api: api,
@@ -138,8 +138,8 @@ const Carousel = (
       >
         {children}
       </div>
-    </CarouselContext.Provider>
-  )
+    </CarouselContext>)
+  );
 }
 Carousel.displayName = "Carousel"
 

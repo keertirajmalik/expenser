@@ -40,7 +40,7 @@ export const UserProvider = ({
   }, [name, username, profileImage]);
 
   return (
-    <UserContext.Provider
+    (<UserContext
       value={{
         name,
         setName,
@@ -51,7 +51,7 @@ export const UserProvider = ({
       }}
     >
       {children}
-    </UserContext.Provider>
+    </UserContext>)
   );
 };
 
