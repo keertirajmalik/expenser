@@ -26,7 +26,7 @@ export const CategoryFormSchema = z.object({
   }),
   type: z
     .string({
-      required_error: "Please select a category type",
+      error: "Please select a category type",
     })
     .refine((val) => ["Expense", "Investment", "Income"].includes(val), {
       message: "Type must be either 'Expense' or 'Investment' or 'Income'",
