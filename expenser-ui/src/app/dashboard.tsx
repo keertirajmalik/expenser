@@ -1,8 +1,8 @@
 import { BarChartComponent } from "@/components/chart/bar-chart";
 import { CardComponent } from "@/components/chart/card-component";
 import {
-    LineChartComponent,
-    LineChartData,
+  LineChartComponent,
+  LineChartData,
 } from "@/components/chart/line-chart";
 import { PieChartComponent, PieChartData } from "@/components/chart/pie-chart";
 import { Separator } from "@/components/ui/separator";
@@ -54,7 +54,9 @@ export default function Dashboard() {
         <Separator orientation="vertical" className="mr-2 h-4" />
         <div className="flex flex-col">
           <h1 className="text-lg font-semibold">Dashboard</h1>
-          <p className={`text-sm text-gray-500 ${isMobile ? "sr-only" : ""}`}>
+          <p
+            className={`text-sm text-muted-foreground ${isMobile ? "sr-only" : ""}`}
+          >
             Keep Track, Assess, and Enhance Your Financial Performance
           </p>
         </div>
@@ -139,21 +141,24 @@ const generateLineChartData = (
 ): LineChartData[] => {
   const dataMap: Record<string, LineChartData> = {};
   // Helper function to process each data array
-    const processData = (items: Array<{date: string | Date, amount: string}>, field: 'expense' | 'income' | 'investment') => {
-      for (const item of items) {
-        const month = formatDate(item.date.toString());
-        const amount = parseFloat(item.amount);
+  const processData = (
+    items: Array<{ date: string | Date; amount: string }>,
+    field: "expense" | "income" | "investment",
+  ) => {
+    for (const item of items) {
+      const month = formatDate(item.date.toString());
+      const amount = parseFloat(item.amount);
 
-        if (!dataMap[month]) {
-          dataMap[month] = { month, expense: 0, income: 0, investment: 0 };
-        }
-        dataMap[month][field] += amount;
+      if (!dataMap[month]) {
+        dataMap[month] = { month, expense: 0, income: 0, investment: 0 };
       }
-    };
+      dataMap[month][field] += amount;
+    }
+  };
 
-    processData(expenses, 'expense');
-    processData(incomes, 'income');
-    processData(investments, 'investment');
+  processData(expenses, "expense");
+  processData(incomes, "income");
+  processData(investments, "investment");
 
   return Object.values(dataMap);
 };

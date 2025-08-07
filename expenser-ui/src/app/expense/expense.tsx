@@ -26,7 +26,9 @@ export default function Expense() {
           />
           <section className="flex flex-col">
             <h1 className="text-lg font-semibold">Expense</h1>
-            <p className={`text-sm text-gray-500 ${isMobile ? "sr-only" : ""}`}>
+            <p
+              className={`text-sm text-muted-foreground ${isMobile ? "sr-only" : ""}`}
+            >
               List of Your Expenses
             </p>
           </section>

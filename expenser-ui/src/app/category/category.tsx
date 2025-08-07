@@ -25,7 +25,9 @@ export default function Category() {
           />
           <section className="flex flex-col">
             <h1 className="text-lg font-semibold">Category</h1>
-            <p className={`text-sm text-gray-500 ${isMobile ? "sr-only" : ""}`}>
+            <p
+              className={`text-sm text-muted-foreground ${isMobile ? "sr-only" : ""}`}
+            >
               List of Your Categories
             </p>
           </section>

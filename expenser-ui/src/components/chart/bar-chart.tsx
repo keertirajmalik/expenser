@@ -36,7 +36,7 @@ const generateChartData = (expenses: Expense[], limit = 6): ChartData[] => {
 const chartConfig = {
   expense: {
     label: "Expenses",
-    color: "hsl(var(--chart-2))",
+    color: "var(--color-chart-2)",
   },
 } satisfies ChartConfig;
 
