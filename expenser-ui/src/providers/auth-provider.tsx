@@ -2,7 +2,7 @@ import {
   createContext,
   JSX,
   ReactNode,
-  useContext,
+  use,
   useEffect,
   useState,
 } from "react";
@@ -65,14 +65,14 @@ export const AuthProvider = ({
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, handleLogin, handleLogout }}>
+    (<AuthContext value={{ isLoggedIn, handleLogin, handleLogout }}>
       {children}
-    </AuthContext.Provider>
+    </AuthContext>)
   );
 };
 
 export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
+  const context = use(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
