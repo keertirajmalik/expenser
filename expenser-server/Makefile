@@ -1,7 +1,6 @@
 include .env
 export $(shell sed 's/=.*//' .env)
 
-
 watch:
 	@if command -v air > /dev/null; then \
 		air; \
@@ -20,7 +19,7 @@ watch:
 
 # Create DB container
 docker-run:
-	@if docker compose up  db -d --build 2>/dev/null; then \
+	@if docker compose up db -d --build 2>/dev/null; then \
 		: ; \
 	else \
 		echo "Falling back to Docker Compose V1"; \
