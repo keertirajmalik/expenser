@@ -38,6 +38,8 @@ func (s *Server) RegisterRoutes(config model.Config) http.Handler {
 	mux.HandleFunc("GET /cxf/income", handler.HandleIncomeGet(config.IncomeService))
 	mux.HandleFunc("PUT /cxf/income/{id}", handler.HandleIncomeUpdate(config.IncomeService))
 	mux.HandleFunc("DELETE /cxf/income/{id}", handler.HandleIncomeDelete(config.IncomeService))
+
+	mux.HandleFunc("POST /cxf/bulk-import", handler.HandleTransactionImport())
 	return mux
 }
 
