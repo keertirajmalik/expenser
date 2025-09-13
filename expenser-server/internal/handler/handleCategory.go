@@ -12,7 +12,11 @@ import (
 
 func HandleCategoryGet(categoryService model.CategoryService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 		categories, err := categoryService.GetCategoriesFromDB(r.Context(), userID)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "Failed to retrieve categories")
@@ -42,7 +46,11 @@ func HandleCategoryCreate(categoryService model.CategoryService) http.HandlerFun
 			return
 		}
 
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 		category, err := categoryService.AddCategoryToDB(r.Context(), model.Category{
 			ID:          uuid.New(),
 			Name:        params.Name,
@@ -56,7 +64,7 @@ func HandleCategoryCreate(categoryService model.CategoryService) http.HandlerFun
 			return
 		}
 
-		respondWithJson(w, http.StatusOK, category)
+		respondWithJson(w, http.StatusCreated, category)
 	}
 }
 
@@ -93,7 +101,11 @@ func HandleCategoryUpdate(categoryService model.CategoryService) http.HandlerFun
 			return
 		}
 
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 		category, err := categoryService.UpdateCategoryInDB(r.Context(), model.Category{
 			ID:          id,
 			Name:        params.Name,
@@ -120,7 +132,11 @@ func HandleCategoryDelete(categoryService model.CategoryService) http.HandlerFun
 			return
 		}
 
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 		err = categoryService.DeleteCategoryFromDB(r.Context(), id, userID)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())

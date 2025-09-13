@@ -13,10 +13,15 @@ import (
 
 func HandleTransactionGet(transactionService model.TransactionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
+
 		transactions, err := transactionService.GetTransactionsFromDB(r.Context(), userID)
 		if err != nil {
-			logger.Error("Error while fetching tranasactions", map[string]any{
+			logger.Error("Error while fetching transactions", map[string]any{
 				"error": err,
 			})
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -49,7 +54,11 @@ func HandleTransactionCreate(transactionService model.TransactionService) http.H
 			return
 		}
 
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 
 		transaction := model.InputTransaction{
 			ID:       uuid.New(),
@@ -66,7 +75,7 @@ func HandleTransactionCreate(transactionService model.TransactionService) http.H
 			respondWithError(w, http.StatusBadRequest, err.Error())
 			return
 		}
-		respondWithJson(w, http.StatusOK, dbTransaction)
+		respondWithJson(w, http.StatusCreated, dbTransaction)
 	}
 }
 
@@ -104,7 +113,11 @@ func HandleTransactionUpdate(transactionService model.TransactionService) http.H
 			return
 		}
 
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 
 		transaction := model.InputTransaction{
 			ID:       id,
@@ -139,7 +152,11 @@ func HandleTransactionDelete(transactionService model.TransactionService) http.H
 			return
 		}
 
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 		err = transactionService.DeleteTransactionFromDB(r.Context(), id, userID)
 		if err != nil {
 			logger.Error("Error while deleting transaction", map[string]any{

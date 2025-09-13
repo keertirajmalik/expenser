@@ -15,7 +15,11 @@ import (
 
 func HandleIncomeGet(incomeService model.IncomeService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 		incomes, err := incomeService.GetIncomesFromDB(r.Context(), userID)
 		if err != nil {
 			logger.Error("Error while fetching incomes", map[string]interface{}{
@@ -51,7 +55,11 @@ func HandleIncomeCreate(incomeService model.IncomeService) http.HandlerFunc {
 			return
 		}
 
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 
 		income := model.InputIncome{
 			ID:       uuid.New(),
@@ -106,7 +114,11 @@ func HandleIncomeUpdate(incomeService model.IncomeService) http.HandlerFunc {
 			return
 		}
 
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 
 		income := model.InputIncome{
 			ID:       id,
@@ -141,7 +153,11 @@ func HandleIncomeDelete(incomeService model.IncomeService) http.HandlerFunc {
 			return
 		}
 
-		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 		err = incomeService.DeleteIncomeFromDB(r.Context(), id, userID)
 		if err != nil {
 			if err == pgx.ErrNoRows {
