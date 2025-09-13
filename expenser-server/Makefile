@@ -23,7 +23,7 @@ docker-run:
 		: ; \
 	else \
 		echo "Falling back to Docker Compose V1"; \
-		docker-compose up db --build; \
+		docker-compose up db -d --build; \
 	fi
 	@for i in {1..10}; do \
 		if echo > /dev/tcp/localhost/5432 2>/dev/null; then \

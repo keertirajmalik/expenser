@@ -2,7 +2,6 @@ package util
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -21,13 +20,20 @@ func ReadExcelFile(filename string) ([]model.BulkTransaction, error) {
 		return nil, err
 	}
 	defer func() {
-		// Close the spreadsheet.
-		if err := f.Close(); err != nil {
-			fmt.Println(err)
+		if cerr := f.Close(); cerr != nil {
+			logger.Error("failed to close excel file", map[string]any{
+				"error":    cerr.Error(),
+				"filename": filename,
+			})
 		}
 	}()
+
 	// Get all the rows in the Sheet1.
-	rows, err := f.GetRows(f.GetSheetName(0))
+	sheet := f.GetSheetName(0)
+	if sheet == "" {
+		return nil, errors.New("excel file has no sheets")
+	}
+	rows, err := f.GetRows(sheet)
 	if err != nil {
 		logger.Error("empty excel sheet uploaded", map[string]any{
 			"error":    err.Error(),
@@ -37,12 +43,14 @@ func ReadExcelFile(filename string) ([]model.BulkTransaction, error) {
 	}
 
 	//check for the table titles
-	if !strings.Contains("Serial Number Transaction Date Transaction Remark CR/DR Amount(INR)", strings.Join(rows[0], " ")) {
+	expectedHeader := "Serial Number Transaction Date Transaction Remark CR/DR Amount(INR)"
+	actualHeader := strings.Join(rows[0], " ")
+	if !strings.Contains(actualHeader, expectedHeader) {
 		logger.Error("remove the extra cell from sheet till the transaction table header", map[string]any{
-			"error":  "file has additional cells on top of file",
+			"error":  "file has additional cells on top of transactions table keep only the transaction details table",
 			"header": rows[0],
 		})
-		return nil, errors.New("remove the extra cell from sheet till the transaction table header")
+		return nil, errors.New("remove the extra cell from sheet till the transaction table header keep only the transaction table")
 	}
 
 	var transactions []model.BulkTransaction
@@ -64,10 +72,12 @@ func ReadExcelFile(filename string) ([]model.BulkTransaction, error) {
 			})
 			return nil, errors.New("remove the extra cell in sheet from the bottom of transaction table")
 		}
+
+		transactionType := strings.TrimSpace(row[3])
 		transaction := model.BulkTransaction{
-			Name:    row[2],
-			Date:    row[1],
-			Expense: row[3] == "Dr.",
+			Name:    strings.TrimSpace(row[2]),
+			Date:    strings.TrimSpace(row[1]),
+			Expense: strings.EqualFold(transactionType, "Dr.") || strings.EqualFold(transactionType, "DR"),
 			Amount:  amount,
 		}
 		transactions = append(transactions, transaction)

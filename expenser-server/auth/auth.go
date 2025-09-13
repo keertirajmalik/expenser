@@ -56,7 +56,7 @@ func GetBearerToken(header http.Header) (string, error) {
 func ValidateJWT(tokenString string, tokenSecret []byte) (uuid.UUID, error) {
 	claimStruct := jwt.RegisteredClaims{}
 
-	token, err := jwt.ParseWithClaims(tokenString, &claimStruct, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &claimStruct, func(t *jwt.Token) (any, error) {
 		return []byte(tokenSecret), nil
 	})
 
