@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/keertirajmalik/expenser/expenser-server/auth"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 	"github.com/keertirajmalik/expenser/expenser-server/logger"
 	"github.com/shopspring/decimal"
@@ -12,10 +13,10 @@ import (
 
 func HandleTransactionGet(transactionService model.TransactionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
 		transactions, err := transactionService.GetTransactionsFromDB(r.Context(), userID)
 		if err != nil {
-			logger.Error("Error while fetching tranasactions", map[string]interface{}{
+			logger.Error("Error while fetching tranasactions", map[string]any{
 				"error": err,
 			})
 			respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -40,7 +41,7 @@ func HandleTransactionCreate(transactionService model.TransactionService) http.H
 		params := parameters{}
 		err := decoder.Decode(&params)
 		if err != nil {
-			logger.Error("Error while decoding parameters", map[string]interface{}{
+			logger.Error("Error while decoding parameters", map[string]any{
 				"params": params,
 				"error":  err,
 			})
@@ -48,7 +49,7 @@ func HandleTransactionCreate(transactionService model.TransactionService) http.H
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
 
 		transaction := model.InputTransaction{
 			ID:       uuid.New(),
@@ -83,7 +84,7 @@ func HandleTransactionUpdate(transactionService model.TransactionService) http.H
 
 		id, err := uuid.Parse(idStr)
 		if err != nil {
-			logger.Error("Error while parsing transaction ID", map[string]interface{}{
+			logger.Error("Error while parsing transaction ID", map[string]any{
 				"error": err,
 				"uuid":  idStr,
 			})
@@ -95,7 +96,7 @@ func HandleTransactionUpdate(transactionService model.TransactionService) http.H
 		params := parameters{}
 		err = decoder.Decode(&params)
 		if err != nil {
-			logger.Error("Error while decoding parameters", map[string]interface{}{
+			logger.Error("Error while decoding parameters", map[string]any{
 				"error":  err,
 				"params": params,
 			})
@@ -103,7 +104,7 @@ func HandleTransactionUpdate(transactionService model.TransactionService) http.H
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
 
 		transaction := model.InputTransaction{
 			ID:       id,
@@ -130,7 +131,7 @@ func HandleTransactionDelete(transactionService model.TransactionService) http.H
 
 		id, err := uuid.Parse(idStr)
 		if err != nil {
-			logger.Error("Error while parsing uuid", map[string]interface{}{
+			logger.Error("Error while parsing uuid", map[string]any{
 				"error": err,
 				"uuid":  idStr,
 			})
@@ -138,10 +139,10 @@ func HandleTransactionDelete(transactionService model.TransactionService) http.H
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
 		err = transactionService.DeleteTransactionFromDB(r.Context(), id, userID)
 		if err != nil {
-			logger.Error("Error while deleting transaction", map[string]interface{}{
+			logger.Error("Error while deleting transaction", map[string]any{
 				"transaction_id": id,
 				"user_id":        userID,
 				"error":          err,

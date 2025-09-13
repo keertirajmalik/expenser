@@ -25,7 +25,11 @@ func HandleTransactionImport() http.HandlerFunc {
 			return
 		}
 
-		defer file.Close()
+		defer func() {
+			if cerr := file.Close(); cerr != nil {
+				logger.Error("failed to close temp file", map[string]any{"error": cerr, "name": handler.Filename})
+			}
+		}()
 
 		ext := strings.ToLower(filepath.Ext(handler.Filename))
 		if ext == ".xls" {

@@ -17,7 +17,7 @@ func HandleUserGet(userService model.UserService) http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
 
 		user, err := userService.GetUserByUserIdFromDB(r.Context(), userID)
 		if err != nil {
@@ -81,7 +81,7 @@ func HandleUserUpdate(userService model.UserService) http.HandlerFunc {
 		Image string `json:"image"`
 	}
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
 
 		decoder := json.NewDecoder(r.Body)
 		decoder.DisallowUnknownFields()

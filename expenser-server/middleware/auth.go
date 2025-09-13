@@ -37,7 +37,7 @@ func AuthMiddleware(jwtSecret string) Middleware {
 			}
 
 			// Add userID to request context
-			ctx := context.WithValue(r.Context(), "userID", userID)
+			ctx := context.WithValue(r.Context(), auth.UserIDKey, userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

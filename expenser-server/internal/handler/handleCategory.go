@@ -5,13 +5,14 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/keertirajmalik/expenser/expenser-server/auth"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 	"github.com/keertirajmalik/expenser/expenser-server/logger"
 )
 
 func HandleCategoryGet(categoryService model.CategoryService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
 		categories, err := categoryService.GetCategoriesFromDB(r.Context(), userID)
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "Failed to retrieve categories")
@@ -41,7 +42,7 @@ func HandleCategoryCreate(categoryService model.CategoryService) http.HandlerFun
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
 		category, err := categoryService.AddCategoryToDB(r.Context(), model.Category{
 			ID:          uuid.New(),
 			Name:        params.Name,
@@ -92,7 +93,7 @@ func HandleCategoryUpdate(categoryService model.CategoryService) http.HandlerFun
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
 		category, err := categoryService.UpdateCategoryInDB(r.Context(), model.Category{
 			ID:          id,
 			Name:        params.Name,
@@ -119,7 +120,7 @@ func HandleCategoryDelete(categoryService model.CategoryService) http.HandlerFun
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID := r.Context().Value(auth.UserIDKey).(uuid.UUID)
 		err = categoryService.DeleteCategoryFromDB(r.Context(), id, userID)
 		if err != nil {
 			respondWithError(w, http.StatusBadRequest, err.Error())
