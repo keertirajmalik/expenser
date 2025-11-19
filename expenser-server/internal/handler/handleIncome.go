@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/keertirajmalik/expenser/expenser-server/auth"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 	"github.com/keertirajmalik/expenser/expenser-server/logger"
 	"github.com/shopspring/decimal"
@@ -14,7 +15,11 @@ import (
 
 func HandleIncomeGet(incomeService model.IncomeService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 		incomes, err := incomeService.GetIncomesFromDB(r.Context(), userID)
 		if err != nil {
 			logger.Error("Error while fetching incomes", map[string]interface{}{
@@ -50,7 +55,11 @@ func HandleIncomeCreate(incomeService model.IncomeService) http.HandlerFunc {
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 
 		income := model.InputIncome{
 			ID:       uuid.New(),
@@ -105,7 +114,11 @@ func HandleIncomeUpdate(incomeService model.IncomeService) http.HandlerFunc {
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 
 		income := model.InputIncome{
 			ID:       id,
@@ -140,7 +153,11 @@ func HandleIncomeDelete(incomeService model.IncomeService) http.HandlerFunc {
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 		err = incomeService.DeleteIncomeFromDB(r.Context(), id, userID)
 		if err != nil {
 			if err == pgx.ErrNoRows {
@@ -149,8 +166,8 @@ func HandleIncomeDelete(incomeService model.IncomeService) http.HandlerFunc {
 			}
 			logger.Error("Error while deleting income", map[string]interface{}{
 				"incomeId": id,
-				"userId":       userID,
-				"error":        err,
+				"userId":   userID,
+				"error":    err,
 			})
 			respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Failed to delete income: %v", err))
 			return

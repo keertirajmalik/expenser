@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/keertirajmalik/expenser/expenser-server/auth"
 	"github.com/keertirajmalik/expenser/expenser-server/internal/model"
 	"github.com/keertirajmalik/expenser/expenser-server/logger"
 	"github.com/shopspring/decimal"
@@ -14,7 +15,11 @@ import (
 
 func HandleInvestmentGet(investmentService model.InvestmentService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 		investments, err := investmentService.GetInvestmentsFromDB(r.Context(), userID)
 		if err != nil {
 			logger.Error("Error while fetching investments", map[string]interface{}{
@@ -50,7 +55,11 @@ func HandleInvestmentCreate(investmentService model.InvestmentService) http.Hand
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 
 		investment := model.InputInvestment{
 			ID:       uuid.New(),
@@ -105,7 +114,11 @@ func HandleInvestmentUpdate(investmentService model.InvestmentService) http.Hand
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 
 		investment := model.InputInvestment{
 			ID:       id,
@@ -140,7 +153,11 @@ func HandleInvestmentDelete(investmentService model.InvestmentService) http.Hand
 			return
 		}
 
-		userID := r.Context().Value("userID").(uuid.UUID)
+		userID, ok := auth.UserIDFromContext(r.Context())
+		if !ok {
+			respondWithError(w, http.StatusUnauthorized, "Unauthorized")
+			return
+		}
 		err = investmentService.DeleteInvestmentFromDB(r.Context(), id, userID)
 		if err != nil {
 			if err == pgx.ErrNoRows {

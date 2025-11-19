@@ -24,20 +24,20 @@ func AuthMiddleware(jwtSecret string) Middleware {
 
 			token, err := auth.GetBearerToken(r.Header)
 			if err != nil {
-				logger.Error("error with token", map[string]interface{}{"error": err})
+				logger.Error("error with token", map[string]any{"error": err})
 				respondWithJson(w, err)
 				return
 			}
 
 			userID, err := auth.ValidateJWT(token, []byte(jwtSecret))
 			if err != nil {
-				logger.Error("error with token", map[string]interface{}{"error": err})
+				logger.Error("error with token", map[string]any{"error": err})
 				respondWithJson(w, err)
 				return
 			}
 
 			// Add userID to request context
-			ctx := context.WithValue(r.Context(), "userID", userID)
+			ctx := context.WithValue(r.Context(), auth.UserIDKey, userID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -48,12 +48,17 @@ func respondWithJson(w http.ResponseWriter, err error) {
 		Error: err.Error(),
 	})
 	if err != nil {
-		logger.Error("Error marshalling JSON", map[string]interface{}{"error": err})
+		logger.Error("Error marshalling JSON", map[string]any{"error": err})
 		w.WriteHeader(500)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusUnauthorized)
-	w.Write(dat)
+	_, err = w.Write(dat)
+	if err != nil {
+		logger.Error("error while writing the response", map[string]any{"error": err})
+		w.WriteHeader(500)
+		return
+	}
 }
