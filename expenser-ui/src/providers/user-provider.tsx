@@ -2,7 +2,7 @@ import {
   createContext,
   JSX,
   ReactNode,
-  useContext,
+  use,
   useEffect,
   useState,
 } from "react";
@@ -40,7 +40,7 @@ export const UserProvider = ({
   }, [name, username, profileImage]);
 
   return (
-    <UserContext.Provider
+    (<UserContext
       value={{
         name,
         setName,
@@ -51,12 +51,12 @@ export const UserProvider = ({
       }}
     >
       {children}
-    </UserContext.Provider>
+    </UserContext>)
   );
 };
 
 export const useUser = (): UserContextType => {
-  const context = useContext(UserContext);
+  const context = use(UserContext);
   if (!context) {
     throw new Error("useUser must be used within a UserProvider");
   }
