@@ -8,6 +8,6 @@ export function showToast(
   toast({
     title: title,
     description: description,
-    variant: variant,
+    variant: variant ?? undefined,
   });
 }
