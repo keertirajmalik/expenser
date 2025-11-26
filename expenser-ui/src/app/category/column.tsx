@@ -34,6 +34,7 @@ export const columns: ColumnDef<Category>[] = [
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
       const [editSheetOpen, setEditSheetOpen] = useState(false);
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
