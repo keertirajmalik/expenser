@@ -241,7 +241,7 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="p-2" align="start">
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -253,7 +253,9 @@ export function IncomeForm({ initialData, onSubmit }: IncomeFormProps) {
                     disabled={(date) =>
                       date > new Date() || date < new Date("1900-01-01")
                     }
-                    initialFocus
+                    className="w-auto rounded-lg border"
+                    captionLayout="dropdown"
+                    autoFocus
                   />
                 </PopoverContent>
               </Popover>

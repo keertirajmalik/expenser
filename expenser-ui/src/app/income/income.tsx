@@ -4,7 +4,7 @@ import { DataTable } from "@/components/data-table/data-table";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetIncomeQuery } from "@/hooks/use-income-query";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Separator } from "@radix-ui/react-separator";
+import { Separator } from "@/components/ui/separator";
 
 export default function Income() {
   const { data } = useGetIncomeQuery();

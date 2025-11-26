@@ -86,7 +86,7 @@ export const Dropzone = ({
   });
 
   return (
-    <DropzoneContext.Provider
+    (<DropzoneContext
       key={JSON.stringify(src)}
       value={{ src, accept, maxSize, minSize, maxFiles }}
     >
@@ -104,7 +104,7 @@ export const Dropzone = ({
         <input {...getInputProps()} disabled={disabled} />
         {children}
       </Button>
-    </DropzoneContext.Provider>
+    </DropzoneContext>)
   );
 };
 

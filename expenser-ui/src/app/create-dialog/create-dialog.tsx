@@ -82,15 +82,19 @@ export function CreateDialog({
     case "Expense":
       formComponent = <ExpenseForm onSubmit={onExpenseSubmit} />;
       break;
+
     case "Category":
       formComponent = <CategoryForm onSubmit={onCategorySubmit} />;
       break;
+
     case "Investment":
       formComponent = <InvestmentForm onSubmit={onInvestmentSubmit} />;
       break;
+
     case "Income":
       formComponent = <IncomeForm onSubmit={onIncomeSubmit} />;
       break;
+
     default:
       formComponent = null;
   }

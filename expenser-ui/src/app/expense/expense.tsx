@@ -1,11 +1,11 @@
 import { CreateDialog } from "@/app/create-dialog/create-dialog";
 import { columns } from "@/app/expense/column";
 import { DataTable } from "@/components/data-table/data-table";
+import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetExpensesQuery } from "@/hooks/use-expense-query";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Separator } from "@radix-ui/react-separator";
 
 export default function Expense() {
   const { data } = useGetExpensesQuery();

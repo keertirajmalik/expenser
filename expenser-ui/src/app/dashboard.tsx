@@ -45,20 +45,26 @@ export default function Dashboard() {
   const trendingDownColor = theme === "dark" ? "#ff0000" : "#d31212";
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-2">
+    <div className="flex h-96 w-full flex-col gap-2">
       <header
-        className="flex h-16 shrink-0 items-center gap-2 border-b px-4"
+        className="flex h-16 shrink-0 justify-between items-center gap-2 border-b px-4"
         role="banner"
       >
-        <SidebarTrigger className="-ml-1" />
-        <Separator orientation="vertical" className="mr-2 h-4" />
-        <div className="flex flex-col">
-          <h1 className="text-lg font-semibold">Dashboard</h1>
-          <p
-            className={`text-sm text-muted-foreground ${isMobile ? "sr-only" : ""}`}
-          >
-            Keep Track, Assess, and Enhance Your Financial Performance
-          </p>
+        <div className="flex items-center gap-2">
+          <SidebarTrigger className="-ml-1" aria-label="Toggle sidebar" />
+          <Separator
+            orientation="vertical"
+            className="bg-border w-px mr-2 h-4"
+            decorative={true}
+          />
+          <section className="flex flex-col">
+            <h1 className="text-lg font-semibold">Dashboard</h1>
+            <p
+              className={`text-sm text-muted-foreground ${isMobile ? "sr-only" : ""}`}
+            >
+              Keep Track, Assess, and Enhance Your Financial Performance
+            </p>
+          </section>
         </div>
       </header>
       <main

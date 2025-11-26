@@ -1,10 +1,10 @@
 import { columns } from "@/app/category/column";
 import { CreateDialog } from "@/app/create-dialog/create-dialog";
 import { DataTable } from "@/components/data-table/data-table";
+import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetCategoryQuery } from "@/hooks/use-category-query";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Separator } from "@radix-ui/react-separator";
 
 export default function Category() {
   const { data } = useGetCategoryQuery();
