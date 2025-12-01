@@ -1,20 +1,20 @@
 import AccountPage from "@/app/sidebar/account";
-import ImportTransactionPage from "@/app/sidebar/import-transaction";
+import ImportAndReviewPage from "@/app/sidebar/import/transaction";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    useSidebar,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetUserQuery } from "@/hooks/use-user-query";
@@ -22,7 +22,7 @@ import { generateAvatarName } from "@/lib/utils";
 import { useAuth } from "@/providers/auth-provider";
 import { BadgeCheck, ChevronsUpDown, Import, LogOut } from "lucide-react";
 import { useState } from "react";
-;
+
 
 export function NavUser() {
   const { isMobile } = useSidebar();
@@ -92,7 +92,6 @@ export function NavUser() {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setImportOpen(true)}>
                   <Import />
-                  {/*https://ui.shadcn.com/docs/components/input*/}
                   Import Transactions
                 </DropdownMenuItem>
               </DropdownMenuGroup>
@@ -115,10 +114,7 @@ export function NavUser() {
         username={data?.username ?? ""}
         profileImage={data?.image ?? ""}
       />
-      <ImportTransactionPage
-        open={importOpen}
-        setOpen={setImportOpen}
-      />
+      <ImportAndReviewPage open={importOpen} setOpen={setImportOpen}/>
     </>
   );
 }
