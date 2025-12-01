@@ -27,6 +27,7 @@ import { useGetCategoryQuery } from "@/hooks/use-category-query";
 import { useCurrencyFormat } from "@/hooks/use-currency-format";
 import { cn } from "@/lib/utils";
 import { Category, CategoryType } from "@/types/category";
+import { TransactionFormSchema } from "@/types/transaction-form-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
@@ -35,7 +36,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 interface InvestmentFormProps {
-  onSubmit: (data: z.infer<typeof InvestmentFormSchema>) => void;
+  onSubmit: (data: z.infer<typeof TransactionFormSchema>) => void;
   initialData?: {
     name: string;
     category: string;
@@ -45,37 +46,13 @@ interface InvestmentFormProps {
   };
 }
 
-export const InvestmentFormSchema = z.object({
-  name: z.string().nonempty({
-    message: "Investment name is required.",
-  }),
-  category: z.string().nonempty({
-    message: "Investment category is required.",
-  }),
-  amount: z
-    .string()
-    .nonempty({ message: "Investment amount is required." })
-    .transform((val) => val.replace(/[^0-9.]/g, "")) // Remove currency formatting
-    .refine((val) => /^(?:\d{1,15}|\d{1,15}\.\d{1,4})$/.test(val), {
-      message:
-        "Amount must be a positive number with up to 4 decimal places (max 15 digits).",
-    })
-    .refine((val) => parseFloat(val) > 0, {
-      message: "Amount must be greater than 0.",
-    }),
-  date: z.date({
-    error: "Investment date is required.",
-  }),
-  note: z.string(),
-});
-
 export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
   const [openCategory, setOpenCategory] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
 
-  const form = useForm<z.infer<typeof InvestmentFormSchema>>({
-    resolver: zodResolver(InvestmentFormSchema),
+  const form = useForm<z.infer<typeof TransactionFormSchema>>({
+    resolver: zodResolver(TransactionFormSchema),
     defaultValues: initialData || {
       name: "",
       category: "",
