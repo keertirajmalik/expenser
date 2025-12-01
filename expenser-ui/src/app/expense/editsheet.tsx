@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { parseDate } from "@/lib/dateUtil";
 import { Expense } from "@/types/expense";
-import { TransactionFormSchema } from "@/types/transaction-form-schema";
+import { TransactionFormSchema } from "@/types/form-schema/transaction";
 import { Row } from "@tanstack/react-table";
 import { z } from "zod";
 

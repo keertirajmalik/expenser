@@ -15,7 +15,7 @@ import {
   useUpdateExpenseMutation,
 } from "@/hooks/use-expense-query";
 import { Expense } from "@/types/expense";
-import { TransactionFormSchema } from "@/types/transaction-form-schema";
+import { TransactionFormSchema } from "@/types/form-schema/transaction";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { useState } from "react";

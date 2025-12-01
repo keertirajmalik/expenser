@@ -27,7 +27,7 @@ import { useGetCategoryQuery } from "@/hooks/use-category-query";
 import { useCurrencyFormat } from "@/hooks/use-currency-format";
 import { cn } from "@/lib/utils";
 import { Category, CategoryType } from "@/types/category";
-import { TransactionFormSchema } from "@/types/transaction-form-schema";
+import { TransactionFormSchema, TransactionFormValues } from "@/types/form-schema/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
@@ -37,13 +37,7 @@ import { z } from "zod";
 
 interface ExpenseFormProps {
   onSubmit: (data: z.infer<typeof TransactionFormSchema>) => void;
-  initialData?: {
-    name: string;
-    category: string;
-    amount: string;
-    date: Date;
-    note: string;
-  };
+  initialData?: TransactionFormValues;
 }
 
 export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {

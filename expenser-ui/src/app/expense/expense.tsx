@@ -6,6 +6,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetExpensesQuery } from "@/hooks/use-expense-query";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { TransactionType } from "@/types/transaction";
 
 export default function Expense() {
   const { data } = useGetExpensesQuery();
@@ -34,9 +35,7 @@ export default function Expense() {
           </section>
         </div>
         <div className="sticky top-0 right-2">
-          <CreateDialog
-            creation="Expense"
-          />
+          <CreateDialog creation={TransactionType.Expense} />
         </div>
       </header>
       <main

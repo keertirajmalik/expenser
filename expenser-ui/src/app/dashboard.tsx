@@ -2,8 +2,8 @@ import { CreateDialog } from "@/app/create-dialog/create-dialog";
 import { BarChartComponent } from "@/components/chart/bar-chart";
 import { CardComponent } from "@/components/chart/card-component";
 import {
-    LineChartComponent,
-    LineChartData,
+  LineChartComponent,
+  LineChartData,
 } from "@/components/chart/line-chart";
 import { PieChartComponent, PieChartData } from "@/components/chart/pie-chart";
 import { Separator } from "@/components/ui/separator";
@@ -17,6 +17,7 @@ import { useTheme } from "@/providers/theme-provider";
 import { Expense } from "@/types/expense";
 import { Income } from "@/types/income";
 import { Investment } from "@/types/investment";
+import { TransactionType } from "@/types/transaction";
 import { format, parse } from "date-fns";
 import { DollarSign, TrendingDown, TrendingUp } from "lucide-react";
 import { useMemo } from "react";
@@ -68,9 +69,7 @@ export default function Dashboard() {
           </section>
         </div>
         <div className="sticky top-0 right-2">
-          <CreateDialog 
-            creation="Transaction"
-          />
+          <CreateDialog creation={TransactionType.Transaction} />
         </div>
       </header>
       <main

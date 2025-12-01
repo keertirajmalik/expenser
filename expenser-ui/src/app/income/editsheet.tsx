@@ -8,8 +8,8 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { parseDate } from "@/lib/dateUtil";
+import { TransactionFormSchema } from "@/types/form-schema/transaction";
 import { Income } from "@/types/income";
-import { TransactionFormSchema } from "@/types/transaction-form-schema";
 import { Row } from "@tanstack/react-table";
 import { z } from "zod";
 

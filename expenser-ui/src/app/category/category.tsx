@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetCategoryQuery } from "@/hooks/use-category-query";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { TransactionType } from "@/types/transaction";
 
 export default function Category() {
   const { data } = useGetCategoryQuery();
@@ -33,9 +34,7 @@ export default function Category() {
           </section>
         </div>
         <div className="sticky top-0 right-2">
-          <CreateDialog
-            creation="Category"
-          />
+          <CreateDialog creation={TransactionType.Category} />
         </div>
       </header>
       <main className="flex min-h-[calc(100vh-4rem)] w-full justify-center py-4">

@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetInvestmentQuery } from "@/hooks/use-investment-query";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { TransactionType } from "@/types/transaction";
 
 export default function Investment() {
   const { data } = useGetInvestmentQuery();
@@ -33,9 +34,7 @@ export default function Investment() {
           </section>
         </div>
         <div className="sticky top-0 right-2">
-          <CreateDialog
-            creation="Investment"
-          />
+          <CreateDialog creation={TransactionType.Investment} />
         </div>
       </header>
       <main className="flex flex-1 w-full justify-center py-4" role="main">

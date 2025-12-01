@@ -5,6 +5,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetIncomeQuery } from "@/hooks/use-income-query";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
+import { TransactionType } from "@/types/transaction";
 
 export default function Income() {
   const { data } = useGetIncomeQuery();
@@ -33,9 +34,7 @@ export default function Income() {
           </section>
         </div>
         <div className="sticky top-0 right-2">
-          <CreateDialog
-            creation="Income"
-          />
+          <CreateDialog creation={TransactionType.Income} />
         </div>
       </header>
       <main className="flex flex-1 w-full justify-center py-4" role="main">

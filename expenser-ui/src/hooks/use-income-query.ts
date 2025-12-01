@@ -1,7 +1,7 @@
 import { apiRequest } from "@/lib/apiRequest";
 import { showToast } from "@/lib/showToast";
 import { Income } from "@/types/income";
-import { TransactionFormSchema } from "@/types/transaction-form-schema";
+import { TransactionFormSchema } from "@/types/form-schema/transaction";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { z } from "zod";

@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod"; 
 
 export const TransactionFormSchema = z.object({
   name: z.string().nonempty({
@@ -23,3 +23,5 @@ export const TransactionFormSchema = z.object({
   }),
   note: z.string(),
 });
+
+export type TransactionFormValues = z.infer<typeof TransactionFormSchema>;

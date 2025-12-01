@@ -15,7 +15,7 @@ import {
   useUpdateInvestmentMutation,
 } from "@/hooks/use-investment-query";
 import { Investment } from "@/types/investment";
-import { TransactionFormSchema } from "@/types/transaction-form-schema";
+import { TransactionFormSchema } from "@/types/form-schema/transaction";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { useState } from "react";

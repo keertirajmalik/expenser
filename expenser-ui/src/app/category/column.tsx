@@ -1,5 +1,4 @@
 import { EditCategorySheet } from "@/app/category/editsheet";
-import { CategoryFormSchema } from "@/app/create-dialog/category-form";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
 import { DeleteDialog } from "@/components/data-table/row-action";
 import {
@@ -7,6 +6,7 @@ import {
   useUpdateCategoryMutation,
 } from "@/hooks/use-category-query";
 import { Category } from "@/types/category";
+import { CategoryFormSchema } from "@/types/form-schema/category";
 import { ColumnDef } from "@tanstack/react-table";
 import { Pencil, Trash } from "lucide-react";
 import { useState } from "react";
