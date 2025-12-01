@@ -1,4 +1,3 @@
-import { InvestmentFormSchema } from "@/app/create-dialog/investment-form";
 import { EditInvestmentSheet } from "@/app/investment/editsheet";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
 import { DeleteDialog } from "@/components/data-table/row-action";
@@ -16,6 +15,7 @@ import {
   useUpdateInvestmentMutation,
 } from "@/hooks/use-investment-query";
 import { Investment } from "@/types/investment";
+import { TransactionFormSchema } from "@/types/transaction-form-schema";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
@@ -78,7 +78,7 @@ export const columns: ColumnDef<Investment>[] = [
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
       const editInvestmentMutation = useUpdateInvestmentMutation();
-      const onSubmit = (data: z.infer<typeof InvestmentFormSchema>) => {
+      const onSubmit = (data: z.infer<typeof TransactionFormSchema>) => {
         editInvestmentMutation.mutate(
           { investment: data, id: row.original.id },
           {

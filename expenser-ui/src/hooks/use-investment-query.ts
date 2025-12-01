@@ -1,7 +1,7 @@
-import { InvestmentFormSchema } from "@/app/create-dialog/investment-form";
 import { apiRequest } from "@/lib/apiRequest";
 import { showToast } from "@/lib/showToast";
 import { Investment } from "@/types/investment";
+import { TransactionFormSchema } from "@/types/transaction-form-schema";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { z } from "zod";
@@ -21,7 +21,7 @@ export const useCreateInvestmentMutation = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: z.infer<typeof InvestmentFormSchema>) => {
+    mutationFn: async (data: z.infer<typeof TransactionFormSchema>) => {
       const investmentData = {
         ...data,
         amount: parseFloat(data.amount),
@@ -49,7 +49,7 @@ export const useUpdateInvestmentMutation = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: {
-      investment: z.infer<typeof InvestmentFormSchema>;
+      investment: z.infer<typeof TransactionFormSchema>;
       id: string;
     }) => {
       const investmentData = {

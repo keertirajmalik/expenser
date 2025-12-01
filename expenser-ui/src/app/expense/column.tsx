@@ -1,4 +1,3 @@
-import { ExpenseFormSchema } from "@/app/create-dialog/expense-form";
 import { EditExpenseSheet } from "@/app/expense/editsheet";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
 import { DeleteDialog } from "@/components/data-table/row-action";
@@ -16,6 +15,7 @@ import {
   useUpdateExpenseMutation,
 } from "@/hooks/use-expense-query";
 import { Expense } from "@/types/expense";
+import { TransactionFormSchema } from "@/types/transaction-form-schema";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
@@ -78,7 +78,7 @@ export const columns: ColumnDef<Expense>[] = [
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
       const editExpenseMutation = useUpdateExpenseMutation();
-      const onSubmit = (data: z.infer<typeof ExpenseFormSchema>) => {
+      const onSubmit = (data: z.infer<typeof TransactionFormSchema>) => {
         editExpenseMutation.mutate(
           { expense: data, id: row.original.id },
           {

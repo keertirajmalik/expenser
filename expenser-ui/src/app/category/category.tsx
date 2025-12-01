@@ -35,8 +35,6 @@ export default function Category() {
         <div className="sticky top-0 right-2">
           <CreateDialog
             creation="Category"
-            title="Create Expense Category"
-            description="Provide information regarding expense category."
           />
         </div>
       </header>

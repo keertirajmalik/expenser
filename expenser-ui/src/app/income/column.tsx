@@ -1,4 +1,3 @@
-import { IncomeFormSchema } from "@/app/create-dialog/income-form";
 import { EditIncomeSheet } from "@/app/income/editsheet";
 import { DataTableColumnHeader } from "@/components/data-table/column-header";
 import { DeleteDialog } from "@/components/data-table/row-action";
@@ -16,6 +15,7 @@ import {
   useUpdateIncomeMutation,
 } from "@/hooks/use-income-query";
 import { Income } from "@/types/income";
+import { TransactionFormSchema } from "@/types/transaction-form-schema";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { useState } from "react";
@@ -78,7 +78,7 @@ export const columns: ColumnDef<Income>[] = [
       const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
       const editIncomeMutation = useUpdateIncomeMutation();
-      const onSubmit = (data: z.infer<typeof IncomeFormSchema>) => {
+      const onSubmit = (data: z.infer<typeof TransactionFormSchema>) => {
         editIncomeMutation.mutate(
           { income: data, id: row.original.id },
           {

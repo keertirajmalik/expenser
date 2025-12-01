@@ -36,8 +36,6 @@ export default function Expense() {
         <div className="sticky top-0 right-2">
           <CreateDialog
             creation="Expense"
-            title="Create Expense"
-            description="Provide information regarding expense."
           />
         </div>
       </header>

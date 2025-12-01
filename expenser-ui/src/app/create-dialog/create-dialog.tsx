@@ -36,14 +36,25 @@ import { z } from "zod";
 interface CreateDialogProps {
   creation: "Expense" | "Category" | "Investment" | "Income" | "Transaction";
   initialData?: typeof TransactionFormSchema | typeof CategoryFormSchema;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  trigger?: React.ReactNode; // Optional custom trigger
 }
 
 export function CreateDialog({
   creation: creationCategory,
   initialData,
+  open: controlledOpen,
+  onOpenChange,
+  trigger,
 }: CreateDialogProps) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  // Use controlled open if provided, otherwise use internal state
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = onOpenChange || setInternalOpen;
   const [transactionType, setTransacationType] = useState(creationCategory);
+  const buttonName = creationCategory;
 
   const createExpenseMutation = useCreateExpenseMutation();
   const onExpenseSubmit = (data: z.infer<typeof TransactionFormSchema>) => {
@@ -96,7 +107,7 @@ export function CreateDialog({
     case "Expense":
       title = "Create Expense";
       description = "Provide information regarding your expense.";
-      defaultValue="expense"
+      defaultValue = "expense";
       formComponent = (
         <ExpenseForm
           onSubmit={onExpenseSubmit}
@@ -110,7 +121,7 @@ export function CreateDialog({
     case "Investment":
       title = "Create Investment";
       description = "Provide information regarding your investment.";
-      defaultValue = "investment"
+      defaultValue = "investment";
       formComponent = (
         <InvestmentForm
           onSubmit={onInvestmentSubmit}
@@ -124,7 +135,7 @@ export function CreateDialog({
     case "Income":
       title = "Create Income";
       description = "Provide information regarding your income.";
-      defaultValue = "income"
+      defaultValue = "income";
       formComponent = (
         <IncomeForm
           onSubmit={onIncomeSubmit}
@@ -139,17 +150,21 @@ export function CreateDialog({
       title = "Select transaction type";
       description = "Provide information regarding your income.";
       formComponent = null;
-      defaultValue = ""
+      defaultValue = "";
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="default">
-          <Plus />
-          Create {transactionType}
-        </Button>
-      </DialogTrigger>
+      {trigger !== null && (
+        <DialogTrigger asChild>
+          {trigger || (
+            <Button variant="default">
+              <Plus />
+              Create {buttonName}
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>

@@ -35,8 +35,6 @@ export default function Investment() {
         <div className="sticky top-0 right-2">
           <CreateDialog
             creation="Investment"
-            title="Create Investment"
-            description="Provide information regarding your investment."
           />
         </div>
       </header>

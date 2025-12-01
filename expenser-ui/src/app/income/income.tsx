@@ -35,8 +35,6 @@ export default function Income() {
         <div className="sticky top-0 right-2">
           <CreateDialog
             creation="Income"
-            title="Create Income"
-            description="Provide information regarding your income."
           />
         </div>
       </header>

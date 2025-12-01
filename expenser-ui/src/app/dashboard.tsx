@@ -1,8 +1,9 @@
+import { CreateDialog } from "@/app/create-dialog/create-dialog";
 import { BarChartComponent } from "@/components/chart/bar-chart";
 import { CardComponent } from "@/components/chart/card-component";
 import {
-  LineChartComponent,
-  LineChartData,
+    LineChartComponent,
+    LineChartData,
 } from "@/components/chart/line-chart";
 import { PieChartComponent, PieChartData } from "@/components/chart/pie-chart";
 import { Separator } from "@/components/ui/separator";
@@ -65,6 +66,11 @@ export default function Dashboard() {
               Keep Track, Assess, and Enhance Your Financial Performance
             </p>
           </section>
+        </div>
+        <div className="sticky top-0 right-2">
+          <CreateDialog 
+            creation="Transaction"
+          />
         </div>
       </header>
       <main
