@@ -1,6 +1,5 @@
 import {
   ExpenseForm,
-  ExpenseFormSchema,
 } from "@/app/create-dialog/expense-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,13 +11,14 @@ import {
 } from "@/components/ui/sheet";
 import { parseDate } from "@/lib/dateUtil";
 import { Expense } from "@/types/expense";
+import { TransactionFormSchema } from "@/types/form-schema/transaction";
 import { Row } from "@tanstack/react-table";
 import { z } from "zod";
 
 interface EditExpenseSheetProps {
   editSheetOpen: boolean;
   setEditSheetOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onSubmit: (data: z.infer<typeof ExpenseFormSchema>) => void;
+  onSubmit: (data: z.infer<typeof TransactionFormSchema>) => void;
   row: Row<Expense>;
 }
 

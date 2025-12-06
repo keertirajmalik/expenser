@@ -1,7 +1,7 @@
-import { CategoryFormSchema } from "@/app/create-dialog/category-form";
 import { apiRequest } from "@/lib/apiRequest";
 import { showToast } from "@/lib/showToast";
 import { Category } from "@/types/category";
+import { CategoryFormSchema } from "@/types/form-schema/category";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 

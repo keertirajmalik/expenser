@@ -1,7 +1,7 @@
-import { IncomeFormSchema } from "@/app/create-dialog/income-form";
 import { apiRequest } from "@/lib/apiRequest";
 import { showToast } from "@/lib/showToast";
 import { Income } from "@/types/income";
+import { TransactionFormSchema } from "@/types/form-schema/transaction";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { z } from "zod";
@@ -21,7 +21,7 @@ export const useCreateIncomeMutation = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: z.infer<typeof IncomeFormSchema>) => {
+    mutationFn: async (data: z.infer<typeof TransactionFormSchema>) => {
       const incomeData = {
         ...data,
         amount: parseFloat(data.amount),
@@ -48,7 +48,7 @@ export const useUpdateIncomeMutation = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: {
-      income: z.infer<typeof IncomeFormSchema>;
+      income: z.infer<typeof TransactionFormSchema>;
       id: string;
     }) => {
       const incomeData = {

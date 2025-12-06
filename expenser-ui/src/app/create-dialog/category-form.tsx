@@ -16,23 +16,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { CategoryFormSchema } from "@/types/form-schema/category";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-export const CategoryFormSchema = z.object({
-  name: z.string().nonempty({
-    message: "Expense category name is required.",
-  }),
-  type: z
-    .string({
-      error: "Please select a category type",
-    })
-    .refine((val) => ["Expense", "Investment", "Income"].includes(val), {
-      message: "Type must be either 'Expense' or 'Investment' or 'Income'",
-    }),
-  description: z.string(),
-});
 
 interface CategoryFormProps {
   onSubmit: (data: z.infer<typeof CategoryFormSchema>) => void;

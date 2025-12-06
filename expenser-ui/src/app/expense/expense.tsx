@@ -1,11 +1,12 @@
 import { CreateDialog } from "@/app/create-dialog/create-dialog";
 import { columns } from "@/app/expense/column";
 import { DataTable } from "@/components/data-table/data-table";
+import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGetExpensesQuery } from "@/hooks/use-expense-query";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Separator } from "@radix-ui/react-separator";
+import { TransactionType } from "@/types/transaction";
 
 export default function Expense() {
   const { data } = useGetExpensesQuery();
@@ -34,11 +35,7 @@ export default function Expense() {
           </section>
         </div>
         <div className="sticky top-0 right-2">
-          <CreateDialog
-            creation="Expense"
-            title="Create Expense"
-            description="Provide information regarding expense."
-          />
+          <CreateDialog creation={TransactionType.Expense} />
         </div>
       </header>
       <main
