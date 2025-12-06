@@ -15,7 +15,6 @@ import { CreateTransactionForm } from "./create-transaction-form"; // path where
 interface CreateDialogProps {
   creation: TransactionType;
   initialData?: TransactionFormValues;
-  trigger?: React.ReactNode | null;
 }
 
 export function CreateDialog({ creation, initialData }: CreateDialogProps) {

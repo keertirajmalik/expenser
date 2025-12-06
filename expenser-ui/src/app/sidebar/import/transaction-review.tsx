@@ -40,38 +40,53 @@ export default function TransactionReviewPage({
     }
     setCount(api.scrollSnapList().length);
     setCurrent(api.selectedScrollSnap() + 1);
-    api.on("select", () => {
+    const onSelect = () => {
       setCurrent(api.selectedScrollSnap() + 1);
-    });
+    };
+    api.on("select", onSelect);
+    return () => {
+      api.off("select", onSelect);
+    };
   }, [api]);
 
   const removeIndex = (index: number) => {
     setItems((prev) => prev.filter((_, i) => i !== index));
-    if (count - 1 === 0) handleCloseReview();
-    setCount(count - 1);
-    if (count === current) setCurrent(current - 1);
+    setCount((prevCount) => {
+      const newCount = prevCount - 1;
+      if (newCount === 0) handleCloseReview();
+      return newCount;
+    });
+    setCurrent((prevCurrent) => {
+      // Adjust if we're removing the last item we were viewing
+      return prevCurrent > items.length - 1 ? prevCurrent - 1 : prevCurrent;
+    });
   };
 
   const handleCompleted = (index: number) => {
     removeIndex(index);
-    showToast("Transaction saved ✅", "default");
+    showToast("Transaction saved ✅", "", "default");
   };
 
   const handleCancel = (index: number) => {
     removeIndex(index);
-    showToast("Skipped this transaction ❌", "default");
+    showToast("Skipped this transaction ❌", "", "default");
   };
 
-  if (items.length === 0) {
-    showToast("No more transactions 🎉", "default");
-  }
+  useEffect(() => {
+    if (items.length === 0) {
+      showToast("No more transactions 🎉", "default");
+    }
+  }, [items.length]);
 
   return (
     <div className="flex-col items-center justify-center">
       <Carousel setApi={setApi} className="w-full max-w-md relative">
         <CarouselContent>
           {items.map((tx, index) => (
-            <CarouselItem key={index} className="w-full basis-full">
+            <CarouselItem
+              key={`${tx.name}-${tx.date}-${tx.amount}`}
+              className="w-full basis-full"
+            >
               <div className="p-2 w-full">
                 <Card>
                   <CardContent className="p-4 space-y-4">

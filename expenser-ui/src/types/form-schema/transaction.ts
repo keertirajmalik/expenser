@@ -1,4 +1,4 @@
-import { z } from "zod"; 
+import { z } from "zod";
 
 export const TransactionFormSchema = z.object({
   name: z.string().nonempty({
@@ -21,7 +21,9 @@ export const TransactionFormSchema = z.object({
   date: z.date({
     error: "Date is required.",
   }),
-  note: z.string(),
+  note: z.string().max(100, {
+    message: "Note must be at most 100 characters.",
+  }),
 });
 
 export type TransactionFormValues = z.infer<typeof TransactionFormSchema>;

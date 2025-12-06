@@ -33,10 +33,9 @@ import { format } from "date-fns";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 interface ExpenseFormProps {
-  onSubmit: (data: z.infer<typeof TransactionFormSchema>) => void;
+  onSubmit: (data: TransactionFormValues) => void;
   initialData?: TransactionFormValues;
 }
 
@@ -45,7 +44,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
 
-  const form = useForm<z.infer<typeof TransactionFormSchema>>({
+  const form = useForm<TransactionFormValues>({
     resolver: zodResolver(TransactionFormSchema),
     defaultValues: initialData || {
       name: "",

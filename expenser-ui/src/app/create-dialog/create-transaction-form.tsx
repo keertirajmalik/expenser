@@ -84,14 +84,14 @@ export function CreateTransactionForm({
   let formComponent: React.ReactNode;
 
   switch (transactionType) {
-    case "Category":
+    case TransactionType.Category:
       title = "Create Expense Category";
       description = "Provide information regarding expense category.";
       defaultValue = undefined;
       formComponent = <CategoryForm onSubmit={onCategorySubmit} />;
       break;
 
-    case "Expense":
+    case TransactionType.Expense:
       title = "Create Expense";
       description = "Provide information regarding your expense.";
       defaultValue = "expense";
@@ -105,7 +105,7 @@ export function CreateTransactionForm({
       );
       break;
 
-    case "Investment":
+    case TransactionType.Investment:
       title = "Create Investment";
       description = "Provide information regarding your investment.";
       defaultValue = "investment";
@@ -119,7 +119,7 @@ export function CreateTransactionForm({
       );
       break;
 
-    case "Income":
+    case TransactionType.Income:
       title = "Create Income";
       description = "Provide information regarding your income.";
       defaultValue = "income";
@@ -147,12 +147,11 @@ export function CreateTransactionForm({
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
 
-      <div className="space-y-2">
-        <Label required className="pb-1">
-          Transaction type
-        </Label>
-
-        {creation !== "Category" && (
+      {creation !== TransactionType.Category && (
+        <div className="space-y-2">
+          <Label required className="pb-1">
+            Transaction type
+          </Label>
           <Select
             defaultValue={defaultValue}
             onValueChange={(value) => {
@@ -176,8 +175,8 @@ export function CreateTransactionForm({
               </SelectGroup>
             </SelectContent>
           </Select>
-        )}
-      </div>
+        </div>
+      )}
 
       {formComponent}
       <Button

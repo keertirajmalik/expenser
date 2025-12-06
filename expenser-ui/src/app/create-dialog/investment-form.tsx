@@ -1,42 +1,41 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
 } from "@/components/ui/command";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { useGetCategoryQuery } from "@/hooks/use-category-query";
 import { useCurrencyFormat } from "@/hooks/use-currency-format";
 import { cn } from "@/lib/utils";
 import { Category, CategoryType } from "@/types/category";
-import { TransactionFormSchema } from "@/types/form-schema/transaction";
+import { TransactionFormSchema, TransactionFormValues } from "@/types/form-schema/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 interface InvestmentFormProps {
-  onSubmit: (data: z.infer<typeof TransactionFormSchema>) => void;
+  onSubmit: (data: TransactionFormValues) => void;
   initialData?: {
     name: string;
     category: string;
@@ -51,7 +50,7 @@ export function InvestmentForm({ initialData, onSubmit }: InvestmentFormProps) {
   const [openCalendar, setOpenCalendar] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
 
-  const form = useForm<z.infer<typeof TransactionFormSchema>>({
+  const form = useForm<TransactionFormValues>({
     resolver: zodResolver(TransactionFormSchema),
     defaultValues: initialData || {
       name: "",

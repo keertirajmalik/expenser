@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { TransactionType } from "@/types/transaction";
-import TransactionImportPage from "./transaction-import";
-import TransactionReviewPage from "./transacation-review";
+import TransactionImportPage from "@/app/sidebar/import/transaction-import";
+import TransactionReviewPage from "@/app/sidebar/import/transaction-review";
 
 type ApiTransaction = {
   name: string;
