@@ -85,8 +85,8 @@ export function CreateTransactionForm({
 
   switch (transactionType) {
     case TransactionType.Category:
-      title = "Create Expense Category";
-      description = "Provide information regarding expense category.";
+      title = "Create Category";
+      description = "Provide information regarding category.";
       defaultValue = undefined;
       formComponent = <CategoryForm onSubmit={onCategorySubmit} />;
       break;
@@ -96,12 +96,7 @@ export function CreateTransactionForm({
       description = "Provide information regarding your expense.";
       defaultValue = "expense";
       formComponent = (
-        <ExpenseForm
-          onSubmit={onExpenseSubmit}
-          initialData={
-            initialData as z.infer<typeof TransactionFormSchema> | undefined
-          }
-        />
+        <ExpenseForm onSubmit={onExpenseSubmit} initialData={initialData} />
       );
       break;
 
@@ -112,9 +107,7 @@ export function CreateTransactionForm({
       formComponent = (
         <InvestmentForm
           onSubmit={onInvestmentSubmit}
-          initialData={
-            initialData as z.infer<typeof TransactionFormSchema> | undefined
-          }
+          initialData={initialData}
         />
       );
       break;
@@ -124,12 +117,7 @@ export function CreateTransactionForm({
       description = "Provide information regarding your income.";
       defaultValue = "income";
       formComponent = (
-        <IncomeForm
-          onSubmit={onIncomeSubmit}
-          initialData={
-            initialData as z.infer<typeof TransactionFormSchema> | undefined
-          }
-        />
+        <IncomeForm onSubmit={onIncomeSubmit} initialData={initialData} />
       );
       break;
 

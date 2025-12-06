@@ -50,16 +50,15 @@ export default function TransactionReviewPage({
   }, [api]);
 
   const removeIndex = (index: number) => {
-    setItems((prev) => prev.filter((_, i) => i !== index));
-    setCount((prevCount) => {
-      const newCount = prevCount - 1;
-      if (newCount === 0) handleCloseReview();
-      return newCount;
+    setItems((prev) => {
+      const newItems = prev.filter((_, i) => i !== index);
+      if (newItems.length === 0) handleCloseReview();
+      return newItems;
     });
-    setCurrent((prevCurrent) => {
-      // Adjust if we're removing the last item we were viewing
-      return prevCurrent > items.length - 1 ? prevCurrent - 1 : prevCurrent;
-    });
+    setCount((prevCount) => prevCount - 1);
+    setCurrent((prevCurrent) =>
+      prevCurrent > index ? prevCurrent - 1 : prevCurrent,
+    );
   };
 
   const handleCompleted = (index: number) => {
@@ -74,7 +73,7 @@ export default function TransactionReviewPage({
 
   useEffect(() => {
     if (items.length === 0) {
-      showToast("No more transactions 🎉", "default");
+      showToast("No more transactions 🎉", "", "default");
     }
   }, [items.length]);
 
