@@ -155,12 +155,7 @@ export function DataTable<TData, TValue>({
                       {detailCells.map((cell) => {
                         const header = cell.column.columnDef.header;
                         const headerText =
-                          typeof header === "string"
-                            ? header
-                            : typeof header === "function"
-                              ? ""
-                              : "";
-
+                          typeof header === "string" ? header : "";
                         return (
                           <div key={cell.id} className="flex py-3 sm:px-6">
                             <span className="text-sm font-medium w-28 sm:w-36 shrink-0">
