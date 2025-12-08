@@ -53,7 +53,7 @@ export const columns: ColumnDef<Category>[] = [
 
       return (
         <>
-          <div className="flex items-center h-8 flex-row gap-4">
+          <div className="flex items-center justify-end h-8 flex-row gap-4">
             <Pencil
               onClick={() => setEditSheetOpen(true)}
               size="20px"
