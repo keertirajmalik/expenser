@@ -32,7 +32,7 @@ function AuthRoutes() {
 function MainRoutes() {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar variant="floating" />
       <SidebarInset>
         <div className="flex flex-1 flex-col pt-0">
           <Routes>

@@ -1,6 +1,5 @@
 import {
   CategoryForm,
-  CategoryFormSchema,
 } from "@/app/create-dialog/category-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +10,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Category } from "@/types/category";
+import { CategoryFormSchema } from "@/types/form-schema/category";
 import { Row } from "@tanstack/react-table";
 import { z } from "zod";
 
@@ -49,7 +49,7 @@ export function EditCategorySheet({
         <Button
           type="reset"
           variant="secondary"
-          className="w-full my-4"
+          className="mx-2"
           onClick={() => setEditSheetOpen(false)}
         >
           Cancel

@@ -1,6 +1,5 @@
 import {
   InvestmentForm,
-  InvestmentFormSchema,
 } from "@/app/create-dialog/investment-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,13 +11,14 @@ import {
 } from "@/components/ui/sheet";
 import { parseDate } from "@/lib/dateUtil";
 import { Investment } from "@/types/investment";
+import { TransactionFormSchema } from "@/types/form-schema/transaction";
 import { Row } from "@tanstack/react-table";
 import { z } from "zod";
 
 interface EditInvestmentSheetProps {
   editSheetOpen: boolean;
   setEditSheetOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onSubmit: (data: z.infer<typeof InvestmentFormSchema>) => void;
+  onSubmit: (data: z.infer<typeof TransactionFormSchema>) => void;
   row: Row<Investment>;
 }
 
@@ -51,7 +51,7 @@ export function EditInvestmentSheet({
         <Button
           type="button"
           variant="secondary"
-          className="w-full my-4"
+          className="mx-2"
           onClick={() => setEditSheetOpen(false)}
         >
           Cancel

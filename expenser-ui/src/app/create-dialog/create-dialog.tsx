@@ -1,114 +1,44 @@
-import {
-  CategoryForm,
-  CategoryFormSchema,
-} from "@/app/create-dialog/category-form";
-import {
-  ExpenseForm,
-  ExpenseFormSchema,
-} from "@/app/create-dialog/expense-form";
-import { IncomeForm, IncomeFormSchema } from "@/app/create-dialog/income-form";
-import {
-  InvestmentForm,
-  InvestmentFormSchema,
-} from "@/app/create-dialog/investment-form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useCreateCategoryMutation } from "@/hooks/use-category-query";
-import { useCreateExpenseMutation } from "@/hooks/use-expense-query";
-import { useCreateIncomeMutation } from "@/hooks/use-income-query";
-import { useCreateInvestmentMutation } from "@/hooks/use-investment-query";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { z } from "zod";
+import { TransactionType } from "@/types/transaction";
+import { TransactionFormValues } from "@/types/form-schema/transaction";
+import { CreateTransactionForm } from "./create-transaction-form"; // path where you put it
 
 interface CreateDialogProps {
-  creation: "Expense" | "Category" | "Investment" | "Income";
-  title: string;
-  description: string;
+  creation: TransactionType;
+  initialData?: TransactionFormValues;
 }
 
-export function CreateDialog({
-  creation: creationCategory,
-  title,
-  description,
-}: CreateDialogProps) {
+export function CreateDialog({ creation, initialData }: CreateDialogProps) {
   const [open, setOpen] = useState(false);
-
-  const createExpenseMutation = useCreateExpenseMutation();
-  const onExpenseSubmit = (data: z.infer<typeof ExpenseFormSchema>) => {
-    createExpenseMutation.mutate(data, {
-      onSuccess: () => {
-        setOpen(false);
-      },
-    });
-  };
-
-  const createCategoryMutation = useCreateCategoryMutation();
-  const onCategorySubmit = (data: z.infer<typeof CategoryFormSchema>) => {
-    createCategoryMutation.mutate(data, {
-      onSuccess: () => {
-        setOpen(false);
-      },
-    });
-  };
-
-  const createInvestmentMutation = useCreateInvestmentMutation();
-  const onInvestmentSubmit = (data: z.infer<typeof InvestmentFormSchema>) => {
-    createInvestmentMutation.mutate(data, {
-      onSuccess: () => {
-        setOpen(false);
-      },
-    });
-  };
-
-  const createIncomeMutation = useCreateIncomeMutation();
-  const onIncomeSubmit = (data: z.infer<typeof IncomeFormSchema>) => {
-    createIncomeMutation.mutate(data, {
-      onSuccess: () => {
-        setOpen(false);
-      },
-    });
-  };
-
-  let formComponent;
-  switch (creationCategory) {
-    case "Expense":
-      formComponent = <ExpenseForm onSubmit={onExpenseSubmit} />;
-      break;
-    case "Category":
-      formComponent = <CategoryForm onSubmit={onCategorySubmit} />;
-      break;
-    case "Investment":
-      formComponent = <InvestmentForm onSubmit={onInvestmentSubmit} />;
-      break;
-    case "Income":
-      formComponent = <IncomeForm onSubmit={onIncomeSubmit} />;
-      break;
-    default:
-      formComponent = null;
-  }
+  const buttonName = creation;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="default">
-          <Plus />
-          Create {creationCategory}
+          <Plus className="mr-2 h-4 w-4" />
+          Create {buttonName}
         </Button>
       </DialogTrigger>
+
       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
-        </DialogHeader>
-        {formComponent}
+        <DialogTitle hidden={true} />
+        <DialogDescription hidden={true} />
+        <CreateTransactionForm
+          creation={creation}
+          initialData={initialData}
+          onCompleted={() => setOpen(false)}
+          onCancel={() => setOpen(false)}
+        />
       </DialogContent>
     </Dialog>
   );

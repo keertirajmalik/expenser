@@ -27,55 +27,25 @@ import { useGetCategoryQuery } from "@/hooks/use-category-query";
 import { useCurrencyFormat } from "@/hooks/use-currency-format";
 import { cn } from "@/lib/utils";
 import { Category, CategoryType } from "@/types/category";
+import { TransactionFormSchema, TransactionFormValues } from "@/types/form-schema/transaction";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 interface ExpenseFormProps {
-  onSubmit: (data: z.infer<typeof ExpenseFormSchema>) => void;
-  initialData?: {
-    name: string;
-    category: string;
-    amount: string;
-    date: Date;
-    note: string;
-  };
+  onSubmit: (data: TransactionFormValues) => void;
+  initialData?: TransactionFormValues;
 }
-
-export const ExpenseFormSchema = z.object({
-  name: z.string().nonempty({
-    message: "Expense name is required.",
-  }),
-  category: z.string().nonempty({
-    message: "Expense category is required.",
-  }),
-  amount: z
-    .string()
-    .nonempty({ message: "Expense amount is required." })
-    .transform((val) => val.replace(/[^0-9.]/g, "")) // Remove currency formatting
-    .refine((val) => /^(?:\d{1,15}|\d{1,15}\.\d{1,4})$/.test(val), {
-      message:
-        "Amount must be a positive number with up to 4 decimal places (max 15 digits).",
-    })
-    .refine((val) => parseFloat(val) > 0, {
-      message: "Amount must be greater than 0.",
-    }),
-  date: z.date({
-    error: "Expense date is required.",
-  }),
-  note: z.string(),
-});
 
 export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
   const [openCategory, setOpenCategory] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState<Category[]>([]);
 
-  const form = useForm<z.infer<typeof ExpenseFormSchema>>({
-    resolver: zodResolver(ExpenseFormSchema),
+  const form = useForm<TransactionFormValues>({
+    resolver: zodResolver(TransactionFormSchema),
     defaultValues: initialData || {
       name: "",
       category: "",
@@ -119,7 +89,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="px-2 space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -241,7 +211,7 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="p-2" align="start">
                   <Calendar
                     mode="single"
                     selected={field.value}
@@ -253,7 +223,9 @@ export function ExpenseForm({ initialData, onSubmit }: ExpenseFormProps) {
                     disabled={(date) =>
                       date > new Date() || date < new Date("1900-01-01")
                     }
-                    initialFocus
+                    className="w-auto rounded-lg border"
+                    captionLayout="dropdown"
+                    autoFocus
                   />
                 </PopoverContent>
               </Popover>

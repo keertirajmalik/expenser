@@ -1,4 +1,4 @@
-import { IncomeForm, IncomeFormSchema } from "@/app/create-dialog/income-form";
+import { IncomeForm } from "@/app/create-dialog/income-form";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -8,6 +8,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { parseDate } from "@/lib/dateUtil";
+import { TransactionFormSchema } from "@/types/form-schema/transaction";
 import { Income } from "@/types/income";
 import { Row } from "@tanstack/react-table";
 import { z } from "zod";
@@ -15,7 +16,7 @@ import { z } from "zod";
 interface EditIncomeSheetProps {
   editSheetOpen: boolean;
   setEditSheetOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onSubmit: (data: z.infer<typeof IncomeFormSchema>) => void;
+  onSubmit: (data: z.infer<typeof TransactionFormSchema>) => void;
   row: Row<Income>;
 }
 
@@ -48,7 +49,7 @@ export function EditIncomeSheet({
         <Button
           type="button"
           variant="secondary"
-          className="w-full my-4"
+          className="mx-2"
           onClick={() => setEditSheetOpen(false)}
         >
           Cancel

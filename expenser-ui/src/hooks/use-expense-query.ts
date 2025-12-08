@@ -1,7 +1,7 @@
-import { ExpenseFormSchema } from "@/app/create-dialog/expense-form";
 import { apiRequest } from "@/lib/apiRequest";
 import { showToast } from "@/lib/showToast";
 import { Expense } from "@/types/expense";
+import { TransactionFormSchema } from "@/types/form-schema/transaction";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { z } from "zod";
@@ -21,7 +21,7 @@ export const useCreateExpenseMutation = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (data: z.infer<typeof ExpenseFormSchema>) => {
+    mutationFn: async (data: z.infer<typeof TransactionFormSchema>) => {
       const expenseData = {
         ...data,
         amount: parseFloat(data.amount),
@@ -48,7 +48,7 @@ export const useUpdateExpenseMutation = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: {
-      expense: z.infer<typeof ExpenseFormSchema>;
+      expense: z.infer<typeof TransactionFormSchema>;
       id: string;
     }) => {
       const expenseData = {

@@ -1,10 +1,11 @@
 import { CreateDialog } from "@/app/create-dialog/create-dialog";
 import { columns } from "@/app/investment/column";
 import { DataTable } from "@/components/data-table/data-table";
+import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useGetInvestmentQuery } from "@/hooks/use-investment-query";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Separator } from "@radix-ui/react-separator";
+import { TransactionType } from "@/types/transaction";
 
 export default function Investment() {
   const { data } = useGetInvestmentQuery();
@@ -33,11 +34,7 @@ export default function Investment() {
           </section>
         </div>
         <div className="sticky top-0 right-2">
-          <CreateDialog
-            creation="Investment"
-            title="Create Investment"
-            description="Provide information regarding your investment."
-          />
+          <CreateDialog creation={TransactionType.Investment} />
         </div>
       </header>
       <main className="flex flex-1 w-full justify-center py-4" role="main">
