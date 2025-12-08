@@ -49,7 +49,7 @@ export function EditIncomeSheet({
         <Button
           type="button"
           variant="secondary"
-          className="w-full my-4"
+          className="mx-2"
           onClick={() => setEditSheetOpen(false)}
         >
           Cancel
