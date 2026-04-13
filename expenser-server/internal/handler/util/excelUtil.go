@@ -48,48 +48,60 @@ func ReadExcelFile(filename string) ([]model.BulkTransaction, error) {
 		return nil, errors.New("excel file contains no rows")
 	}
 
-	//check for the table titles
-	expectedHeader := "Serial Number Transaction Date Transaction Remark CR/DR Amount(INR)"
-	actualHeader := strings.Join(rows[0], " ")
-	if !strings.Contains(actualHeader, expectedHeader) {
-		logger.Error("remove the extra cell from sheet till the transaction table header", map[string]any{
-			"error":  "file has additional cells on top of transactions table keep only the transaction details table",
-			"header": rows[0],
-		})
-		return nil, errors.New("remove the extra cell from sheet till the transaction table header keep only the transaction table")
-	}
-
 	var transactions []model.BulkTransaction
 
-	for _, row := range rows[1:] {
+	for _, row := range rows {
 		// skip empty/trailing rows
 		if len(row) == 0 || strings.TrimSpace(strings.Join(row, "")) == "" {
 			continue
 		}
-		if len(row) < 5 {
-			logger.Error("remove the extra cell in sheet from the bottom of transaction table", map[string]any{
-				"error": "file has additional cells on bottom of transaction table ",
-				"row":   row,
-			})
+		if len(row) < 8 {
+			logger.Info("remove the extra row in sheet other than transaction table")
 			continue
 		}
 
-		amount, err := decimal.NewFromString(strings.SplitAfter(strings.ReplaceAll(row[4], ",", ""), " ")[1])
+		expectedHeader := "S No. Value Date Transaction Date Cheque Number Transaction Remarks Withdrawal Amount(INR) Deposit Amount(INR) Balance(INR)"
+		actualHeader := strings.Join(row, " ")
+
+		if strings.Contains(actualHeader, expectedHeader) {
+			continue
+		}
+
+		debitAmount, err := decimal.NewFromString(row[6])
 		if err != nil {
 			logger.Error("unable to parse amount", map[string]any{
 				"error":    err.Error(),
-				"cell":     row[4],
+				"cell":     row[6],
 				"filename": filename,
 			})
 			return nil, errors.New("unable to parse amount; expected like: INR 5,000.00")
 		}
 
-		transactionType := strings.ToLower(strings.Trim(strings.TrimSpace(row[3]), "."))
+		creditAmount, err := decimal.NewFromString(row[7])
+		if err != nil {
+			logger.Error("unable to parse amount", map[string]any{
+				"error":    err.Error(),
+				"cell":     row[7],
+				"filename": filename,
+			})
+			return nil, errors.New("unable to parse amount; expected like: INR 5,000.00")
+		}
+
+		var debitTransactionType bool
+		var amount decimal.Decimal
+
+		if debitAmount.Equal(decimal.NewFromFloat32(0.00)) {
+			debitTransactionType = false
+			amount = creditAmount
+		} else {
+			debitTransactionType = true
+			amount = debitAmount
+		}
 
 		transaction := model.BulkTransaction{
-			Name:    strings.TrimSpace(row[2]),
-			Date:    strings.TrimSpace(row[1]),
-			Expense: transactionType == "dr",
+			Name:    strings.TrimSpace(row[5]),
+			Date:    strings.TrimSpace(row[2]),
+			Expense: debitTransactionType,
 			Amount:  amount,
 		}
 		transactions = append(transactions, transaction)

@@ -18,7 +18,7 @@ watch:
 	fi
 
 # Create DB container
-docker-run:
+start-db:
 	@if docker compose up db -d --build 2>/dev/null; then \
 		: ; \
 	else \
@@ -39,7 +39,7 @@ docker-run:
 
 
 # Shutdown DB container
-docker-down:
+stop-db:
 	@echo "Running database migrations..."
 	@goose postgres "user=${DB_USERNAME} dbname=${DB_DATABASE} sslmode=disable host=localhost password=${DB_PASSWORD}" -dir internal/database/schema reset
 	@if docker compose down db 2>/dev/null; then \
@@ -49,4 +49,4 @@ docker-down:
 		docker-compose down db; \
 	fi
 
-.PHONY: watch docker-run docker-down
+.PHONY: watch start-db stop-db
